@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="%PUBLIC_URL%/favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta
+      name="description"
+      content="Web site created using create-react-app"
+    />
+
+ 
+    <title>Team Asia</title>
+    <style>
+      .mybtncustomer {
+        margin-right:5px;
+      }
+      .my-btn-color{
+        background-color:#5b9395 !important;
+        color:white !important;
+      }
+      .my-btn-color:hover{
+        background-color:#1b5557 !important;
+        color:white !important;
+        border-color: #5b9395 !important;
+      }
+      .my-btn-color-blue{
+        background-color:#00c2f8 !important;
+        color:white !important;
+      }
+      .my-btn-color-blue:hover{
+        background-color:#289cbc !important;
+        color:white !important;
+        border-color: #00c2f8 !important;
+
+      }
+      .my-btn-color-yellow{
+        background-color: #F3BB45 !important;
+        color: #FFFFFF !important;
+        border-color: #ccb05d !important;
+      }
+      .my-btn-color-yellow:hover{
+        background-color: #BB992F !important;
+        color: #FFFFFF !important;
+        border-color: #BB992F !important;
+      }
+      .my-btn-color-red{
+        background-color: #EB5E28 !important;
+        color: #FFFFFF !important;
+        opacity: 1 !important;
+      }
+      .my-btn-color-red:hover{
+        background-color: #EB5E28 !important;
+        color: rgba(255, 255, 255, 0.8) !important;
+        border-color: #EB5E28 !important;
+      }
+      .my-btn-color-green{
+        background-color: #2a6344 !important;
+        color: #FFFFFF !important;
+        opacity: 1 !important;
+      }
+      .my-btn-color-green:hover{
+        background-color: #134429 !important;
+        color: rgba(255, 255, 255, 0.8) !important;
+        border-color: #2e483a !important;
+      }
+      .my-btn-color-white{
+        background-color: #f3f1f0 !important;
+        color: rgba(0, 0, 0) !important;
+        border-color: #66615B !important;
+      }
+      .my-btn-color-white:hover{
+        background-color: #66615B !important;
+        color: rgba(255, 255, 255, 0.7) !important;
+        border-color: #66615B !important;
+      }
+      .sidebarIcon i{
+        font-size: 16px !important;
+        font-weight: 900 !important;
+        /* color:#66615B !important; */
+      }
+      .mybtncustomer i{
+        font-size: 16px !important;
+      }
+      .my-pen-color{
+        color: #45d385 !important;
+      }
+      .my-eye-color{
+        color: #00abdb !important;
+
+      }
+      .my-geo-color{
+        color: #7b8282 !important;
+
+      }
+      .my-list-color{
+        color: #ff0000 !important;
+      }
+      .my-trash-color{
+        color: #F3BB45 !important;
+      }
+      .my-bell-color{
+        color: #f34500 !important;
+
+      }
+      .my-printer-color{
+        color: #4d4242 !important;
+      }
+      .my-calander-color{
+        color: #3e7b59 !important;
+      }
+      thead, tbody, tfoot, tr, th{
+        border-style: solid;
+       border-width: 1px !important;
+      }
+      .table-title{
+        font-size: 18px;
+      }
+      .noborder{
+        border:none !important;
+      }
+      .nobordertop{
+        border:none !important;
+      }
+      .my-btn-mo-color{
+        background-color:#403D39 !important;
+        color:white !important;
+      }
+      .table-margin-zero{
+        margin-bottom: 4px !important;
+      }
+
+      .table-margin{
+         margin-bottom: 20px;
+      }
+      .progress_bar_color{
+        width:300px !important;
+        height:25px !important;
+      }
+      .progress_bar_color1{
+        width:100% !important;
+        height:20px !important;
+      }
+      .date-cell {
+          white-space: nowrap;
+        }
+
+        .table-size-x{
+          font-size:12px;
+        }
+        .table-size-x-button .table-size-x-button-row{
+          display: flex;
+          width:215px !important;
+          justify-content: space-between;
+        }
+        .table-size-x-button  button{
+          padding: 2px !important;
+        }
+        .table-size-x-button button i{
+          font-size: 15px !important;
+        }
+        .fix-wid{
+          overflow: hidden;
+          width: 80px !important;
+          white-space:nowrap;
+          text-overflow: ellipsis; 
+        }
+        .fix-wid-1{
+          overflow: hidden;
+          width: 125px !important;
+          white-space:nowrap;
+          text-overflow: ellipsis; 
+        }
+        .my-table .heading{
+          /* background-color: rgb(80, 223, 24); */
+           width:60px;
+           overflow: hidden;
+           /* white-space: nowrap; */
+           text-overflow: ellipsis;
+           margin:0px 10px;
+           position: relative;
+        }
+        .tooltip-container{
+          /* background-color: red; */
+          width: 60px;
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          margin: 0 10px;
+          cursor: default; 
+          position: relative;
+        }
+        
+        .my-tooltip{
+          visibility: hidden;
+          width: auto;
+          background-color: black;
+          color: #ffffff;
+          text-align: center;
+          padding: 5px 10px;
+          border-radius: 6px;
+          position: absolute;
+          z-index: 1;
+          /* bottom: 100%; */
+          left: 50%;
+          margin-left: -50px; 
+          opacity: 0;
+          transition: opacity 0.3s;
+          }
+
+          .tooltip-container:hover .my-tooltip {
+            visibility: visible;
+            opacity: 1;
+            z-index: 1;
+          }
+         
+          .order-table-button button{
+            font-size: 12px;
+            padding: 5px 2px !important;
+            margin-right: 3px;
+            margin-bottom: 5px;
+          }
+         .order-view-page-flex{
+            display: flex;
+            flex-wrap: wrap;
+         }
+         .order-view-page-flex div{
+          width:33.33%;
+          white-space: nowrap;
+         }
+         .order-view-page-flex div i{
+           font-size:15px;
+           margin-right:5px
+         } 
+         @media only screen and (max-width:768px) {
+          .order-view-page-flex{
+            flex-direction: column;
+          }
+         }
+         .order-background{
+          background:#ebeff3 !important;
+         }
+         .order-history{
+          display:'flex';
+          flex-direction:'column'
+         }
+         .ledger-btn-margin{
+           margin-bottom: 4px;
+           margin-right:3px;
+         }
+         .order-page-table tr td{
+          width: 6rem !important;
+          max-width: 115px !important; 
+          overflow: hidden !important; 
+          text-Overflow:ellipsis !important; 
+          white-space: nowrap !important;
+         }
+         .order-page-table tr th{
+          width: 6rem !important;
+          max-width: 160px !important; 
+          overflow: hidden !important; 
+          text-Overflow:ellipsis !important; 
+          white-space: nowrap !important;
+          border: none !important;
+         }
+         
+         .order-page-table tr th button{
+            font-size: 12px;
+            padding: 2px 2px !important;
+            margin-right: 3px;
+            margin-bottom: 5px;
+         }
+         .role-page-blocks{
+          margin-bottom: 20px;
+         }
+         .role-page-blocks label{
+          margin-bottom: 20px;
+          color:#134429 ;
+          font-weight: 450 !important;
+         }
+         .role-page-blocks input{
+          margin-bottom: 20px;
+          color:#134429 ;
+          font-weight: 450 !important;
+          border: 2px solid green;
+          margin-right:5px;
+         }
+         .role-page-blocks > div:first-child{
+          margin-bottom: 15px;
+          font-size: 20px;
+          font-weight: 500;
+         }
+         .QapViewtable th,td{
+           /* white-space: nowrap; */
+         }
+         .stockmanagementtable th{
+           padding-left:10px !important;
+         }
+        .my-bg-alice{
+          background-color:aliceblue;
+        }
+    </style>
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+  </body>
+</html>
+
+      		
+        
+        	
