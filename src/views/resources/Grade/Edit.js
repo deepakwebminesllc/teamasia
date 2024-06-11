@@ -186,7 +186,7 @@ const validateForm=()=>{
                      type="text" 
                      name="name" 
                      id="name" 
-                     placeholder="Enter name" 
+                     placeholder="Enter" 
                      value={formDatas.name}
                      onChange={handleChange} 
                       className={errors.name ? "is-invalid":""}
@@ -201,7 +201,7 @@ const validateForm=()=>{
                       type="text" 
                       name="DiscountPercentage" 
                       id="name" 
-                      placeholder="Enter name" 
+                      placeholder="Enter" 
                       value={formDatas.DiscountPercentage}
                       onChange={handleChange} 
                       className={errors.DiscountPercentage ? "is-invalid":""}

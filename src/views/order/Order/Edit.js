@@ -25,7 +25,7 @@ import Product from './Products';
 import DashCard from '../../../components/dashboard/dashboardCards/DashCard';
 // import ComponentCard from '../../components/ComponentCard';
 
-const Add = () => {
+const Edit = () => {
   const navigate= useNavigate();
   const location = useLocation();
   const 
@@ -41,20 +41,24 @@ const Add = () => {
     image_id:imageId,
     purchase_order_document_file_path:purchaseOrderDocumentFilePath,
     representative_id:representativeId,
-    customer_id:customerId
- } = location.state;
-const [data1, setData1] = useState([]);
-const [data, setData] = useState([]);
-const [data2, setData2] = useState([]);
-const [data3, setData3] = useState([]);
-const [firstcheck, setFirstCheck] = useState(false);
-const [secondcheck, setSecondCheck] = useState(false);
+    customer_id:customerId,
+    status_id:statusId
+ } = location.state.order;
+  
+  const {data1,data2,data3,data4,data5} = location.state;
+  const [SaverityData, setSaverityData] = useState([]);
+  const [CustomerData, setCustomerData] = useState([]);
+  const [AddressData, setAddressData] = useState([]);
+  const [AddressData1, setAddressData1] = useState([]);
+  const [firstcheck, setFirstCheck] = useState(false);
+  const [secondcheck, setSecondCheck] = useState(false);
+  const [errorMessageFromApi, setErrorMessageFromApi] = useState([]);
 
 
-const content1 = orderNotes;
 
 
-const contentFromHTML = stateFromHTML(content1);
+
+const contentFromHTML = stateFromHTML(orderNotes);
 
 console.log('convertFromRaw(content)',contentFromHTML ,EditorState.createWithContent(contentFromHTML));
 
@@ -79,6 +83,7 @@ console.log('convertFromRaw(content)',contentFromHTML ,EditorState.createWithCon
     imageId,
     purchaseOrderDocumentFilePath,
     representativeId,
+    statusId
   });
   
   const onContentStateChange = (c) => {
@@ -102,7 +107,7 @@ console.log('convertFromRaw(content)',contentFromHTML ,EditorState.createWithCon
 
 const handleChange = (e) => {
   const { name, value } = e.target;
-
+  console.log('name,value',name,value);
   setFormDataS(prevState => ({
     ...prevState,
     [name]: value
@@ -135,16 +140,19 @@ const checkboxclick1 = () => {
     }));
   }
   setFirstCheck(!firstcheck);
- 
 };
+
 const checkboxclick2 = () => {
   console.log('check',secondcheck);
   if(secondcheck){
-    setData3(data2);
+    setAddressData1(AddressData);
   }
   setSecondCheck(!secondcheck);
 };
 
+const closer =()=>{
+  setErrorMessageFromApi([]);
+}
 
   async function apiCall() {
     try {
@@ -156,7 +164,7 @@ const checkboxclick2 = () => {
           customer_id:formDatas.customerId,
           billing_address_id:formDatas.billingAddressId,
           delivery_address_id:formDatas.deliveryAddressId,
-          order_notes:formDatas.orderNotes,
+          order_notes:htmlContent,
           severity_id:formDatas.severityId,
           expected_delivery_date:formDatas.expectedDeliveryDate,
           purchase_order:formDatas.purchaseOrder,
@@ -177,31 +185,35 @@ const checkboxclick2 = () => {
               customer_id:formDatas.customerId,
               billing_address_id:formDatas.billingAddressId,
               delivery_address_id:formDatas.deliveryAddressId,
-              order_notes:formDatas.orderNotes,
+              order_notes:htmlContent,
               severity_id:formDatas.severityId,
               expected_delivery_date:formDatas.expectedDeliveryDate,
               purchase_order:formDatas.purchaseOrder,
+              image_id:formDatas.imageId,
+              purchase_order_document_file_path:formDatas.purchaseOrderDocumentFilePath,
               representative_id:formDatas.representativeId,
               is_trashed:0,
             }),
         });
 
         const dataZ = await response.json();
-        console.log("dataapi",dataZ)
-        if (response.ok) {
-
-
-          navigate('/order/orders');
-            
-        } 
-            // Handle any errors, such as showing an error message to the user
-            console.error("Authentication failed:", dataZ.message);
-            return null;
-      
-    } catch (error) {
-        console.error("Network error:", error);
+        console.log("dataapi",dataZ,response);
+        if (response.status === 200) {
+          
+            navigate(-1);
+        
+        } else {
+          console.error("Authentication failed:", Object.values(dataZ.messages.errors));
+          if (dataZ.error) {
+            setErrorMessageFromApi(Object.values(dataZ.messages.errors));
+          }
+        }  
         return null;
-    }
+      } catch (error) {
+        console.log('error',error);
+         setErrorMessageFromApi(["Network error"]);
+        return null;
+      }
 }
 
 
@@ -239,10 +251,10 @@ useEffect(()=>{
     const resultX = result.addresses.slice();
     resultX.push({id:'x',address_line_1:'Choose'});
     if(secondcheck){
-      setData3(resultX);
+      setAddressData1(resultX);
     }else{
-      setData2(resultX);
-      setData3(resultX);
+      setAddressData(resultX);
+      setAddressData1(resultX);
     }
   };
   fetchData2();
@@ -268,7 +280,7 @@ useEffect(()=>{
       const result = await response.json();
       console.log("data1 customers",result.customers);
       const resultX = result.customers.slice();
-      const sever = resultX.find(item => item.id === customerId);
+      const sever = resultX.find(item => item.id === formDatas.customerId);
       if(!sever){
         setFormDataS(prevState => ({
           ...prevState,
@@ -277,8 +289,9 @@ useEffect(()=>{
            deliveryAddressId:'x'
         }));
       }
+
       resultX.push({id:'x',company_name:'Choose'});
-      setData1(resultX); 
+      setCustomerData(resultX); 
     };
 
     const fetchData = async () => {
@@ -297,7 +310,7 @@ useEffect(()=>{
       const result = await response.json();
       console.log("data severities",result.severities);
       const resultX = result.severities.slice();
-      const sever = resultX.find(item => item.id === severityId);
+      const sever = resultX.find(item => item.id === formDatas.severityId);
       if(!sever){
         setFormDataS(prevState => ({
           ...prevState,
@@ -305,10 +318,27 @@ useEffect(()=>{
         }));
       }
       resultX.push({id:'x',name:'Choose'});
-      setData(resultX); 
+      setSaverityData(resultX); 
+    };
+    const fetchFutureOrderId = async () => {
+      const token = localStorage.getItem('userToken');
+      // console.log('token',token);
+      const response = await fetch('https://factory.teamasia.in/api/public/orders/getId', {
+        method: 'GET', 
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      // console.log('result',response);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const result = await response.json();
+      console.log("future order id",result);
+    
     };
 
-    
+    fetchFutureOrderId();
     fetchData1();
     fetchData();
   },[]);
@@ -328,6 +358,22 @@ useEffect(()=>{
            <CardBody style={{background:'#edf1f5'}}>
              <Form onSubmit={handleSubmit}>
                <Row>
+               <Col md="9">{errorMessageFromApi.length !== 0 && (
+                      <div style={{ background:'#ff9c7a',color: 'black', marginBottom: '10px', padding:"5px 10px"}}>
+                        <div style={{display:'flex',justifyContent:'space-between'}}>
+                          Following errors were found:
+                          <span onClick={closer} style={{cursor:'pointer'}}>X</span>
+                        </div>
+                        <ul>
+                          {errorMessageFromApi.map((item)=>
+                          <li>
+                              {item}
+                          </li>
+                          )}
+                        </ul>
+                      </div>
+                    )}
+                  </Col>
                    <Col md="6">
                       <DashCard title="Address" >
                           <Col md="10" className=''>
@@ -338,7 +384,7 @@ useEffect(()=>{
                                 value={formDatas.customerId}
                                 onChange={handleChange}
                                 >
-                                  {data1.map((item)=>{
+                                  {CustomerData.map((item)=>{
           
                                     return <option key={item.id} value={item.id}>{item.company_name}</option>
                                   })}
@@ -360,7 +406,7 @@ useEffect(()=>{
                                 value={formDatas.billingAddressId}
                                 onChange={handleChange}
                                 >
-                                  {data2.map((item)=>{
+                                  {AddressData.map((item)=>{
                                   
           
                                     return <option key={item.id} value={item.id}>{item.address_line_1}</option>
@@ -397,7 +443,7 @@ useEffect(()=>{
                                         value={formDatas.customerId2}
                                         onChange={handleChange}
                                         >
-                                          {data1.map((item)=>{
+                                          {CustomerData.map((item)=>{
                   
                                             return <option key={item.id} value={item.id}>{item.company_name}</option>
                                           })}
@@ -419,9 +465,7 @@ useEffect(()=>{
                                 value={formDatas.deliveryAddressId}
                                 onChange={handleChange}
                                 >
-                                  {data3.map((item)=>{
-                                  
-          
+                                  {AddressData1.map((item)=>{
                                     return <option key={item.id} value={item.id}>{item.address_line_1}</option>
                                   })}
                               </Input>
@@ -452,7 +496,7 @@ useEffect(()=>{
                                 name="severityId" 
                                 value={formDatas.severityId}
                                 onChange={handleChange} >
-                                  {data.map((item)=>{
+                                  {SaverityData.map((item)=>{
           
                                     return <option key={item.id} value={item.id}>{item.name}</option>
                                   })}
@@ -486,7 +530,7 @@ useEffect(()=>{
                             <FormText className="muted"></FormText>
                           </FormGroup>
                        </Col>
-                      <Col md="8">
+                      {/* <Col md="8">
                             <FormGroup>
                               <Label>Purchase Order Document</Label>
                               <Input type="file" 
@@ -497,7 +541,7 @@ useEffect(()=>{
                                 />
                               <FormText className="muted"></FormText>
                             </FormGroup>
-                       </Col>
+                       </Col> */}
                     </DashCard>
 
                     <DashCard title="Representative Details" >
@@ -505,13 +549,11 @@ useEffect(()=>{
                             <FormGroup>
                               <Input type="select" 
                                 name="vendorId" 
-                                value={formDatas.vendorId}
+                                value={formDatas.representativeId}
                                 onChange={handleChange}
                                 >
-                                  {data1.map((item)=>{
-          
-                                    return <option key={item.id} value={item.id}>{item.company_name}</option>
-                                  })}
+                                <option value={formDatas.representativeId}>choose representative</option>
+                              
                               </Input>
                              
                                 <FormText className="text-danger"></FormText>
@@ -536,14 +578,15 @@ useEffect(()=>{
                               <FormGroup>
                                 <Label>Status</Label>
                                 <Input type="select" 
-                                  name="vendorId" 
-                                  value={formDatas.vendorId}
+                                  name="statusId" 
+                                  value={formDatas.statusId}
                                   onChange={handleChange}
                                   >
-                                    {data1.map((item)=>{
-            
-                                      return <option key={item.id} value={item.id}>{item.company_name}</option>
-                                    })}
+                                    <option value={0}>Under Review</option>
+                                    <option value={1}>Confirmed</option>
+                                    <option value={2}>Canceled</option>
+                                    <option value={3}>Completed</option>
+                                    <option value={4}>Parked</option>
                                 </Input>
                               
                                   <FormText className="text-danger"></FormText>
@@ -567,7 +610,7 @@ useEffect(()=>{
 
                  <Row style={{marginTop:'10px'}}>
                   <Col md="12">
-                        <Product/>
+                        <Product orderID={id} data1={data1} data2={data2} data3={data3} data4={data4} data5={data5}/>
                   </Col>
                 </Row>
               
@@ -588,4 +631,4 @@ useEffect(()=>{
   );
 };
 
-export default Add;
+export default Edit;

@@ -20,9 +20,9 @@ const App = () => {
         dir={direction ? 'rtl' : 'ltr'}
       >
         <ThemeSelector />
-       
+
            {routing}
-       
+
       </div>
     </Suspense>
     </AuthProvider>

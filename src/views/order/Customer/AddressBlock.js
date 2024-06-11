@@ -31,7 +31,7 @@ const JumbotronComponent = (props) => {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
    const result = await response.json();
-   console.log('responsejsonHYBRID',result);
+  //  console.log('responsejsonHYBRID',result);
    if(result.length !==0){
      setData1(result[0].name);
    }
@@ -87,7 +87,7 @@ const JumbotronComponent = (props) => {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
    const result = await response.json();
-   console.log('responsejsonHYBRID',result);
+  //  console.log('responsejsonHYBRID',result);
    if(result.length !==0){
     setData4(result[0].name);
   }

@@ -189,7 +189,7 @@ const validateForm=()=>{
                      type="text" 
                       name="code" 
                       id="name" 
-                      placeholder="Enter name" 
+                      placeholder="Enter" 
                       value={formDatas.code}
                       onChange={handleChange} 
                       className={errors.code ? "is-invalid":""}
@@ -204,7 +204,7 @@ const validateForm=()=>{
                      type="text" 
                       name="customerAlias" 
                       id="name" 
-                      placeholder="Enter name" 
+                      placeholder="Enter" 
                       value={formDatas.customerAlias}
                       onChange={handleChange} 
                       className={errors.customerAlias ? "is-invalid":""}
@@ -219,7 +219,7 @@ const validateForm=()=>{
                      type="text" 
                       name="manufacturerAlias" 
                       id="name" 
-                      placeholder="Enter name" 
+                      placeholder="Enter" 
                       value={formDatas.manufacturerAlias}
                       onChange={handleChange} 
                       className={errors.manufacturerAlias ? "is-invalid":""}

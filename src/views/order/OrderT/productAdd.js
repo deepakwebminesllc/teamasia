@@ -14,28 +14,26 @@ import {
 
 } from 'reactstrap';
 // import { useParams } from 'react-router-dom';
-import {useLocation, useNavigate} from 'react-router-dom';
-
+import {useNavigate,useLocation} from 'react-router-dom';
+import ProductBackSideAdd from './productBackSideAdd';
 // import ComponentCard from '../../components/ComponentCard';
 
 const Add = () => {
     const location = useLocation();
-    const id  = location.state || {}; // Default to an empty object if state is undefined 
-    const navigate= useNavigate();
+    const navigate = useNavigate();
+    const {id,data1,data2,data3,data4}  = location.state || {}; // Default to an empty object if state is undefined 
   const [items, setItems] = useState([]);
   const [items1, setItems1] = useState([{design_id:'x',shade_id:'x'}]);
   const [items2, setItems2] = useState([]);
-  const [data1, setData1] = useState([]);
-  const [data2, setData2] = useState([]);
-  const [data3, setData3] = useState([]);
-  const [data4, setData4] = useState([]);
-  const [data5, setData5] = useState([]);
+
   const [data6, setData6] = useState([]);
   const [data7, setData7] = useState([]);
   const [data8, setData8] = useState([]);
   const [dataX, setDataX] = useState([]);
   const [errorMessageFromApi, setErrorMessageFromApi] = useState([]);
   const [errors, setErrors] = useState({});
+  const [refproductidforParent, setrefproductidforParent] = useState(null);
+  const [submitBlock, setsubmitBlock] = useState(false);
 
   const [formDatas, setFormDataS] = useState({
     grain:'x',
@@ -43,7 +41,7 @@ const Add = () => {
     fabricColorId:'x',
     qualityId:'x',
     colorId:'x',
-    hsnId:'x',
+    hsnId:'0',
     PricePerUnit:'',
     Thickness:'',
     TaxRate:'',
@@ -56,10 +54,19 @@ const Add = () => {
     FillerInAdhesive:'',
     FinalGsm:'',
     quantity:'',
-
+    isOnlineProduct:'0'
   });
   
 console.log('local',id);
+
+const checkboxclick1 = () => {
+  console.log('isonline',formDatas.isOnlineProduct);
+    setFormDataS(prevState => ({
+      ...prevState,
+      isOnlineProduct: formDatas.isOnlineProduct === '0' ? '1': '0'
+    }));
+ 
+};
 
 const handleChange = (e) => {
   const { name, value } = e.target;
@@ -208,7 +215,7 @@ const removeItem2 = index => {
               final_gsm: formDatas.FinalGsm,
 
               is_factory_surplus_product: '0',
-              is_online_product: '0',
+              is_online_product: formDatas.isOnlineProduct,
               is_trashed:  '0',
               emboss_ids: csvString,
               product_print: filtered1,
@@ -220,7 +227,12 @@ const removeItem2 = index => {
         const datas = await response.json();
         console.log("dataapi",datas,response.status);
         if (response.status === 201) {
-          navigate('/order/order-templates');
+          if(formDatas.isOnlineProduct === '0'){
+            navigate(-1);
+          }
+          setrefproductidforParent(datas.product_id);
+          setsubmitBlock(true);
+          console.log('product is added successfully ,please use this product id as ref_id in back side product')
         } else {
           console.error("Authentication failed:", Object.values(datas.messages.errors));
           if (datas.error) {
@@ -260,11 +272,7 @@ const validateForm = () => {
     // eslint-disable-next-line dot-notation
     errors1["colorId"] = "Please select a color.";
   }
-  if(formDatas.hsnId === 'x') {
-    formIsValid = false;
-    // eslint-disable-next-line dot-notation
-    errors1["hsnId"] = "Please select a hsn.";
-  }
+ 
   
 
 
@@ -324,100 +332,8 @@ const handleSubmit = async (event) => {
 
   useEffect(() => {
     
-    // Fetch the data from the API
-    const fetchData1 = async () => {
-      const token = localStorage.getItem('userToken');
-      // console.log('token',token);
-      const response = await fetch('https://factory.teamasia.in/api/public/grains', {
-        method: 'GET', 
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      // console.log('result',response);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const result = await response.json();
-      console.log("responsejson1",result);
-      const resultX = result.grains.slice();
-      resultX.push({id:'x',name:'Choose'});
-      setData1(resultX); 
-    };
-    const fetchData2 = async () => {
-      const token = localStorage.getItem('userToken');
-      // console.log('token',token);
-      const response = await fetch('https://factory.teamasia.in/api/public/fabrics', {
-        method: 'GET', 
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      // console.log('result',response);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const result = await response.json();
-      console.log("responsejson2",result);
-      const resultX = result.fabrics.slice();
-      resultX.push({id:'x',name:'Choose'});
-      setData2(resultX);
-    };
-    const fetchData3 = async () => {
-      const token = localStorage.getItem('userToken');
-      // console.log('token',token);
-      const response = await fetch('https://factory.teamasia.in/api/public/qualities', {
-        method: 'GET', 
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      // console.log('result',response);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const result = await response.json();
-      console.log("responsejson3",result);
-      const resultX = result.qualities.slice();
-      resultX.push({id:'x',name:'Choose'});
-      setData3(resultX);
-    };
-    const fetchData4 = async () => {
-      const token = localStorage.getItem('userToken');
-      // console.log('token',token);
-      const response = await fetch('https://factory.teamasia.in/api/public/colors', {
-        method: 'GET', 
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      // console.log('result',response);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const result = await response.json();
-      const resultX = result.colors.slice();
-      resultX.push({id:'x',name:'Choose'});
-      setData4(resultX);
-    };
-    const fetchData5 = async () => {
-      const token = localStorage.getItem('userToken');
-      // console.log('token',token);
-      const response = await fetch('https://factory.teamasia.in/api/public/hsns', {
-        method: 'GET', 
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      // console.log('result',response);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const result = await response.json();
-      const resultX = result.hsns.slice();
-      resultX.push({id:'x',name:'Choose'});
-      setData5(resultX);
-    };
+
+   
 
 
     const fetchData6 = async () => {
@@ -479,12 +395,6 @@ const handleSubmit = async (event) => {
     fetchData8();
     fetchData7();
     fetchData6();
-    fetchData5();
-    fetchData4();
-    fetchData3();
-    fetchData2();
-    fetchData1();
-
   },[]);
   
 
@@ -531,6 +441,7 @@ const handleSubmit = async (event) => {
                          value={formDatas.grain}
                         onChange={handleTypeChange}
                         className={errors.grain ? "is-invalid" : ""}
+                        disabled={submitBlock}
                         >
                            {data1.map((item)=>{
    
@@ -552,6 +463,7 @@ const handleSubmit = async (event) => {
                          value={formDatas.fabricId}
                         onChange={handleTypeChange}
                         className={errors.fabricId ? "is-invalid" : ""}
+                        disabled={submitBlock}
                         >
                            {data2.map((item)=>{
    
@@ -570,6 +482,7 @@ const handleSubmit = async (event) => {
                          name="fabricColorId" 
                          value={formDatas.fabricColorId}
                         onChange={handleTypeChange}
+                        disabled={submitBlock}
                        
                         >
                            {dataX.map((item)=>{
@@ -588,6 +501,7 @@ const handleSubmit = async (event) => {
                          value={formDatas.qualityId}
                         onChange={handleTypeChange}
                         className={errors.qualityId ? "is-invalid" : ""}
+                        disabled={submitBlock}
                         >
                            {data3.map((item)=>{
    
@@ -608,6 +522,7 @@ const handleSubmit = async (event) => {
                          value={formDatas.colorId}
                         onChange={handleTypeChange}
                         className={errors.colorId ? "is-invalid" : ""}
+                        disabled={submitBlock}
                         >
                            {data4.map((item)=>{
    
@@ -620,25 +535,7 @@ const handleSubmit = async (event) => {
                     </FormGroup>
                   </Col>
 
-                  <Col md="10">
-                    <FormGroup>
-                      <Label>HSN Code</Label>
-                      <Input type="select" 
-                         name="hsnId" 
-                         value={formDatas.hsnId}
-                        onChange={handleTypeChange}
-                        className={errors.hsnId ? "is-invalid" : ""}
-                        >
-                           {data5.map((item)=>{
-   
-                             return <option key={item.id} value={item.id}>{item.name}</option>
-                           })}
-                      </Input>
-                      {errors.hsnId && (
-                        <FormText className="text-danger">{errors.hsnId}</FormText>
-                      )}
-                    </FormGroup>
-                  </Col>
+                  
 
                   <Col md="10" >
                    <FormGroup>
@@ -649,6 +546,7 @@ const handleSubmit = async (event) => {
                      placeholder="Enter name" 
                      value={formDatas.quantity}
                      onChange={handleChange} 
+                     disabled={submitBlock}
                       />
                      
                      <FormText className="muted"></FormText>
@@ -664,6 +562,7 @@ const handleSubmit = async (event) => {
                      placeholder="Enter name" 
                      value={formDatas.PricePerUnit}
                      onChange={handleChange} 
+                     disabled={submitBlock}
                       />
                      <FormText className="muted"></FormText>
                    </FormGroup>
@@ -676,7 +575,8 @@ const handleSubmit = async (event) => {
                      id="name"
                      placeholder="Enter name" 
                      value={formDatas.Thickness}
-                     onChange={handleChange} 
+                     onChange={handleChange}
+                     disabled={submitBlock} 
                       />
                      <FormText className="muted"></FormText>
                    </FormGroup>
@@ -689,7 +589,8 @@ const handleSubmit = async (event) => {
                      id="name"
                      placeholder="Enter name" 
                      value={formDatas.TaxRate}
-                     onChange={handleChange} 
+                     onChange={handleChange}
+                     disabled={submitBlock} 
                       />
                      <FormText className="muted"></FormText>
                    </FormGroup>
@@ -703,6 +604,7 @@ const handleSubmit = async (event) => {
                      placeholder="Enter name" 
                      value={formDatas.Topcoat}
                      onChange={handleChange} 
+                     disabled={submitBlock}
                       />
                      <FormText className="muted"></FormText>
                    </FormGroup>
@@ -716,6 +618,7 @@ const handleSubmit = async (event) => {
                      placeholder="Enter name" 
                      value={formDatas.FoamI}
                      onChange={handleChange} 
+                     disabled={submitBlock}
                       />
                      <FormText className="muted"></FormText>
                    </FormGroup>
@@ -729,6 +632,7 @@ const handleSubmit = async (event) => {
                      placeholder="Enter name" 
                      value={formDatas.FillerInFoamI}
                      onChange={handleChange} 
+                     disabled={submitBlock}
                       />
                      <FormText className="muted"></FormText>
                    </FormGroup>
@@ -742,6 +646,7 @@ const handleSubmit = async (event) => {
                      placeholder="Enter name" 
                      value={formDatas.FoamII}
                      onChange={handleChange} 
+                     disabled={submitBlock}
                       />
                      <FormText className="muted"></FormText>
                    </FormGroup>
@@ -755,6 +660,7 @@ const handleSubmit = async (event) => {
                      placeholder="Enter name" 
                      value={formDatas.FillerInFoamII}
                      onChange={handleChange} 
+                     disabled={submitBlock}
                       />
                      <FormText className="muted"></FormText>
                    </FormGroup>
@@ -768,6 +674,7 @@ const handleSubmit = async (event) => {
                      placeholder="Enter name" 
                      value={formDatas.Adhesive}
                      onChange={handleChange} 
+                     disabled={submitBlock}
                       />
                      <FormText className="muted"></FormText>
                    </FormGroup>
@@ -781,6 +688,7 @@ const handleSubmit = async (event) => {
                      placeholder="Enter name" 
                      value={formDatas.FillerInAdhesive}
                      onChange={handleChange} 
+                     disabled={submitBlock}
                       />
                      <FormText className="muted"></FormText>
                    </FormGroup>
@@ -795,6 +703,7 @@ const handleSubmit = async (event) => {
                      placeholder="Enter name" 
                      value={formDatas.FinalGsm}
                      onChange={handleChange} 
+                     disabled={submitBlock}
                       />
                      <FormText className="muted"></FormText>
                    </FormGroup>
@@ -811,7 +720,7 @@ const handleSubmit = async (event) => {
                           <Row>
                             <Col md="8"><th className='noborder'>Embosses</th></Col>
                             <Col md="2">
-                              <Button type="button" className='btn-success' onClick={addItem}>Add More</Button>
+                              <Button type="button" className='btn-success' onClick={addItem} disabled={submitBlock}>Add More</Button>
                             </Col>
                           </Row>
                         </tr>
@@ -856,7 +765,7 @@ const handleSubmit = async (event) => {
                             <Col md="4"><th className='noborder'>Designs</th></Col>
                             <Col md="4"><th className='noborder'>Shades</th></Col>
                             <Col md="2">
-                              <Button type="button" className='btn-success' onClick={addItem1}>Add More</Button>
+                              <Button type="button" className='btn-success' onClick={addItem1} disabled={submitBlock}>Add More</Button>
                             </Col>
                           </Row>
                         </tr>
@@ -907,7 +816,7 @@ const handleSubmit = async (event) => {
                           <Row>
                             <Col md="8"><th className='noborder'>Additional Treatments</th></Col>
                             <Col md="2">
-                              <Button type="button" className='btn-success' onClick={addItem2}>Add More</Button>
+                              <Button type="button" className='btn-success' onClick={addItem2} disabled={submitBlock}>Add More</Button>
                             </Col>
                           </Row>
                         </tr>
@@ -927,10 +836,20 @@ const handleSubmit = async (event) => {
                   </table>
                 </Row>
                 
+                <Col md="10">
+                          <FormGroup>
+                            {/* <Input type="checkbox" checked={ DefaultToFactoryStock === '1'} onChange={checkboxclick()}  /> */}
+                            <Input type="checkbox" checked={formDatas.isOnlineProduct === '1'} onChange={checkboxclick1} disabled={submitBlock} />
+                            <Label className='mx-1'> This is a online product</Label>
+                            <FormText className="muted"></FormText>
+                          </FormGroup>
+                </Col>
 
                  <Col md="4">
                    <FormGroup>
-                    <Button type="submit" className="btn my-btn-color" style={{marginTop:"28px"}}>
+                    <Button type="submit" className="btn my-btn-color" style={{marginTop:"28px"}}
+                    disabled={submitBlock}
+                    >
                         Submit
                     </Button>
                    </FormGroup>
@@ -939,7 +858,9 @@ const handleSubmit = async (event) => {
                
               
              </Form>
-             
+             {
+              formDatas.isOnlineProduct === '1'? <ProductBackSideAdd refproductidforParent={refproductidforParent} FrontSubmitBlock={submitBlock} frontSidedata={formDatas} orderTemplateID = {id} data1={data1} data2={data2} data3={data3} data4={data4}  data6={data6} data7={data7} data8={data8} />:''
+             }
            </CardBody>
           
           

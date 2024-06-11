@@ -14,20 +14,21 @@ import {
 
 } from 'reactstrap';
 // import { useParams } from 'react-router-dom';
-import {useNavigate} from 'react-router-dom';
+import {useLocation,useNavigate} from 'react-router-dom';
 
 // import ComponentCard from '../../components/ComponentCard';
 
 const Add = () => {
   const navigate= useNavigate();
-// const {grain, fabric, quality, color,hsnCode,PricePerUnit,Thickness,TaxRate,deliveryDate,CustomerItemRefernce,quantity} = location.state || {}; // Default to an empty object if state is undefined 
+  const location= useLocation();
+const productId = location.state || {}; // Default to an empty object if state is undefined 
+const [data1, setData1] = useState([]);
+const [data2, setData2] = useState([]);
+const [errorMessageFromApi, setErrorMessageFromApi] = useState([]);
 
-  const [data1, setData1] = useState([]);
-  const [data2, setData2] = useState([]);
- 
- 
-  const [formDatas, setFormDataS] = useState({
-    product_id:'1',
+
+const [formDatas, setFormDataS] = useState({
+    product_id:productId,
     roll_code:'sp',
     cut_piece_length:'',
     quantity:'',
@@ -38,24 +39,22 @@ const Add = () => {
     t1:'',
     t2:'',
     t3:'',
-    send_to_factory_stock:'1',
+    send_to_factory_stock:'0',
     comment:'',
     qa_id:'x',
     is_trashed:'0'
   });
   
-  // const [data2, setData2] = useState([
-  //   {
-  //     id:'1',
-  //     name:'black'
-  //   },
-  //   {
-  //     id:'2',
-  //     name:'white'
-  //   }
-  // ]);
-
-// const [selectedType, setSelectedType] = useState('');
+  const [firstcheck, setFirstCheck] = useState(formDatas.send_to_factory_stock !== '0');
+  const checkboxclick1 = () => {
+    console.log('formdatas',formDatas.send_to_factory_stock);
+    const send = formDatas.send_to_factory_stock=== '1' ? '0' : '1'
+    setFormDataS((prevState) => ({
+      ...prevState,
+      send_to_factory_stock:send,
+    }));
+    setFirstCheck(!firstcheck);
+  };
 
 const handleChange = (e) => {
   const { name, value } = e.target;
@@ -68,7 +67,9 @@ const handleChange = (e) => {
 
 
 
- 
+const closer =()=>{
+  setErrorMessageFromApi([]);
+}
 
   async function apiCall() {
     try {
@@ -119,18 +120,20 @@ const handleChange = (e) => {
         });
 
         const dataZ = await response.json();
-        console.log("dataapi",dataZ)
-        if (response.ok) {
-          navigate('/order/factory-surplus');
-        } 
-            // Handle any errors, such as showing an error message to the user
-            console.error("Authentication failed:", dataZ.message);
-            return null;
-      
-    } catch (error) {
-        console.error("Network error:", error);
-        return null;
-    }
+        console.log('dataapi', dataZ);
+        if (response.status === 201) {
+           navigate(-1);
+         } else {
+           console.error("Authentication failed:", Object.values(dataZ.messages.errors));
+           if (dataZ.error) {
+             setErrorMessageFromApi(Object.values(dataZ.messages.errors));
+           }
+         }  
+         return null;
+     } catch (error) {
+       setErrorMessageFromApi(["Network error"]);
+         return null;
+     }
 }
 
 const handleSubmit = async (event) => {
@@ -219,6 +222,23 @@ const handleSubmit = async (event) => {
            <CardBody>
              <Form onSubmit={handleSubmit}>
                <Row>
+               <Col md="8">{errorMessageFromApi.length !== 0 && (
+                      <div style={{ background:'#ff9c7a',color: 'black', marginBottom: '10px', padding:"5px 10px"}}>
+                        <div style={{display:'flex',justifyContent:'space-between'}}>
+                          Following errors were found:
+                          <span onClick={closer} style={{cursor:'pointer'}}>X</span>
+                        </div>
+                        <ul>
+                        {errorMessageFromApi.map((item)=>
+                        <li>
+                            {item}
+                        </li>
+                        )}
+                        </ul>
+                      </div>
+                    )}
+                  </Col>
+
                <Col md="10" >
                    <FormGroup>
                      <Label>Quantity (in meters)</Label>
@@ -342,8 +362,8 @@ const handleSubmit = async (event) => {
                      name="send_to_factory_stock" 
                      id="name"
                      placeholder="Enter name" 
-                     value={formDatas.send_to_factory_stock}
-                     onChange={handleChange} 
+                     value={firstcheck}
+                     onChange={checkboxclick1} 
                      />
                      <Label> Send to factory stock</Label>
                      

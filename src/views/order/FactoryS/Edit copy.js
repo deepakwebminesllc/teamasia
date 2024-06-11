@@ -14,18 +14,45 @@ import {
 
 } from 'reactstrap';
 // import { useParams } from 'react-router-dom';
-import { useLocation,useNavigate} from 'react-router-dom';
+import {useLocation, useNavigate} from 'react-router-dom';
 
 // import ComponentCard from '../../components/ComponentCard';
 
-const Edit = () => {
-  const location = useLocation();
-  const navigate= useNavigate();
-// const {grain, fabric, quality, color,hsnCode,PricePerUnit,Thickness,TaxRate,deliveryDate,CustomerItemRefernce,quantity} = location.state || {}; // Default to an empty object if state is undefined 
-  const {id,order_id :orderId, template_id:templateId, topcoat,grain_id:grain,fabric_id:fabricId,fabric_color_id:fabricColorId,quality_id:qualityId,color_id:colorId,hsn_id:hsnId,price:PricePerUnit,thickness:Thickness,tax_rate:TaxRate,delivery_date:deliveryDate,customer_item_reference:CustomerItemRefernce,quantity,productprints,productadditionaltreatments} = location.state || {}; 
-  const [items, setItems] = useState([{id:'2'}]);
-  const [items1, setItems1] = useState(productprints);
-  const [items2, setItems2] = useState(productadditionaltreatments);
+const Add = () => {
+    const location = useLocation();
+    const   {
+      id,
+      order_id:orderId,
+      template_id:templateId,
+      grain_id:grain,
+      fabric_id:fabricId,
+      fabric_color_id:fabricColorId,
+      quality_id:qualityId,
+      color_id:colorId,
+      hsn_id:hsnId,
+      quantity,
+      price,
+      thickness:Thickness,
+      tax_rate:TaxRate,
+      topcoat:Topcoat,
+      foam_1:FoamI,
+      filler_in_foam_1:FillerInFoamI,
+      foam_2:FoamII,
+      filler_in_foam_2:FillerInFoamII,
+      adhesive:Adhesive,
+      filler_in_adhesive:FillerInAdhesive,
+      final_gsm:FinalGsm,
+
+      delivery_date:deliveryDate,
+      customer_item_reference:CustomerItemRefernce,
+      is_factory_surplus_product: isFactorySurplusProduct,
+      is_online_product:isOnlineProduct,
+      is_trashed:isTrashed,
+      productadditionaltreatments,
+      productprints,  
+  }  = location.state || {}; // Default to an empty object if state is undefined 
+    const navigate= useNavigate();
+  const [items, setItems] = useState([]);
   const [data1, setData1] = useState([]);
   const [data2, setData2] = useState([]);
   const [data3, setData3] = useState([]);
@@ -35,38 +62,41 @@ const Edit = () => {
   const [data7, setData7] = useState([]);
   const [data8, setData8] = useState([]);
   const [dataX, setDataX] = useState([]);
- 
+  const [errorMessageFromApi, setErrorMessageFromApi] = useState([]);
+  const [errors, setErrors] = useState({});
+
   const [formDatas, setFormDataS] = useState({
-    orderId,
-    templateId,
-    topcoat,
     grain,
     fabricId,
     fabricColorId,
     qualityId,
     colorId,
     hsnId,
-    PricePerUnit,
+    
+    quantity,
+    PricePerUnit:price,
+
     Thickness,
     TaxRate,
+    Topcoat,
+    FoamI,
+    FillerInFoamI,
+    FoamII,
+    FillerInFoamII,
+    Adhesive,
+    FillerInAdhesive,
+    FinalGsm,
+    isTrashed,
     deliveryDate,
     CustomerItemRefernce,
-    quantity
+    isFactorySurplusProduct,
+    isOnlineProduct,
+    productprints, 
+    productadditionaltreatments,
   });
 
-console.log('loc',location.state);
-  // const [data2, setData2] = useState([
-  //   {
-  //     id:'1',
-  //     name:'black'
-  //   },
-  //   {
-  //     id:'2',
-  //     name:'white'
-  //   }
-  // ]);
 
-// const [selectedType, setSelectedType] = useState('');
+console.log('local',id,location.state);
 
 const handleChange = (e) => {
   const { name, value } = e.target;
@@ -82,7 +112,7 @@ const handleChange = (e) => {
  const addItem = () => {
   console.log('mega',items);
   const newItems = items.slice();
-  newItems.push({id:'z'})
+  newItems.push({id:'z'});
   console.log('mega',newItems);
   setItems(newItems);
 };
@@ -92,33 +122,44 @@ const removeItem = index => {
   newItems.splice(index, 1);
   setItems(newItems);
 };
-
 const addItem1 = () => {
-  console.log('mega',items1);
-  const newItems = items1.slice();
+  const newItems = formDatas.productprints.slice();
   newItems.push({design_id:'x',shade_id:'x'})
   console.log('mega',newItems);
-  setItems1(newItems);
+  setFormDataS(prevState => ({
+    ...prevState,
+    productprints: newItems
+  }));
+
 };
 
 const removeItem1 = index => {
-  const newItems = items1.slice();
+  const newItems = formDatas.productprints.slice();
   newItems.splice(index, 1);
-  setItems1(newItems);
+  setFormDataS(prevState => ({
+    ...prevState,
+    productprints: newItems
+  }));
   
 };
+
 const addItem2 = () => {
-  console.log('mega',items);
-  const newItems = items2.slice();
+  const newItems = formDatas.productadditionaltreatments.slice();
   newItems.push({description:''})
   console.log('mega',newItems);
-  setItems2(newItems);
+  setFormDataS(prevState => ({
+    ...prevState,
+    productadditionaltreatments: newItems
+  }));
 };
 
 const removeItem2 = index => {
-  const newItems = items2.slice();
+  const newItems = formDatas.productadditionaltreatments.slice();
   newItems.splice(index, 1);
-  setItems2(newItems);
+  setFormDataS(prevState => ({
+    ...prevState,
+    productadditionaltreatments: newItems
+  }));
 };
 
  const handleInputChange = (index, event) => {
@@ -131,40 +172,40 @@ const removeItem2 = index => {
 
   const handleInputChange1 = (index, event) => {
     const {name,value} = event.target;
-    const newItems = items1.slice();
+    const newItems = formDatas.productprints.slice();
     console.log("data1",index,name,value,newItems);
     newItems[index][name] = value;
-    setItems1(newItems);
+    setFormDataS(prevState => ({
+      ...prevState,
+      productprints: newItems
+    }));
   };
 
   const handleInputChange2 = (index, event) => {
     const {name,value} = event.target;
-    const newItems = items2.slice();
+    const newItems = formDatas.productadditionaltreatments.slice();
     console.log("data2",index,name,value,newItems);
     newItems[index][name] = value;
-    setItems2(newItems);
+    setFormDataS(prevState => ({
+      ...prevState,
+      productadditionaltreatments: newItems
+    }));
   };
+
+  const closer =()=>{
+    setErrorMessageFromApi([]);
+  }
 
   async function apiCall() {
     try {
-      
-        // const formData = new FormData();
-        // formData.append('name', formDatas.name);
-        // formData.append('iso_code', formDatas.isoCode);
-        // formData.append('isd_code', formDatas.isdCode);
 
         console.log('item',items);
-        console.log('item1',items1);
-        console.log('item2',items2);
+    
+
+        console.log('XXXXX',id);
         // console.log('dataX',formDatas);
         const filtered = items.filter((temp)=>{
           return temp.id !== 'z';
-        });
-        const filtered1 = items1.filter((temp)=>{
-          return  (temp.design_id !== 'x') &&  (temp.shade_id !== 'x');
-        });
-        const filtered2 = items2.filter((temp)=>{
-          return temp.description !== '';
         });
 
         const csvString = filtered.map(item => item.id).join(', ');
@@ -173,11 +214,13 @@ const removeItem2 = index => {
         // const filtered1 = formDatas.CompanyDocuments.filter((temp)=>{
         //   return temp.name !== '';
         // });
+        const filtered2 = formDatas.productadditionaltreatments.filter((temp)=>{
+          return temp.description !== '';
+        });
 
         console.log('formdataX',formDatas);
         console.log('filtered',filtered);
-        console.log('filtered1',filtered1);
-        console.log('filtered2',filtered2);
+      
 
 
         const token = localStorage.getItem('userToken');
@@ -189,9 +232,8 @@ const removeItem2 = index => {
             },
            
             body: JSON.stringify({
-              order_id: formDatas.orderId,
-              template_id: formDatas.templateId,
-              topcoat: formDatas.topcoat,
+              order_id:orderId,
+              template_id:templateId,
               grain_id: formDatas.grain,
               fabric_id: formDatas.fabricId,
               fabric_color_id: formDatas.fabricColorId,
@@ -202,53 +244,119 @@ const removeItem2 = index => {
               price: formDatas.PricePerUnit,
               thickness: formDatas.Thickness,
               tax_rate: formDatas.TaxRate,
-              delivery_date: formDatas.deliveryDate,
-              customer_item_reference: formDatas.CustomerItemRefernce,
-              is_factory_surplus_product: '1',
-              is_online_product: '0',
-              is_trashed:  '0',
+              delivery_date:formDatas.deliveryDate,
+              customer_item_reference:formDatas.CustomerItemRefernce,
+
+              topcoat: formDatas.Topcoat,
+              foam_1: formDatas.FoamI,
+              filler_in_foam_1: formDatas.FillerInFoamI,
+              foam_2: formDatas.FoamII,
+              filler_in_foam_2: formDatas.FillerInFoamII,
+              adhesive: formDatas.Adhesive,
+              filler_in_adhesive: formDatas.FillerInAdhesive,
+              final_gsm: formDatas.FinalGsm,
+
+              is_factory_surplus_product:formDatas.isFactorySurplusProduct,
+              is_online_product: formDatas.isOnlineProduct,
+              is_trashed: formDatas.isTrashed,
               emboss_ids: csvString,
-              product_print: filtered1,
+              product_print: formDatas.productprints,
               product_additional_treatment: filtered2,
             }),
         });
 
-        const dataZ = await response.json();
-        console.log("dataapi",dataZ)
-        if (response.ok) {
-
-
+        const datas = await response.json();
+        console.log("dataapi",datas,response.status);
+        if (response.status === 200) {
           navigate('/order/factory-surplus');
-            
-        } 
-            // Handle any errors, such as showing an error message to the user
-            console.error("Authentication failed:", dataZ.message);
-            return null;
-      
-    } catch (error) {
-        console.error("Network error:", error);
+        } else {
+          console.error("Authentication failed:", Object.values(datas.messages.errors));
+          if (datas.error) {
+            setErrorMessageFromApi(Object.values(datas.messages.errors));
+          }
+        }  
         return null;
-    }
+      } catch (error) {
+        console.log('error',error);
+         setErrorMessageFromApi(["Network error"]);
+        return null;
+      }
 }
+
+const validateForm = () => {
+  let formIsValid = true;
+  const errors1 = {};
+
+  if(formDatas.grain === 'x') {
+    formIsValid = false;
+    // eslint-disable-next-line dot-notation
+    errors1["grain"] = "Please select a grain.";
+  }
+
+  if(formDatas.fabricId === 'x') {
+    formIsValid = false;
+    // eslint-disable-next-line dot-notation
+    errors1["fabricId"] = "Please select a fabric.";
+  }
+  if(formDatas.qualityId === 'x') {
+    formIsValid = false;
+    // eslint-disable-next-line dot-notation
+    errors1["qualityId"] = "Please select a quality.";
+  }
+  if(formDatas.colorId === 'x') {
+    formIsValid = false;
+    // eslint-disable-next-line dot-notation
+    errors1["colorId"] = "Please select a color.";
+  }
+  if(formDatas.hsnId === 'x') {
+    formIsValid = false;
+    // eslint-disable-next-line dot-notation
+    errors1["hsnId"] = "Please select a hsn.";
+  }
+  
+
+
+  // ... repeat for other fields ...
+
+  setErrors(errors1);
+  return formIsValid;
+};
+
 
 const handleSubmit = async (event) => {
   event.preventDefault();
-  console.log('event',event);
-  apiCall();
+  if(validateForm()) {
+    console.log('Form is valid, proceed with API call');
+    apiCall();
+  } else {
+    console.log('Form is invalid, do not submit');
+  }
+
 };
 
   const handleTypeChange = (e) => {
     const { name, value } = e.target;
     // setSelectedType(e.target.value);
-    if(name === 'fabricId'){
-      const element = data2.filter(item => item.id === value);
-      console.log('element',element[0]);
-      setDataX(element[0].fabriccolors);
-    }
+    console.log('element',value,data2);
     setFormDataS(prevState => ({
       ...prevState,
       [name]: value
     }));
+
+    if(name === 'fabricId'){
+      const element = data2.filter(item => item.id === value);
+      console.log('element',value,data2,element);
+      console.log('element',data2,element[0].fabriccolors[0]);
+      setDataX(element[0].fabriccolors);
+      setFormDataS(prevState => ({
+        ...prevState,
+        fabricColorId : element[0].fabriccolors[0].id
+      }));
+    }
+    
+   
+   
+    
     // console.log('e',e.target.options[e.target.selectedIndex].text);
     console.log('e',e.target.value);
   };
@@ -272,7 +380,7 @@ const handleSubmit = async (event) => {
       const result = await response.json();
       console.log("responsejson1",result);
       const resultX = result.grains.slice();
-      resultX.push({id:'X',name:'Choose'});
+      resultX.push({id:'x',name:'Choose'});
       setData1(resultX); 
     };
     const fetchData2 = async () => {
@@ -290,10 +398,26 @@ const handleSubmit = async (event) => {
       }
       const result = await response.json();
       console.log("responsejson2",result);
-      setData2(result.fabrics);
-      const element = result.fabrics.filter(item => item.id === fabricId);
-      console.log('element',element[0]);
-      setDataX(element[0].fabriccolors);
+      const resultX = result.fabrics.slice();
+      resultX.push({id:'x',name:'Choose'});
+      setData2(resultX);
+      
+      const resultFabric = resultX.filter((item)=>(
+        item.id === formDatas.fabricId
+      ));
+      
+      if(resultFabric.length === 0){
+        setFormDataS(prevState => ({
+          ...prevState,
+          fabricId: 'x',
+          fabricColorId:'x'
+        }));
+      }
+
+      if(resultFabric.length >0){
+        console.log('robo',resultFabric[0].fabriccolors)
+        setDataX(resultFabric[0].fabriccolors);
+      }
     };
     const fetchData3 = async () => {
       const token = localStorage.getItem('userToken');
@@ -310,7 +434,20 @@ const handleSubmit = async (event) => {
       }
       const result = await response.json();
       console.log("responsejson3",result);
-      setData3(result.qualities); 
+      const resultX = result.qualities.slice();
+      resultX.push({id:'x',name:'Choose'});
+      setData3(resultX);
+
+      const resultQuality = resultX.filter((item)=>(
+        item.id === formDatas.qualityId
+      ));
+      
+      if(resultQuality.length === 0){
+        setFormDataS(prevState => ({
+          ...prevState,
+          qualityId: 'x',
+        }));
+      }
     };
     const fetchData4 = async () => {
       const token = localStorage.getItem('userToken');
@@ -326,7 +463,21 @@ const handleSubmit = async (event) => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const result = await response.json();
-      setData4(result.colors); 
+      const resultX = result.colors.slice();
+      resultX.push({id:'x',name:'Choose'});
+      setData4(resultX);
+
+      const resultColor = resultX.filter((item)=>(
+        item.id === formDatas.colorId
+      ));
+      
+      if(resultColor.length === 0){
+        setFormDataS(prevState => ({
+          ...prevState,
+          colorId: 'x',
+        }));
+      }
+
     };
     const fetchData5 = async () => {
       const token = localStorage.getItem('userToken');
@@ -342,14 +493,22 @@ const handleSubmit = async (event) => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const result = await response.json();
-      setData5(result.hsns); 
+      const resultX = result.hsns.slice();
+      resultX.push({id:'x',name:'Choose'});
+      setData5(resultX);
+
+      const resultHsn = resultX.filter((item)=>(
+        item.id === formDatas.hsnId
+      ));
+      
+      if(resultHsn.length === 0){
+        setFormDataS(prevState => ({
+          ...prevState,
+          hsnId: 'x',
+        }));
+      }
+
     };
-
-
-
-
-
-
 
 
     const fetchData6 = async () => {
@@ -386,7 +545,7 @@ const handleSubmit = async (event) => {
       const result = await response.json();
       const resultX = result.designs.slice();
       resultX.push({id:'x',design_id:'x',code:'Choose'});
-      setData7(resultX); 
+      setData7(resultX);
     };
 
     const fetchData8 = async () => {
@@ -403,9 +562,10 @@ const handleSubmit = async (event) => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const result = await response.json();
+      console.log("responsejsonXY",formDatas);
       const resultX = result.shades.slice();
       resultX.push({id:'x',shade_id:'x',name:'Choose'});
-      setData8(resultX); 
+      setData8(resultX);
     };
     fetchData8();
     fetchData7();
@@ -437,20 +597,41 @@ const handleSubmit = async (event) => {
            <CardBody>
              <Form onSubmit={handleSubmit}>
                <Row>
+               <Col md="9">{errorMessageFromApi.length !== 0 && (
+                      <div style={{ background:'#ff9c7a',color: 'black', marginBottom: '10px', padding:"5px 10px"}}>
+                        <div style={{display:'flex',justifyContent:'space-between'}}>
+                          Following errors were found:
+                          <span onClick={closer} style={{cursor:'pointer'}}>X</span>
+                        </div>
+                        <ul>
+                          {errorMessageFromApi.map((item)=>
+                          <li>
+                              {item}
+                          </li>
+                          )}
+                        </ul>
+                      </div>
+                    )}
+                  </Col>
+                  
                   <Col md="10" className=''>
                     <FormGroup>
                       <Label>Grain</Label>
                       <Input type="select" 
                          name="grain" 
                          value={formDatas.grain}
-                        onChange={handleTypeChange}>
+                        onChange={handleTypeChange}
+                        className={errors.grain ? "is-invalid" : ""}
+                        >
                            {data1.map((item)=>{
    
                              return <option key={item.id} value={item.id}>{item.name}</option>
                            })}
                       </Input>
-
-                      <FormText className="muted"></FormText>
+                      {errors.grain && (
+                        <FormText className="text-danger">{errors.grain}</FormText>
+                      )}
+                      
                     </FormGroup>
                   </Col>
 
@@ -460,13 +641,17 @@ const handleSubmit = async (event) => {
                       <Input type="select" 
                          name="fabricId" 
                          value={formDatas.fabricId}
-                        onChange={handleTypeChange}>
+                        onChange={handleTypeChange}
+                        className={errors.fabricId ? "is-invalid" : ""}
+                        >
                            {data2.map((item)=>{
    
                              return <option key={item.id} value={item.id}>{item.name}</option>
                            })}
                       </Input>
-                      {/* <FormText className="muted">Popular Dates</FormText> */}
+                      {errors.fabricId && (
+                        <FormText className="text-danger">{errors.fabricId}</FormText>
+                      )}
                     </FormGroup>
                   </Col>
                   <Col md="5">
@@ -475,12 +660,14 @@ const handleSubmit = async (event) => {
                       <Input type="select" 
                          name="fabricColorId" 
                          value={formDatas.fabricColorId}
-                        onChange={handleTypeChange}>
+                        onChange={handleTypeChange}
+                       
+                        >
                            {dataX.map((item)=>{
                              return <option key={item.id} value={item.id}>{item.name}</option>
                            })}
                       </Input>
-                      {/* <FormText className="muted">Popular Dates</FormText> */}
+                      
                     </FormGroup>
                   </Col>
 
@@ -490,13 +677,17 @@ const handleSubmit = async (event) => {
                       <Input type="select" 
                          name="qualityId" 
                          value={formDatas.qualityId}
-                        onChange={handleTypeChange}>
+                        onChange={handleTypeChange}
+                        className={errors.qualityId ? "is-invalid" : ""}
+                        >
                            {data3.map((item)=>{
    
                              return <option key={item.id} value={item.id}>{item.name}</option>
                            })}
                       </Input>
-                      {/* <FormText className="muted">Popular Dates</FormText> */}
+                      {errors.qualityId && (
+                        <FormText className="text-danger">{errors.qualityId}</FormText>
+                      )}
                     </FormGroup>
                   </Col>
 
@@ -506,13 +697,17 @@ const handleSubmit = async (event) => {
                       <Input type="select" 
                          name="colorId" 
                          value={formDatas.colorId}
-                        onChange={handleTypeChange}>
+                        onChange={handleTypeChange}
+                        className={errors.colorId ? "is-invalid" : ""}
+                        >
                            {data4.map((item)=>{
    
                              return <option key={item.id} value={item.id}>{item.name}</option>
                            })}
                       </Input>
-                      {/* <FormText className="muted">Popular Dates</FormText> */}
+                      {errors.colorId && (
+                        <FormText className="text-danger">{errors.colorId}</FormText>
+                      )}
                     </FormGroup>
                   </Col>
 
@@ -522,13 +717,17 @@ const handleSubmit = async (event) => {
                       <Input type="select" 
                          name="hsnId" 
                          value={formDatas.hsnId}
-                        onChange={handleTypeChange}>
+                        onChange={handleTypeChange}
+                        className={errors.hsnId ? "is-invalid" : ""}
+                        >
                            {data5.map((item)=>{
    
                              return <option key={item.id} value={item.id}>{item.name}</option>
                            })}
                       </Input>
-                      {/* <FormText className="muted">Popular Dates</FormText> */}
+                      {errors.hsnId && (
+                        <FormText className="text-danger">{errors.hsnId}</FormText>
+                      )}
                     </FormGroup>
                   </Col>
 
@@ -586,10 +785,11 @@ const handleSubmit = async (event) => {
                      <FormText className="muted"></FormText>
                    </FormGroup>
                  </Col>
+
                  <Col md="10" >
                    <FormGroup>
                      <Label>Delivery Date</Label>
-                     <Input type="text" 
+                     <Input type="date" 
                      name="deliveryDate" 
                      id="name"
                      placeholder="Enter name" 
@@ -612,6 +812,11 @@ const handleSubmit = async (event) => {
                      <FormText className="muted"></FormText>
                    </FormGroup>
                  </Col>
+                 
+              
+             
+
+                 
 
                  <Row>
                   <Col md="8">
@@ -675,7 +880,7 @@ const handleSubmit = async (event) => {
                       </thead>
           
                     <tbody>
-                    {items1.map((item, index) => (
+                    {formDatas.productprints.map((item, index) => (
                         <tr key={item.index}>
                           <Row>
                             <Col md="4">
@@ -700,7 +905,7 @@ const handleSubmit = async (event) => {
                                     })}
                               </Input>
                             </Col>
-                            <Col md="2"><button type="button"  style={{ backgroundColor:"red",marginTop:"5px"}} onClick={() => removeItem1(index)}>X</button></Col>
+                            <Col md="2"><button type="button"  style={{ backgroundColor:"red",marginTop:"5px"}} onClick={() => removeItem1(index)} disabled={index === 0}>X</button></Col>
                           </Row>
                           
                         </tr>
@@ -726,7 +931,7 @@ const handleSubmit = async (event) => {
                       </thead>
           
                     <tbody>
-                    {items2.map((item, index) => (
+                    {formDatas.productadditionaltreatments.map((item, index) => (
                         <tr key={item.id}>
                           <Row>
                             <Col md="8"><Input name="description" value={item.description} type="text" onChange={e => handleInputChange2(index, e)} placeholder="" /></Col>
@@ -767,4 +972,4 @@ const handleSubmit = async (event) => {
   );
 };
 
-export default Edit;
+export default Add;

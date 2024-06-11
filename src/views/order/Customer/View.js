@@ -31,13 +31,17 @@ const JumbotronComponent = () => {
     navigate('/order/customers/edit',{state:location.state});
   };
 
-  const handlePendingReport = () => {
-    navigate('/order/customers/pending-report');
-  };
+  // const handlePendingReport = () => {
+  //   navigate('/order/customers/pending-report');
+  // };
 
   const handleAddAddress = ()=>{
     console.log('address');
      navigate('/order/customers/address/add', {state:id});
+   }
+
+   const handleViewOrder = ()=>{
+     navigate('/order/orders');
    }
 
 const handleEditAddress = (addressId)=>{
@@ -106,7 +110,7 @@ const handleEditAddress = (addressId)=>{
                  <Col md="6">
                     <ComponentCard4>
                         <div className="order-view-page-flex">
-                          <div><i className="bi-person-circle my-list-color"/>Company Name : {data1.company_name}</div>
+                          <div><i className="bi-person-circle my-list-color"/>Company Name : <span style={{fontWeight:'900',textTransform:'uppercase'}}>{data1.company_name}</span></div>
                         </div>
                     </ComponentCard4>
 
@@ -208,7 +212,7 @@ const handleEditAddress = (addressId)=>{
                           
                         </Table>
                         
-                        <div>
+                        {/* <div>
                           <div className="order-history">
                               <div>Outstanding Balance : 460.00</div>
                               <div>Credit Limit : 50,000,000.00</div>
@@ -217,6 +221,9 @@ const handleEditAddress = (addressId)=>{
                           <ul>
                             <li>Invoice TCINV/22-23/0632 of  172,426.00 on 01 Jun, 2022 has been overdue  460.00 for more than 90 days</li>
                           </ul>
+                        </div> */}
+                        <div style={{background:'green',textAlign:'center',color:'white'}}>
+                           API IS MISSING
                         </div>
                       </div>
                     </ComponentCard4>
@@ -240,8 +247,10 @@ const handleEditAddress = (addressId)=>{
                           </Row>
                           
                         </Table>
-                        
-                        <div>
+                        <div style={{background:'green',textAlign:'center',color:'white'}}>
+                           API IS MISSING
+                        </div>
+                        {/* <div>
                           <div className="order-history">
                               <div>Email History</div>
                                 <div><i className="bi bi-arrow-right my-eye-color" style={{fontSize:'19px',marginRight:'2px'}}/>No history found</div>
@@ -251,7 +260,7 @@ const handleEditAddress = (addressId)=>{
                               <div>Whatsapp History</div>
                                 <div><i className="bi bi-arrow-right my-eye-color" style={{fontSize:'19px',marginRight:'2px'}}/>No history found</div>
                           </div>
-                        </div>
+                        </div> */}
                       </div>
                     </ComponentCard4>
 
@@ -259,16 +268,16 @@ const handleEditAddress = (addressId)=>{
                           <Row  style={{background:'rgb(246 246 246)',padding:'2px'}}>
                             <Col md="9">
                               <div style={{margin:'5px 0px'}}>
-                                <div><i className="bi bi-copy  my-calander-color" style={{fontSize:'20px',marginRight:'1px'}}/> Orders</div> 
+                                <div><i className="bi bi-copy  my-calander-color" style={{fontSize:'20px',marginRight:'1px'}} /> Orders</div> 
                               </div>
                             </Col>
                             <Col md="3" style={{padding:'5px 0px'}}>
-                              <Button  className="btn mybtncustomer btn-secondary" outline color="info">View Orders</Button>
+                              <Button  className="btn mybtncustomer btn-secondary" outline color="info" onClick={()=>{handleViewOrder()}}>View Orders</Button>
                             </Col>
                           </Row>
                     </ComponentCard4>
 
-                    <ComponentCard4>
+                    {/* <ComponentCard4>
                           <Row  style={{background:'rgb(246 246 246)',padding:'2px'}}>
                             <Col md="9">
                               <div style={{margin:'5px 0px'}}>
@@ -292,7 +301,7 @@ const handleEditAddress = (addressId)=>{
                               <Button  className="btn mybtncustomer btn-secondary" outline color="info">View Reports</Button>
                             </Col>
                           </Row>
-                    </ComponentCard4>
+                    </ComponentCard4> */}
                  </Col>
               </Row>
          

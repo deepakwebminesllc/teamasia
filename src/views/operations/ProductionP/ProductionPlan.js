@@ -21,7 +21,6 @@ const ProductionPlan = () => {
   const [collapse1, setCollapse1] = useState(false);
   const navigate = useNavigate();
   const data = [
-
       { id: 1, planDate: '01 Aug, 2022', createdBy: 'Team Operations', status: 'published' },
       { id: 2, planDate: '10 Jun, 2022', createdBy: 'Team Operations', status: 'published' },
       { id: 3, planDate: '10 Jun, 2022', createdBy: 'Team Operations', status: 'published' },
@@ -34,10 +33,6 @@ const ProductionPlan = () => {
       { id: 10, planDate: '10 Jun, 2022', createdBy: 'Team Operations', status: 'published' },
       { id: 11, planDate: '10 Jun, 2022', createdBy: 'Team Operations', status: 'published' },
       { id: 12, planDate: '10 Jun, 2022', createdBy: 'Team Operations', status: 'published' },
-
-
-    
-  
   ];
   const tableStyle = {
     // margin: 'auto', 

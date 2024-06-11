@@ -177,7 +177,7 @@ const validateForm=()=>{
                           type="text" 
                           name="hsnCode" 
                           id="name" 
-                          placeholder="Enter name" 
+                          placeholder="Enter" 
                           value={formDatas.hsnCode}
                           onChange={handleChange} 
                           className={errors.hsnCode ? "is-invalid":""}
@@ -192,7 +192,7 @@ const validateForm=()=>{
                      type="text" 
                      name="name" 
                      id="name" 
-                     placeholder="Enter name" 
+                     placeholder="Enter" 
                      value={formDatas.name}
                      onChange={handleChange} 
                      className={errors.name ? "is-invalid":""}

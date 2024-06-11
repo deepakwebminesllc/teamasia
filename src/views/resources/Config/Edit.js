@@ -187,7 +187,7 @@ const validateForm=()=>{
                      type="text" 
                       name="DisplayName" 
                       id="name" 
-                      placeholder="Enter name" 
+                      placeholder="Enter" 
                       value={formDatas.DisplayName}
                       onChange={handleChange} 
                       className={errors.DisplayName ? "is-invalid":""}
@@ -202,7 +202,7 @@ const validateForm=()=>{
                      type="text" 
                       name="ConfigName" 
                       id="name" 
-                      placeholder="Enter name" 
+                      placeholder="Enter" 
                       value={formDatas.ConfigName}
                       onChange={handleChange}
                       disabled
@@ -231,7 +231,7 @@ const validateForm=()=>{
                      type="text" 
                       name="Value" 
                       id="name" 
-                      placeholder="Enter name" 
+                      placeholder="Enter" 
                       value={formDatas.Value}
                       onChange={handleChange} 
                       className={errors.Value ? "is-invalid":""}

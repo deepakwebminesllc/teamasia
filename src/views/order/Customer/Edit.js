@@ -21,6 +21,7 @@ import {
 } from 'reactstrap';
 // import { useParams } from 'react-router-dom';
 import ComponentCard from '../../../components/ComponentCard2';
+import OpenImageButton from './OpenImageButton';
 
 // import ComponentCard from '../../components/ComponentCard';
 
@@ -38,9 +39,13 @@ const Edit= () => {
     const [errorMessageFromApi, setErrorMessageFromApi] = useState([]);
     const [errors, setErrors] = useState({});
     const [imageFile, setImageFile] = useState(null);
-    
+    let compdocFromApi;
 console.log('AddLabels',location.state);
-
+if(compdoc.length === 0){
+  compdocFromApi=[{name:'',file_path:'',image_id:''}]
+}else{
+  compdocFromApi = compdoc;
+}
   
 const [formDatas, setFormDataS] = useState({
   companyName,
@@ -50,7 +55,7 @@ const [formDatas, setFormDataS] = useState({
   LimitforDaysAllowed,
   LimitforCreditAllowed,
   items,
-  compdoc
+  compdoc:compdocFromApi
 });
 
 const [selectedOptions, setSelectedOptions] = useState(Factory);
@@ -251,7 +256,7 @@ const handleInputChange = (index, event) => {
         const data = await response.json();
         console.log("dataapi",data,response.status);
         if (response.status === 200) {
-          navigate('/order/customers');
+          navigate(-1);
         } else {
           console.error("Authentication failed:", Object.values(data.messages.errors));
           if (data.error) {
@@ -319,14 +324,14 @@ const validateForm = () => {
           }
       });
 
-      formDatas.compdoc.forEach((element) => {
-        console.log('element',element);
-              if(element.name === ''){
-                 formIsValid = false;
-          // eslint-disable-next-line dot-notation
-                errors1["compDocName"] ="Required"
-              }
-          });
+      // formDatas.compdoc.forEach((element) => {
+      //   console.log('element',element);
+      //         if(element.name === ''){
+      //            formIsValid = false;
+      //     // eslint-disable-next-line dot-notation
+      //           errors1["compDocName"] ="Required"
+      //         }
+      //     });
   setErrors(errors1);
   return formIsValid;
 };
@@ -789,8 +794,9 @@ const handleSubmit = async (event) => {
                                             placeholder="" 
                                             />
                                       </td>
-                                      
-                                     
+                                      <td>
+                                        <OpenImageButton imageUrl={item.file_path} />
+                                     </td>
                                           
                                       <td>
                                         <button type="button"  style={{ backgroundColor:"red",marginTop:"5px"}} onClick={() => removeCompdoc(index)} disabled={index === 0}>X</button>

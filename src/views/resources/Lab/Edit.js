@@ -241,7 +241,7 @@ const validateForm=()=>{
                      type="text" 
                       name="name" 
                       id="name" 
-                      placeholder="Enter name" 
+                      placeholder="Enter" 
                       value={formDatas.name}
                       onChange={handleChange} 
                       className={errors.name ? "is-invalid":""}
@@ -256,7 +256,7 @@ const validateForm=()=>{
                      type="text" 
                       name="Method" 
                       id="name" 
-                      placeholder="Enter name" 
+                      placeholder="Enter" 
                       value={formDatas.Method}
                       onChange={handleChange} 
                       className={errors.Method ? "is-invalid":""}

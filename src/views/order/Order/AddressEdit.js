@@ -219,8 +219,7 @@ const handleTypeChange = (e) => {
         if (response.ok) {
 
           console.log('formdata2',formDatas)
-          navigate('/order/customers');
-            
+          navigate(-1);
         } 
             // Handle any errors, such as showing an error message to the user
             console.error("Authentication failed:", datas.message);
@@ -310,46 +309,6 @@ useEffect(()=>{
 },[data1,data3,data2])
 
   useEffect(() => {
-    
-    // Fetch the data from the API
-    // const fetchData = async () => {
-    //   const token = localStorage.getItem('userToken');
-    //   console.log('token',token);
-    //   const response = await fetch('https://factory.teamasia.in/api/public/addresses/1', {
-    //     method: 'GET', 
-    //     headers: {
-    //       'Authorization': `Bearer ${token}`
-    //     }
-    //   });
-    //   console.log('result',response);
-    //   if (!response.ok) {
-    //     throw new Error(`HTTP error! status: ${response.status}`);
-    //   }
-    //   const result = await response.json();
-    //   console.log("responsejson",id,result);
-    //   setData(result); 
-    //   setFormDataS(prevState => ({
-    //     ...prevState,
-    //     customer_id:result.customer_id,
-    //     factory_id:result.factory_id,
-    //     vendor_id:result.vendor_id,
-    //     address_type_id:result.address_type_id,
-    //     address_alias:result.address_alias,
-    //     address_line_1:result.address_line_1,
-    //     address_line_2:result.address_line_2,
-    //     landmark:result.landmark,
-    //     pincode:result.pincode,
-    //     country_id:result.country_id,
-    //     state_id:result.state_id,
-    //     city_id:result.city_id,
-    //     gst:result.gst,
-    //     tin:result.tin,
-    //     address_representative:result.addressrepresentatives
-    //   }));
-    //   setItems(result.addressrepresentatives);
-    // };
- 
-
     const fetchData1 = async () => {
       const token = localStorage.getItem('userToken');
       // console.log('token',token);

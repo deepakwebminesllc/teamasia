@@ -51,8 +51,8 @@ const handleChange = (e) => {
 const handleTypeChange = (e) => {
   const { name, value } = e.target;
 
-  console.log('name',name,value);
-  console.log('data3',data3);
+  // console.log('name',name,value);
+  // console.log('data3',data3);
   
   if(name === 'countryId'){
     
@@ -115,7 +115,7 @@ const handleTypeChange = (e) => {
   const removeItem = (index) => {
     const newItems = formDatas.items.slice();
     newItems.splice(index, 1);
-    console.log('newItems',newItems);
+    // console.log('newItems',newItems);
     setFormDataS(prevState=>({
       ...prevState,
       items:newItems
@@ -125,7 +125,7 @@ const handleTypeChange = (e) => {
   const handleInputChange = (index, event) => {
     const {name ,value,type} = event.target;
     const newItems = formDatas.items.slice();
-    console.log("data",index,newItems[index]);
+    // console.log("data",index,newItems[index]);
     if(type === 'checkbox'){
       console.log('check value',value,event.target.checked);
       if(newItems[index][name] === '0')

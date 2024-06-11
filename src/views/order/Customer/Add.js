@@ -89,9 +89,12 @@ const handleChangeLabel = (e) => {
 
 async function uploadImage(file){
   const token = localStorage.getItem('userToken');
+  if(!file){
+    return null
+  }
   try{
     const formData  = new  FormData();
-    formData.append('image_name','sanjay');
+    formData.append('image_name',formDatas.compdoc[0].name);
     formData.append('image_path[]',file);
     const response = await fetch('https://factory.teamasia.in/api/public/fileuploads',{
         method : 'POST',
@@ -100,7 +103,6 @@ async function uploadImage(file){
         },
         body:formData,
     });
-
     const data= await response.json();
     if(response.status === 201){
       console.error('success:',data.messages.image_details[0],response);
@@ -144,7 +146,7 @@ const addItem = () => {
 const removeItem = (index) => {
   const newItems = formDatas.items.slice();
   newItems.splice(index, 1);
-  console.log('newItems',newItems);
+  // console.log('newItems',newItems);
   setFormDataS(prevState=>({
     ...prevState,
     items:newItems
@@ -156,7 +158,7 @@ const handleInputChange = (index, event) => {
   const newItems = formDatas.items.slice();
   console.log("data",index,newItems[index]);
   if(type === 'checkbox'){
-    console.log('check value',value,event.target.checked);
+    // console.log('check value',value,event.target.checked);
     if(newItems[index][name] === '0')
     {
       newItems[index][name] =  '1';
@@ -167,7 +169,7 @@ const handleInputChange = (index, event) => {
   }
   else{
       newItems[index][name] =  value;
-      console.log('check not',newItems[index][name]);
+      // console.log('check not',newItems[index][name]);
   }
   setFormDataS(prevState=>({
         ...prevState,
@@ -197,19 +199,13 @@ const handleInputChange = (index, event) => {
   const handleCompdoc = (index, e) => {
     const { name , value} = e.target;
     const newItems = formDatas.compdoc.slice();
-    console.log("data",index,newItems);
+    // console.log("data",index,newItems);
     newItems[index][name] = value;
     setFormDataS(prevState => ({
       ...prevState,
       compdoc: newItems
     }));
   };
-
-  // const handleEditAddress = ()=>{
-    
-  //  console.log('address',location.state.companyName);
-  //   navigate('/order/customers/address');
-  // }
 
   const closer =()=>{
     setErrorMessageFromApi([]);
@@ -255,7 +251,7 @@ const handleInputChange = (index, event) => {
         const data = await response.json();
         console.log("dataapi",data,response.status);
         if (response.status === 201) {
-          navigate('/factories/factory');
+          navigate(-1);
         } else {
           console.error("Authentication failed:", Object.values(data.messages.errors));
           if (data.error) {
@@ -323,14 +319,14 @@ const validateForm = () => {
           }
       });
 
-      formDatas.compdoc.forEach((element) => {
-        console.log('element',element);
-              if(element.name === ''){
-                 formIsValid = false;
-          // eslint-disable-next-line dot-notation
-                errors1["compDocName"] ="Required"
-              }
-          });
+      // formDatas.compdoc.forEach((element) => {
+      //   console.log('element',element);
+      //         if(element.name === ''){
+      //            formIsValid = false;
+      //     // eslint-disable-next-line dot-notation
+      //           errors1["compDocName"] ="Required"
+      //         }
+      //     });
   setErrors(errors1);
   return formIsValid;
 };
@@ -380,11 +376,11 @@ const handleSubmit = async (event) => {
       setFactoryArray(obj);
   }
   companyOptions();
-  console.log('factoryarray',FactoryArray);
+  // console.log('factoryarray',FactoryArray);
   },[factorydata]);
 
   const handleRegularTags = (tags) => {
-    console.log('tags',tags);
+    // console.log('tags',tags);
     setRegularTags(tags);
   };
 
@@ -475,7 +471,7 @@ const handleSubmit = async (event) => {
                       type="textarea" 
                       name="CompanyDescription" 
                       id="name" 
-                      placeholder="Enter name" 
+                      placeholder="Enter" 
                       value={formDatas.CompanyDescription}
                       onChange={handleChange}
                       className={errors.CompanyDescription ? "is-invalid":""}
@@ -490,7 +486,7 @@ const handleSubmit = async (event) => {
                       type="text" 
                       name="LimitforDaysAllowed" 
                       id="name" 
-                      placeholder="Enter name" 
+                      placeholder="Enter value" 
                       value={formDatas.LimitforDaysAllowed}
                       onChange={handleChange}
                       className={errors.LimitforDaysAllowed ? "is-invalid":""}
@@ -506,7 +502,7 @@ const handleSubmit = async (event) => {
                       type="text" 
                       name="LimitforCreditAllowed" 
                       id="name" 
-                      placeholder="Enter name" 
+                      placeholder="Enter value" 
                       value={formDatas.LimitforCreditAllowed}
                       onChange={handleChange}
                       className={errors.LimitforCreditAllowed ? "is-invalid":""}

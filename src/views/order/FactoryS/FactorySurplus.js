@@ -21,7 +21,7 @@ const FactorySurplus = () => {
 
   const handleEditClick = (item) => {
 
-    navigate('/order/factory-surplus/edit', { state: item });
+    navigate('/order/factory-surplus/edit', { state: { item,data1,data2,data3,data4,data5} });
   };
   const handleView = (item) => {
 
@@ -30,7 +30,7 @@ const FactorySurplus = () => {
   
   const handleEditAdd = () => {
 
-    navigate('/order/factory-surplus/add');
+    navigate('/order/factory-surplus/add',{state: { data1,data2,data3,data4,data5}});
   };
   
   const handleDeleteClick = async (itemId) => {
@@ -62,13 +62,13 @@ const FactorySurplus = () => {
 
   function getGrainNameById(grainId) {
     const Name = data1.find(item => item.id === grainId);
-    console.log('a1',Name);
+    // console.log('a1',Name);
     return Name ? Name.name : 'Unknown grain';
   }
 
   function getFabricNameById(fabricId) {
     const Name = data2.find(item => item.id === fabricId);
-    console.log('a1',Name);
+    // console.log('a1',Name);
     return Name ? Name.name : 'Unknown fabric';
   }
 
@@ -78,26 +78,26 @@ const FactorySurplus = () => {
     if(Name){
        FabricColor = Name.fabriccolors.find(item => item.id === fabricColorId);
     }
-    console.log('a1',Name);
+    // console.log('a1',Name);
     return FabricColor ? FabricColor.name : 'Unknown fabricColor';
   }
 
   function getQualityNameById(qualityId) {
     const Name = data3.find(item => item.id === qualityId);
-    console.log('a1',Name);
+    // console.log('a1',Name);
     return Name ? Name.name : 'Unknown quality';
   }
 
   function getColorNameById(colorId) {
     const Name = data4.find(item => item.id === colorId);
-    console.log('a1',Name);
+    // console.log('a1',Name);
     return Name ?  Name.name : 'Unknown color';
   }
 
   function getHsnNameById(hsnId) {
-    console.log('hi',data5)
+    // console.log('hi',data5)
     const Name = data5.find(item => item.id === hsnId);
-    console.log('a14',Name);
+    // console.log('a14',Name);
     return Name ?  Name.name : 'Unknown hsn';
   }
 
@@ -131,14 +131,14 @@ const FactorySurplus = () => {
       }
       const result = await response.json();
       console.log("responsejson",result);
-      setData(result.products);
-
+      const resultFiltered = result.products.filter(product => product.ref_product_id === '0');
+      setData(resultFiltered);
     };
 
     const fetchData1 = async () => {
       const token = localStorage.getItem('userToken');
       // console.log('token',token);
-      const response = await fetch('https://factory.teamasia.in/api/public/grains/?is_trashed=0', {
+      const response = await fetch('https://factory.teamasia.in/api/public/grains', {
         method: 'GET', 
         headers: {
           'Authorization': `Bearer ${token}`
@@ -149,13 +149,15 @@ const FactorySurplus = () => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const result = await response.json();
-      console.log("responsejson1",result);
-      setData1(result.grains); 
+      // console.log("responsejson1",result);
+      const resultX = result.grains.slice();
+      resultX.push({id:'x',name:'Choose'});
+      setData1(resultX); 
     };
     const fetchData2 = async () => {
       const token = localStorage.getItem('userToken');
       // console.log('token',token);
-      const response = await fetch('https://factory.teamasia.in/api/public/fabrics/?is_trashed=0', {
+      const response = await fetch('https://factory.teamasia.in/api/public/fabrics', {
         method: 'GET', 
         headers: {
           'Authorization': `Bearer ${token}`
@@ -166,13 +168,15 @@ const FactorySurplus = () => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const result = await response.json();
-      console.log("responsejson2",result);
-      setData2(result.fabrics); 
+      // console.log("responsejson2",result);
+      const resultX = result.fabrics.slice();
+      resultX.push({id:'x',name:'Choose'});
+      setData2(resultX);
     };
     const fetchData3 = async () => {
       const token = localStorage.getItem('userToken');
       // console.log('token',token);
-      const response = await fetch('https://factory.teamasia.in/api/public/qualities/?is_trashed=0', {
+      const response = await fetch('https://factory.teamasia.in/api/public/qualities', {
         method: 'GET', 
         headers: {
           'Authorization': `Bearer ${token}`
@@ -183,13 +187,15 @@ const FactorySurplus = () => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const result = await response.json();
-      console.log("responsejson3",result);
-      setData3(result.qualities); 
+      // console.log("responsejson3",result);
+      const resultX = result.qualities.slice();
+      resultX.push({id:'x',name:'Choose'});
+      setData3(resultX);
     };
     const fetchData4 = async () => {
       const token = localStorage.getItem('userToken');
       // console.log('token',token);
-      const response = await fetch('https://factory.teamasia.in/api/public/colors/?is_trashed=0', {
+      const response = await fetch('https://factory.teamasia.in/api/public/colors', {
         method: 'GET', 
         headers: {
           'Authorization': `Bearer ${token}`
@@ -200,13 +206,14 @@ const FactorySurplus = () => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const result = await response.json();
-      console.log("responsejson4",result);
-      setData4(result.colors); 
+      const resultX = result.colors.slice();
+      resultX.push({id:'x',name:'Choose'});
+      setData4(resultX);
     };
     const fetchData5 = async () => {
       const token = localStorage.getItem('userToken');
       // console.log('token',token);
-      const response = await fetch('https://factory.teamasia.in/api/public/hsns/?is_trashed=0', {
+      const response = await fetch('https://factory.teamasia.in/api/public/hsns', {
         method: 'GET', 
         headers: {
           'Authorization': `Bearer ${token}`
@@ -217,8 +224,9 @@ const FactorySurplus = () => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const result = await response.json();
-      console.log("responsejson5",result);
-      setData5(result.hsns); 
+      const resultX = result.hsns.slice();
+      resultX.push({id:'x',name:'Choose'});
+      setData5(resultX);
     };
     fetchData5();
     fetchData4();

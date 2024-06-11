@@ -4,35 +4,33 @@ import PropTypes from 'prop-types';
 
 
 const JumbotronComponent = (props) => {
-  const [data, setData] = useState([]);
-  const [data1, setData1] = useState([]);
-  const [data2, setData2] = useState([]);
-  const [data3, setData3] = useState([]);
-  const [data4, setData4] = useState([]);
 
-const {orderId} = props;
+  const {orderID,data1,data2,data3,data4} = props;
+  const [data, setData] = useState([]);
+
+
 
   function getGrainNameById(grainId) {
     const Name = data1.find(item => item.id === grainId);
-    console.log('a1',Name);
+    // console.log('a1',Name);
     return Name ? Name.name : 'Unknown grain';
   }
 
   function getFabricNameById(fabricId) {
     const Name = data2.find(item => item.id === fabricId);
-    console.log('a1',Name);
+    // console.log('a1',Name);
     return Name ? Name.name : 'Unknown fabric';
   }
 
   function getQualityNameById(qualityId) {
     const Name = data3.find(item => item.id === qualityId);
-    console.log('a1',Name);
+    // console.log('a1',Name);
     return Name ? Name.name : 'Unknown quality';
   }
 
   function getColorNameById(colorId) {
     const Name = data4.find(item => item.id === colorId);
-    console.log('a1',Name);
+    // console.log('a1',Name);
     return Name ?  Name.name : 'Unknown color';
   }
 
@@ -52,7 +50,7 @@ const {orderId} = props;
     const fetchData = async () => {
       const token = localStorage.getItem('userToken');
       // console.log('token',token);
-      const response = await fetch(`https://factory.teamasia.in/api/public/products/?order_id=${orderId}`, {
+      const response = await fetch(`https://factory.teamasia.in/api/public/products/?order_id=${orderID}`, {
         method: 'GET', 
         headers: {
           'Authorization': `Bearer ${token}`
@@ -64,85 +62,11 @@ const {orderId} = props;
       }
       const result = await response.json();
       console.log("responsejson",result);
-      setData(result.products);
+      const resultFiltered = result.products.filter(product => product.ref_product_id === '0');
+      setData(resultFiltered);
 
     };
-
-    const fetchData1 = async () => {
-      const token = localStorage.getItem('userToken');
-      // console.log('token',token);
-      const response = await fetch('https://factory.teamasia.in/api/public/grains/?is_trashed=0', {
-        method: 'GET', 
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      // console.log('result',response);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const result = await response.json();
-      console.log("responsejson1",result);
-      setData1(result.grains); 
-    };
-    const fetchData2 = async () => {
-      const token = localStorage.getItem('userToken');
-      // console.log('token',token);
-      const response = await fetch('https://factory.teamasia.in/api/public/fabrics/?is_trashed=0', {
-        method: 'GET', 
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      // console.log('result',response);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const result = await response.json();
-      console.log("responsejson2",result);
-      setData2(result.fabrics); 
-    };
-    const fetchData3 = async () => {
-      const token = localStorage.getItem('userToken');
-      // console.log('token',token);
-      const response = await fetch('https://factory.teamasia.in/api/public/qualities/?is_trashed=0', {
-        method: 'GET', 
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      // console.log('result',response);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const result = await response.json();
-      console.log("responsejson3",result);
-      setData3(result.qualities); 
-    };
-    const fetchData4 = async () => {
-      const token = localStorage.getItem('userToken');
-      // console.log('token',token);
-      const response = await fetch('https://factory.teamasia.in/api/public/colors/?is_trashed=0', {
-        method: 'GET', 
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      // console.log('result',response);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const result = await response.json();
-      console.log("responsejson4",result);
-      setData4(result.colors); 
-    };
-    fetchData4();
-    fetchData3();
-    fetchData2();
-    fetchData1();
-    fetchData();
-
-  
+    fetchData();  
   },[]);
 
   return (
@@ -180,5 +104,9 @@ const {orderId} = props;
 export default JumbotronComponent;
 
 JumbotronComponent.propTypes = {
-  orderId: PropTypes.string.isRequired
+  orderID: PropTypes.string.isRequired,
+  data1: PropTypes.array.isRequired,
+  data2: PropTypes.array.isRequired,
+  data3: PropTypes.array.isRequired,
+  data4: PropTypes.array.isRequired
 };

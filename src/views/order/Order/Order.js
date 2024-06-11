@@ -19,9 +19,14 @@ const JumbotronComponent = () => {
 // const [data,setData] = useState([]);
       const [collapse, setCollapse] = useState(false);
       const navigate = useNavigate();
-      const [data,setData] = useState([]);
-      const [data1,setData1] = useState([]);
-     
+      const [Orderdata,setOrderData] = useState([]);
+      const [Customerdata,setCustomerData] = useState([]);
+      const [data1, setData1] = useState([]);
+      const [data2, setData2] = useState([]);
+      const [data3, setData3] = useState([]);
+      const [data4, setData4] = useState([]);
+      const [data5, setData5] = useState([]);
+
       function formatDate(inputDate) {
         const date = new Date(inputDate);
       
@@ -32,18 +37,17 @@ const JumbotronComponent = () => {
       }
       
       const toggle = () => setCollapse(!collapse);
-      
       const handleEditAdd = () => {
-        navigate('/order/orders/add');
+        navigate('/order/orders/add',{state: {data1,data2,data3,data4,data5}});
       };
 
       const  editOrder = (order) => {
-        navigate('/order/orders/edit',{state: order});
+        navigate('/order/orders/edit',{state: {order,data1,data2,data3,data4,data5}});
       };
 
       const  viewOrder = (item) => {
         console.log('hi');
-        navigate('/order/orders/view',{state:item});
+        navigate('/order/orders/view',{state:{item,data1,data2,data3,data4,data5}});
       };
 
       const  viewCustomer = (customerId) => {
@@ -52,15 +56,32 @@ const JumbotronComponent = () => {
       };
 
       const CustomerName =(customerId)=>{
-          const result =  data1.find((item)=> item.id === customerId);
+          const result =  Customerdata.find((item)=> item.id === customerId);
           if(!result){
             return 'unknown customer'
           }
           return result.company_name;
       }
 
+      const StatusName = (statusId) => {
+        switch(statusId) {
+          case '0':
+            return 'Under Review';
+          case '1':
+            return 'Confirmed';
+          case '2':
+            return 'Canceled';
+          case '3':
+            return 'Completed';
+          case '4':
+            return 'Parked';
+          default:
+            return 'Unknown Status';
+        }
+      };
+
       useEffect(()=>{
-        const fetchData = async ()=>{
+        const fetchOrderData = async ()=>{
 
           const token = localStorage.getItem('userToken');
           const response =await  fetch(`https://factory.teamasia.in/api/public/orders`,{
@@ -76,10 +97,10 @@ const JumbotronComponent = () => {
           
           const datas = await response.json();
           console.log('result',datas.orders);
-          setData(datas.orders);
+          setOrderData(datas.orders);
         }
 
-        const fetchData1 = async ()=>{
+        const fetchCustomerData = async ()=>{
 
           const token = localStorage.getItem('userToken');
           const response =await  fetch(`https://factory.teamasia.in/api/public/customers`,{
@@ -95,10 +116,110 @@ const JumbotronComponent = () => {
           
           const datas = await response.json();
           console.log('result1',datas.customers);
-          setData1(datas.customers);
+          setCustomerData(datas.customers);
         }
+        const fetchData1 = async () => {
+          const token = localStorage.getItem('userToken');
+          // console.log('token',token);
+          const response = await fetch('https://factory.teamasia.in/api/public/grains', {
+            method: 'GET', 
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          // console.log('result',response);
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          const result = await response.json();
+          console.log("responsejson1",result);
+          const resultX = result.grains.slice();
+          resultX.push({id:'x',name:'Choose'});
+          setData1(resultX); 
+        };
+        const fetchData2 = async () => {
+          const token = localStorage.getItem('userToken');
+          // console.log('token',token);
+          const response = await fetch('https://factory.teamasia.in/api/public/fabrics', {
+            method: 'GET', 
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          // console.log('result',response);
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          const result = await response.json();
+          console.log("responsejson2",result);
+          const resultX = result.fabrics.slice();
+          resultX.push({id:'x',name:'Choose'});
+          setData2(resultX);
+        };
+        const fetchData3 = async () => {
+          const token = localStorage.getItem('userToken');
+          // console.log('token',token);
+          const response = await fetch('https://factory.teamasia.in/api/public/qualities', {
+            method: 'GET', 
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          // console.log('result',response);
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          const result = await response.json();
+          console.log("responsejson3",result);
+          const resultX = result.qualities.slice();
+          resultX.push({id:'x',name:'Choose'});
+          setData3(resultX);
+        };
+        const fetchData4 = async () => {
+          const token = localStorage.getItem('userToken');
+          // console.log('token',token);
+          const response = await fetch('https://factory.teamasia.in/api/public/colors', {
+            method: 'GET', 
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          // console.log('result',response);
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          const result = await response.json();
+          const resultX = result.colors.slice();
+          resultX.push({id:'x',name:'Choose'});
+          setData4(resultX);
+        };
+        const fetchData5 = async () => {
+          const token = localStorage.getItem('userToken');
+          // console.log('token',token);
+          const response = await fetch('https://factory.teamasia.in/api/public/hsns', {
+            method: 'GET', 
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          // console.log('result',response);
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          const result = await response.json();
+          const resultX = result.hsns.slice();
+          resultX.push({id:'x',name:'Choose'});
+          setData5(resultX);
+        };
+
+        fetchData5();
+        fetchData4();
+        fetchData3();
+        fetchData2();
         fetchData1();
-        fetchData();
+
+        fetchCustomerData();
+        fetchOrderData();
       },[])
 
   return (
@@ -113,17 +234,17 @@ const JumbotronComponent = () => {
                   <Button className='my-btn-color' onClick={toggle.bind(null)} style={{ marginBottom: '1rem',marginRight:'10px' }}>
                     Search
                   </Button>
-                  <Button className='my-btn-color-green' style={{ marginBottom: '1rem',marginRight:'10px' }} onClick={() => handleEditAdd()}>
+                  {/* <Button className='my-btn-color-green' style={{ marginBottom: '1rem',marginRight:'10px' }} >
                     Parked
                   </Button>
                 </Col>
                 <Col md="8" style={{textAlign:'right'}}>
-                   <Button className='my-btn-color-red' style={{ marginBottom: '1rem',marginRight:'10px' }} onClick={() => handleEditAdd()}>
+                   <Button className='my-btn-color-red' style={{ marginBottom: '1rem',marginRight:'10px' }} >
                      Print
                   </Button>
-                   <Button className='my-btn-color-green' style={{ marginBottom: '1rem',marginRight:'10px' }} onClick={() => handleEditAdd()}>
+                   <Button className='my-btn-color-green' style={{ marginBottom: '1rem',marginRight:'10px' }} >
                     Sort By Customer
-                  </Button>
+                  </Button> */}
                 </Col>
               </Row>
               <Row>
@@ -238,7 +359,7 @@ const JumbotronComponent = () => {
                       <th>Order Details</th>
                       <th>Order and Exp Date</th>
                       <th>
-                        <Table>
+                        <Table className="order-page-table-product-heading" style={{padding:'0px'}}>
                            <tbody>
                             <tr>
                             <td>         Grain </td>
@@ -258,7 +379,7 @@ const JumbotronComponent = () => {
                     </tr>
                   </thead>
                   <tbody >
-                    {data.map((item)=>(
+                    {Orderdata.map((item)=>(
                           <tr >
                           <td>
                             <Table className="order-page-table" size="sm">
@@ -273,13 +394,13 @@ const JumbotronComponent = () => {
                                 </tr>
                                 <tr>
                                   <th>
-                                      Confirmed
+                                      {StatusName(item.status_id)}
                                   </th>
                                   <th>
                                         <button type="button" className="btn mybtncustomer btn-secondary  mr-1" onClick={()=>{editOrder(item)}}><i className="bi bi-pencil-fill my-pen-color" /></button>
                                         <button type="button" className="btn mybtncustomer btn-secondary  mr-1" onClick={()=>{viewOrder(item)}}><i className="bi bi-eye-fill my-list-color" /></button>
-                                        <button type="button" className="btn mybtncustomer btn-secondary  mr-1"><i className="bi bi-files my-eye-color" /></button>
-                                        <button type="button" className="btn mybtncustomer btn-secondary  mr-1"><i className="bi bi-file-earmark-check-fill my-eye-color" /></button>
+                                        {/* <button type="button" className="btn mybtncustomer btn-secondary  mr-1"><i className="bi bi-files my-eye-color" /></button> */}
+                                        {/* <button type="button" className="btn mybtncustomer btn-secondary  mr-1"><i className="bi bi-file-earmark-check-fill my-eye-color" /></button> */}
                                         <button type="button" className="btn mybtncustomer btn-secondary  mr-1" onClick={()=>{viewCustomer(item.customer_id)}}><i className="bi bi-person-fill my-trash-color" /></button>
                                   </th>
                                 </tr>
@@ -296,7 +417,7 @@ const JumbotronComponent = () => {
                             </div>
                           </td> 
                           <td>
-                          <OrderProduct orderId = {item.id}/> 
+                          <OrderProduct orderID = {item.id} data1={data1} data2={data2} data3={data3} data4={data4}/> 
                           </td>
                           </tr>
                     ))}

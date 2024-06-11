@@ -180,7 +180,7 @@ apiCall();
                       type="text" 
                       name="name" 
                       id="name" 
-                      placeholder="Enter name" 
+                      placeholder="Enter" 
                       value={formDatas.name}
                       onChange={handleChange}
                      />
@@ -194,7 +194,7 @@ apiCall();
                       type="text" 
                       name="Status" 
                       id="name" 
-                      placeholder="Enter name" 
+                      placeholder="Enter" 
                       value={formDatas.Status}
                       onChange={handleChange}
                      />
@@ -225,7 +225,7 @@ apiCall();
                       type="textarea" 
                       name="ShortDescription" 
                       id="name" 
-                      placeholder="Enter name" 
+                      placeholder="Enter" 
                       value={formDatas.ShortDescription}
                       onChange={handleChange}
                      />
@@ -239,7 +239,7 @@ apiCall();
                       type="textarea" 
                       name="SmsContent" 
                       id="name" 
-                      placeholder="Enter name" 
+                      placeholder="Enter" 
                       value={formDatas.SmsContent}
                       onChange={handleChange}
                      />
@@ -253,7 +253,7 @@ apiCall();
                       type="text"   
                       name="Subject" 
                       id="name" 
-                      placeholder="Enter name" 
+                      placeholder="Enter" 
                       value={formDatas.Subject}
                       onChange={handleChange}
                      />

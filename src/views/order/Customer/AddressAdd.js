@@ -143,7 +143,7 @@ const handleTypeChange = (e) => {
   const removeItem = (index) => {
     const newItems = formDatas.items.slice();
     newItems.splice(index, 1);
-    console.log('newItems',newItems);
+    // console.log('newItems',newItems);
     setFormDataS(prevState=>({
       ...prevState,
       items:newItems
@@ -153,7 +153,7 @@ const handleTypeChange = (e) => {
   const handleInputChange = (index, event) => {
     const {name ,value,type} = event.target;
     const newItems = formDatas.items.slice();
-    console.log("data",index,newItems[index]);
+    // console.log("data",index,newItems[index]);
     if(type === 'checkbox'){
       console.log('check value',value,event.target.checked);
       if(newItems[index][name] === '0')
@@ -181,7 +181,7 @@ const handleTypeChange = (e) => {
   async function apiCall() {
     try {
         
-        console.log('dataX',formDatas);
+        // console.log('dataX',formDatas);
         // const filtered = formDatas.items.filter((temp)=>{
         //   return temp.name !== '';
         // })
@@ -298,14 +298,14 @@ const handleSubmit = async (event) => {
 
 useEffect(()=>{
     const stateElement1 = data3.filter(item => item.country_id === formDatas.countryId);
-    console.log('element1',data3,stateElement1,formDatas.countryId);
+    // console.log('element1',data3,stateElement1,formDatas.countryId);
     const resultX = stateElement1.slice();
     resultX.push({id:'x',name:'Choose'});
     setData3x(resultX);
     
 
     const stateElement2 = data1.filter(item => item.state_id === formDatas.stateId);
-    console.log('element2',data1,stateElement2,formDatas.stateId);
+    // console.log('element2',data1,stateElement2,formDatas.stateId);
     const resultY = stateElement2.slice();
     resultY.push({id:'x',name:'Choose'});
     setData1x(resultY);
@@ -324,7 +324,7 @@ useEffect(() => {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     const result = await response.json();
-    console.log("data1(cities)", result.cities);
+    // console.log("data1(cities)", result.cities);
     const resultX = result.cities.slice();
     resultX.push({ id: 'x', name: 'Choose' });
     setData1x(resultX);

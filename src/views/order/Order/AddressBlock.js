@@ -2,13 +2,13 @@ import React ,{useState,useEffect} from 'react';
 import {
   Table
 } from 'reactstrap';
-import { useLocation} from 'react-router-dom';
+// import { useLocation} from 'react-router-dom';
 import PropTypes from 'prop-types';
 import ComponentCard4 from '../../../components/ComponentCard4';
 import 'react-table-v6/react-table.css';
 
 const JumbotronComponent = (props) => {
-  const location = useLocation();
+  // const location = useLocation();
   const [data,setData] = useState({});
   const [data1,setData1] = useState('');
   const [data2,setData2] = useState('');
@@ -16,7 +16,7 @@ const JumbotronComponent = (props) => {
   const [data4,setData4] = useState('');
 
 
-  console.log('locationHYBRID',location.state,props)
+  // console.log('locationHYBRID',location.state,props)
 
    useEffect(()=>{
 
@@ -33,7 +33,7 @@ const JumbotronComponent = (props) => {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
    const result = await response.json();
-   console.log('responsejsonHYBRID',result);
+  //  console.log('responsejsonHYBRID',result);
    if(result.length !==0){
      setData1(result[0].name);
    }
@@ -51,7 +51,7 @@ const JumbotronComponent = (props) => {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
    const result = await response.json();
-   console.log('responsejsonHYBRID',result);
+  //  console.log('responsejsonHYBRID',result);
    if(result.length !==0){
     setData2(result[0].name);
   }
@@ -70,7 +70,7 @@ const JumbotronComponent = (props) => {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
    const result = await response.json();
-   console.log('responsejsonHYBRID',result);
+  //  console.log('responsejsonHYBRID',result);
    if(result.length !==0){
     setData3(result[0].name);
   }
@@ -89,7 +89,7 @@ const JumbotronComponent = (props) => {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
    const result = await response.json();
-   console.log('responsejsonHYBRID',result);
+  //  console.log('responsejsonHYBRID',result);
    if(result.length !==0){
     setData4(result[0].name);
   }
@@ -108,7 +108,7 @@ const JumbotronComponent = (props) => {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
    const result = await response.json();
-   console.log('responsejsonHYBRID',result);
+  //  console.log('responsejsonHYBRID',result);
    if(result){
      fetchDataforCity(result.city_id);
      fetchDataforAddressType(result.address_type_id);

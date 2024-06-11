@@ -155,7 +155,7 @@ const validateForm=()=>{
                      type="text" 
                       name="name" 
                       id="name" 
-                      placeholder="Enter name" 
+                      placeholder="Enter" 
                       value={formDatas.name}
                       onChange={handleChange} 
                       className={errors.name ? "is-invalid":""}
@@ -170,7 +170,7 @@ const validateForm=()=>{
                      type="number" 
                       name="sortOrder" 
                       id="name" 
-                      placeholder="Enter name" 
+                      placeholder="Enter" 
                       value={formDatas.sortOrder}
                       onChange={handleChange} 
                       className={errors.sortOrder ? "is-invalid":""}

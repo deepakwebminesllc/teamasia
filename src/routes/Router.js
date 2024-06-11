@@ -31,6 +31,7 @@ const  OrdersAdd= Loadable(lazy(() => import('../views/order/Order/Add')));
 const  OrdersEdit= Loadable(lazy(() => import('../views/order/Order/Edit')));
 const  OrdersView= Loadable(lazy(() => import('../views/order/Order/View')));
 const  OrdersProductAdd= Loadable(lazy(() => import('../views/order/Order/productAdd')));
+const  OrdersProductEdit= Loadable(lazy(() => import('../views/order/Order/productEdit')));
 
 const  FactorySurplus = Loadable(lazy(() => import('../views/order/FactoryS/FactorySurplus')));
 const  FactorySurplusEdit = Loadable(lazy(() => import('../views/order/FactoryS/Edit')));
@@ -337,6 +338,7 @@ const ThemeRoutes = [
       { path: '/order/orders/edit', name: 'Modern', exact: true, element: <ProtectedRoute> <OrdersEdit /> </ProtectedRoute> },
       { path: '/order/orders/view', name: 'Modern', exact: true, element: <ProtectedRoute> <OrdersView /> </ProtectedRoute> },
       { path: '/order/orders/product-add', name: 'Modern', exact: true, element: <ProtectedRoute> <OrdersProductAdd /> </ProtectedRoute> },
+      { path: '/order/orders/product-edit', name: 'Modern', exact: true, element: <ProtectedRoute> <OrdersProductEdit /> </ProtectedRoute> },
 
       { path: '/order/factory-surplus', name: 'Modern', exact: true, element:  <ProtectedRoute><FactorySurplus /></ProtectedRoute>  },
       { path: '/order/factory-surplus/edit', name: 'Modern', exact: true, element:  <ProtectedRoute><FactorySurplusEdit /></ProtectedRoute>  },

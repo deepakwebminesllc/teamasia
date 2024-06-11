@@ -22,7 +22,7 @@ const JumbotronComponent = () => {
   };
 
   const handleSmallRollCreate = () => {
-    navigate('/order/factory-surplus/small-roll-create');
+    navigate('/order/factory-surplus/small-roll-create',{state:product.id});
   };
   const handleSmallRollEdit = (rollItem) => {
     navigate('/order/factory-surplus/small-roll-edit', {state: rollItem});
@@ -58,7 +58,7 @@ const JumbotronComponent = () => {
     const fetchData = async () => {
       const token = localStorage.getItem('userToken');
       // console.log('token',token);
-      const response = await fetch('https://factory.teamasia.in/api/public/rolls?is_trashed=0', {
+      const response = await fetch(`https://factory.teamasia.in/api/public/rolls/?product_id=${product.id}`, {
         method: 'GET', 
         headers: {
           'Authorization': `Bearer ${token}`
@@ -102,12 +102,12 @@ const JumbotronComponent = () => {
                   <Row  style={{background:'#e3e3e3',padding:'2px'}}>
                     <Col md="6">
                       <div style={{margin:'0px 0px'}}>
-                        <div className='fix-wid-1'><i className="bi-menu-button-wide-fill my-eye-color" style={{fontSize:'20px',marginRight:'1px'}}/>Product</div> 
+                        <div className='fix-wid-1'><i className="bi-menu-button-wide-fill my-eye-color" style={{fontSize:'20px',marginRight:'1px'}}/>Product {product.id}</div> 
                       </div>
                     </Col>
                     <Col md="6" style={{padding:'5px 0px 0px 0px'}}>
-                      <button type='button' className="btn mybtncustomer my-btn-color-blue mr-1"> Remaining:19.80 meters</button>
-                      <button type='button' className="btn mybtncustomer my-btn-color mr-1"> Total: 450 meters</button>
+                      {/* <button type='button' className="btn mybtncustomer my-btn-color-blue mr-1"> Remaining:19.80 meters</button>
+                      <button type='button' className="btn mybtncustomer my-btn-color mr-1"> Total: 450 meters</button> */}
                       <button type='button' className="btn mybtncustomer my-btn-color-red mr-1" onClick={() => handleSmallRollCreate()}> Create Small Roll </button>
                     </Col>
                   </Row>
@@ -199,25 +199,6 @@ const JumbotronComponent = () => {
                                  )
                               })
                             }
-
-                          
-
-                          <tr>
-                            <td>5</td>
-                            <td>17 m</td>
-                            <td>Ist</td>
-                            <td>30.92 kg</td>
-                            <td></td>
-                            <td>1299.16</td>
-                            <td><img src={Barcode} alt='barcode'/></td>
-                            <td>
-                              <td ><Button ><i className="bi bi-printer-fill my-pen-color" /></Button></td>
-                              <td ><Button ><i className="bi bi-pencil-fill my-eye-color" /></Button></td>
-                              <td ><Button ><i className="bi bi-trash-fill my-bell-color" /></Button></td>
-                            </td>
-                            <td></td>
-                          </tr>
-                        
                         </tbody>
                       </Table>
               </ComponentCard4>

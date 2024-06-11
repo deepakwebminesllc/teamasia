@@ -67,6 +67,9 @@ const Edit = () => {
 
   async function uploadImage(file){
     const token = localStorage.getItem('userToken');
+    if(!file){
+    return null
+  }
     try{
       const formData  = new  FormData();
       formData.append('image_name','sanjay');
@@ -103,41 +106,48 @@ const Edit = () => {
   async function apiCall() {
     try {
       const imageDetails = await uploadImage(imageFile);
+      let finalimagepath='';
+      let finalimageId='';
+      
       console.log('imageDetails',imageDetails);
       if(imageDetails){
-        console.log('formdata',formDatas);
-
-        const token = localStorage.getItem('userToken');
-        const response = await fetch(`https://factory.teamasia.in/api/public/faults`, {
-            method: "POST",
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`
-            },
-           
-            body: JSON.stringify({
-              name:formDatas.name,
-              code:formDatas.code,
-              description:formDatas.description,
-              image_path:imageDetails.image_path,
-              image_id:imageDetails.image_id,
-              is_trashed:formDatas.isTrashed,
-            }),
-        });
-       
-        const data = await response.json();
-        console.log("dataapi",data,response.status);
-        if (response.status === 201) {
-          navigate('/resources/faults');
-        } else {
-          console.error("Authentication failed:", Object.values(data.messages.errors));
-          if (data.messages && data.messages.errors) {
-            setErrorMessageFromApi(Object.values(data.messages.errors));
-          }else {
-            setErrorMessageFromApi(["Unknown error occurred"]);
-          }
-        }  
+        finalimagepath = imageDetails.image_path;
+        finalimageId = imageDetails.image_id;
       }
+
+      console.log('formdata',formDatas);
+
+      const token = localStorage.getItem('userToken');
+      const response = await fetch(`https://factory.teamasia.in/api/public/faults`, {
+          method: "POST",
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+         
+          body: JSON.stringify({
+            name:formDatas.name,
+            code:formDatas.code,
+            description:formDatas.description,
+            image_path:finalimagepath,
+            image_id:finalimageId,
+            is_trashed:formDatas.isTrashed,
+          }),
+      });
+     
+      const data = await response.json();
+      console.log("dataapi",data,response.status);
+      if (response.status === 201) {
+        navigate('/resources/faults');
+      } else {
+        console.error("Authentication failed:", Object.values(data.messages.errors));
+        if (data.messages && data.messages.errors) {
+          setErrorMessageFromApi(Object.values(data.messages.errors));
+        }else {
+          setErrorMessageFromApi(["Unknown error occurred"]);
+        }
+      }  
+
         return null;
     } catch (error) {
        setErrorMessageFromApi(["Network error"]);
@@ -214,7 +224,7 @@ const validateForm=()=>{
                      type="text" 
                       name="code" 
                       id="name" 
-                      placeholder="Enter name" 
+                      placeholder="Enter" 
                       value={formDatas.code}
                       onChange={handleChange} 
                       className={errors.code ? "is-invalid":""}
@@ -229,7 +239,7 @@ const validateForm=()=>{
                       type="text" 
                         name="name" 
                         id="name" 
-                        placeholder="Enter name" 
+                        placeholder="Enter" 
                         value={formDatas.name}
                         onChange={handleChange} 
                         className={errors.name ? "is-invalid":""}
@@ -244,7 +254,7 @@ const validateForm=()=>{
                      type="text" 
                       name="description" 
                       id="name" 
-                      placeholder="Enter name" 
+                      placeholder="Enter" 
                       value={formDatas.description}
                       onChange={handleChange} 
                      />
