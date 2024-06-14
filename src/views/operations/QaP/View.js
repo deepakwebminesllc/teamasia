@@ -24,6 +24,7 @@ const JumbotronComponent = () => {
  
   const var1 = "Total: 170 meters"
   const var2 = "Remaining: 9.00 meters"
+  
   const [collapse, setCollapse] = useState(false);
 
   const toggle = () =>{   

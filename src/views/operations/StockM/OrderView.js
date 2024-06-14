@@ -9,6 +9,7 @@ import {
 import ComponentCard from '../../../components/ComponentCard';
 import 'react-table-v6/react-table.css';
 import Barcode from "../../../assets/images/bg/barcode.png"
+import SmallRollDetails from './smallRollDetails'
 
 const JumbotronComponent = () => {
   const data = [
@@ -19,6 +20,12 @@ const JumbotronComponent = () => {
     '296'
   ]
   const [collapse, setCollapse] = useState(Array.from({length: data.length}, ()=>false));
+  const [modal, setModal] = useState(false);
+
+ 
+  
+
+
 
 
   const collapseSetter = (index)=>{
@@ -27,9 +34,14 @@ const JumbotronComponent = () => {
     newCollapse[index] = !newCollapse[index];
     setCollapse(newCollapse);
   }
-
+  
+  const smallRollDetailsTogglefunction = ()=>{
+    console.log('click');
+    setModal(!modal)
+  }
   return (
     <>
+       <SmallRollDetails modal={modal} toggle={smallRollDetailsTogglefunction}/>
       <ComponentCard title="">
        { data.map((item,index) =>(
 
@@ -41,7 +53,7 @@ const JumbotronComponent = () => {
               
             </Col>
             <Collapse isOpen={collapse[index]}>
-            <Table className='table-margin-zero'>
+            <Table className='table-margin-zero' responsive>
                   <thead>
                     <tr>
                       <th scope="col">Quantity</th>
@@ -65,12 +77,15 @@ const JumbotronComponent = () => {
                               <td>3008 B</td>
                               <td>brown</td>
                               <td>1.2 mm</td>
-                              <td><img src={Barcode} alt='barcode'/></td>
+                              <td >
+                                  <span onClick={()=>smallRollDetailsTogglefunction()}>
+                                    <img src={Barcode} alt='barcode'/>
+                                  </span>
+                              </td>
                               <td>
-                              <td ><Button ><i className="bi bi-printer-fill my-bell-color" /></Button></td>
+                                <td ><Button ><i className="bi bi-printer-fill my-bell-color" /></Button></td>
                                 <td ><Button ><i className="bi bi-pencil-fill my-pen-color" /></Button></td>
                                 <td ><Button ><i className="bi bi-trash-fill my-trash-color" /></Button></td>
-                                <td ><Button ><i className="bi bi-printer-fill my-bell-color" /></Button></td>
                               </td>
                               <td></td>
                               
@@ -89,7 +104,6 @@ const JumbotronComponent = () => {
                                 <td ><Button ><i className="bi bi-printer-fill my-bell-color" /></Button></td>
                                 <td ><Button ><i className="bi bi-pencil-fill my-pen-color" /></Button></td>
                                 <td ><Button ><i className="bi bi-trash-fill my-trash-color" /></Button></td>
-                                <td ><Button ><i className="bi bi-printer-fill my-bell-color" /></Button></td>
                               </td>
                               <td></td>
                               

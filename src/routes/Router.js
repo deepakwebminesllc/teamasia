@@ -48,6 +48,7 @@ const  OrderTemplatesProductEdit = Loadable(lazy(() => import('../views/order/Or
 
 const  ProductionPlan = Loadable(lazy(() => import('../views/operations/ProductionP/ProductionPlan')));
 const  ProductionPlanView = Loadable(lazy(() => import('../views/operations/ProductionP/View')));
+const  ProductionPlanManagePlan = Loadable(lazy(() => import('../views/operations/ProductionP/ManagePlan')));
 
 
 const  AdditionalTreat= Loadable(lazy(() => import('../views/operations/AdditionalT/AdditionalTreat')));
@@ -64,6 +65,9 @@ const  QaPackView = Loadable(lazy(() => import('../views/operations/QaP/View')))
 
 const  StockManagement= Loadable(lazy(() => import('../views/operations/StockM/StockManagement')));
 const  StockManagementOrderView= Loadable(lazy(() => import('../views/operations/StockM/OrderView')));
+const  StockManagementBomReport= Loadable(lazy(() => import('../views/operations/StockM/BomReport')));
+const  StockManagementLabReport= Loadable(lazy(() => import('../views/operations/StockM/LabReport')));
+const  StockManagementProductionReport= Loadable(lazy(() => import('../views/operations/StockM/ProductionReport')));
 
 const  ByOrder = Loadable(lazy(() => import('../views/executive/ByO/ByOrder')));
 const  BySmallRoll = Loadable(lazy(() => import('../views/executive/ByS/BySmallRoll')));
@@ -355,6 +359,7 @@ const ThemeRoutes = [
 
       { path: '/operations/production-plans', name: 'Modern', exact: true, element:  <ProtectedRoute><ProductionPlan />  </ProtectedRoute>},
       { path: '/operations/production-plans/view', name: 'Modern', exact: true, element: <ProtectedRoute> <ProductionPlanView /> </ProtectedRoute> },
+      { path: '/operations/production-plans/manage-plan', name: 'Modern', exact: true, element: <ProtectedRoute> <ProductionPlanManagePlan/> </ProtectedRoute> },
       
 
       { path: '/operations/additional-treatment', name: 'Modern', exact: true, element: <ProtectedRoute> <AdditionalTreat /> </ProtectedRoute> },
@@ -370,6 +375,9 @@ const ThemeRoutes = [
 
       { path: '/operations/stock-management', name: 'Modern', exact: true, element: <ProtectedRoute> <StockManagement /></ProtectedRoute>  },
       { path: '/operations/stock-management/order-view', name: 'Modern', exact: true, element: <ProtectedRoute> <StockManagementOrderView /></ProtectedRoute> },
+      { path: '/operations/Bom-Report', name: 'Modern', exact: true, element: <ProtectedRoute> <StockManagementBomReport /></ProtectedRoute> },
+      { path: '/operations/Lab-Report', name: 'Modern', exact: true, element: <ProtectedRoute> <StockManagementLabReport /></ProtectedRoute> },
+      { path: '/operations/Production-Report', name: 'Modern', exact: true, element: <ProtectedRoute> <StockManagementProductionReport /></ProtectedRoute> },
 
       { path: '/executive/by-order', name: 'Modern', exact: true, element: <ProtectedRoute> <ByOrder />  </ProtectedRoute>},
       { path: '/executive/by-small-roll', name: 'Modern', exact: true, element: <ProtectedRoute> <BySmallRoll />  </ProtectedRoute>},

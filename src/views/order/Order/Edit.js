@@ -192,6 +192,7 @@ const closer =()=>{
               image_id:formDatas.imageId,
               purchase_order_document_file_path:formDatas.purchaseOrderDocumentFilePath,
               representative_id:formDatas.representativeId,
+              status_id:formDatas.statusId,
               is_trashed:0,
             }),
         });

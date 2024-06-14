@@ -26,6 +26,15 @@ const Products = (props) => {
     // console.log('a1',Name);
     return Name ? Name.name : 'Unknown fabric';
   }
+  function getFabricColorNameById(fabricId,fabricColorId) {
+    const Name = data2.find(item => item.id === fabricId);
+    let FabricColor = null;
+    if(Name){
+       FabricColor = Name.fabriccolors.find(item => item.id === fabricColorId);
+    }
+    // console.log('a1',Name);
+    return FabricColor ? FabricColor.name : 'Unknown fabricColor';
+  }
 
   function getQualityNameById(qualityId) {
     const Name = data3.find(item => item.id === qualityId);
@@ -50,6 +59,7 @@ const Products = (props) => {
     ...product,
     grainName: getGrainNameById(product.grain_id),
     fabricName: getFabricNameById(product.fabric_id),
+    fabricColorName: getFabricColorNameById(product.fabric_id,product.fabric_color_id),
     qualityName: getQualityNameById(product.quality_id),
     colorName: getColorNameById(product.color_id),
     hsnName: getHsnNameById(product.hsn_id)
@@ -143,7 +153,7 @@ const Products = (props) => {
                           <td title={product.qualityName}>{product.qualityName}</td>
                           <td title={product.thickness}>{product.thickness}</td>
                           <td title={product.fabricName}>{product.fabricName}</td>
-                          <td title={product.fabricName}>{product.fabricName}</td>
+                          <td title={product.fabricColorName}>{product.fabricColorName}</td>
                           <td title={product.hsnName}>{product.hsnName}</td>
                           <td title={product.price}>{product.price}</td>
                           <td title={product.tax_rate}>{product.tax_rate}%</td>

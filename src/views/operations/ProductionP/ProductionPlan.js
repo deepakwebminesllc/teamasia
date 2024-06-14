@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Collapse,
@@ -34,6 +34,11 @@ const ProductionPlan = () => {
       { id: 11, planDate: '10 Jun, 2022', createdBy: 'Team Operations', status: 'published' },
       { id: 12, planDate: '10 Jun, 2022', createdBy: 'Team Operations', status: 'published' },
   ];
+  const [data1, setData1] = useState([]);
+  const [data2, setData2] = useState([]);
+  const [data3, setData3] = useState([]);
+  const [data4, setData4] = useState([]);
+  const [data5, setData5] = useState([]);
   const tableStyle = {
     // margin: 'auto', 
     // width: '60%',  
@@ -43,10 +48,114 @@ const ProductionPlan = () => {
   const toggle1 = () => setCollapse1(!collapse1);
 
   const handleViewClick = (item) => {
-    // Navigate to the edit page with the item's id
-    // Navigate(`/resources/address-types/edit/${itemId}`);
     navigate('/operations/production-plans/view', { state: item });
   };
+  const handleManagePlan = () => {
+    navigate('/operations/production-plans/manage-plan',{ state: {data1,data2,data3,data4,data5} });
+  };
+
+  useEffect(()=>{
+    const fetchData1 = async () => {
+      const token = localStorage.getItem('userToken');
+      // console.log('token',token);
+      const response = await fetch('https://factory.teamasia.in/api/public/grains', {
+        method: 'GET', 
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      // console.log('result',response);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const result = await response.json();
+      console.log("responsejson1",result);
+      const resultX = result.grains.slice();
+      resultX.push({id:'x',name:'Choose'});
+      setData1(resultX); 
+    };
+    const fetchData2 = async () => {
+      const token = localStorage.getItem('userToken');
+      // console.log('token',token);
+      const response = await fetch('https://factory.teamasia.in/api/public/fabrics', {
+        method: 'GET', 
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      // console.log('result',response);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const result = await response.json();
+      console.log("responsejson2",result);
+      const resultX = result.fabrics.slice();
+      resultX.push({id:'x',name:'Choose'});
+      setData2(resultX);
+    };
+    const fetchData3 = async () => {
+      const token = localStorage.getItem('userToken');
+      // console.log('token',token);
+      const response = await fetch('https://factory.teamasia.in/api/public/qualities', {
+        method: 'GET', 
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      // console.log('result',response);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const result = await response.json();
+      console.log("responsejson3",result);
+      const resultX = result.qualities.slice();
+      resultX.push({id:'x',name:'Choose'});
+      setData3(resultX);
+    };
+    const fetchData4 = async () => {
+      const token = localStorage.getItem('userToken');
+      // console.log('token',token);
+      const response = await fetch('https://factory.teamasia.in/api/public/colors', {
+        method: 'GET', 
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      // console.log('result',response);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const result = await response.json();
+      const resultX = result.colors.slice();
+      resultX.push({id:'x',name:'Choose'});
+      setData4(resultX);
+    };
+    const fetchData5 = async () => {
+      const token = localStorage.getItem('userToken');
+      // console.log('token',token);
+      const response = await fetch('https://factory.teamasia.in/api/public/hsns', {
+        method: 'GET', 
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      // console.log('result',response);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const result = await response.json();
+      const resultX = result.hsns.slice();
+      resultX.push({id:'x',name:'Choose'});
+      setData5(resultX);
+    };
+
+    fetchData5();
+    fetchData4();
+    fetchData3();
+    fetchData2();
+    fetchData1();
+  },[])
+
   return (
     <ComponentCard
     title=""
@@ -56,9 +165,12 @@ const ProductionPlan = () => {
       </p>
     }
   >
-    <Button className='my-btn-color-red' onClick={toggle1.bind(null)} style={{ marginBottom: '1rem',marginRight:'10px' }}>
-           Manage Plan
-            </Button>
+         <Button className='my-btn-color-red' onClick={toggle1.bind(null)} style={{ marginBottom: '1rem',marginRight:'10px' }}>
+             Manage Plan
+          </Button>
+          <Button className='my-btn-color' onClick={toggle.bind(null)} style={{ marginBottom: '1rem' }}>
+              Search
+          </Button>
             <Collapse isOpen={collapse1}>
               <Card className="border">
                 <CardBody>
@@ -73,7 +185,7 @@ const ProductionPlan = () => {
                  </Col>
                  <Col md="4">
                    <FormGroup>
-                    <Button type="submit" className="btn btn-danger" style={{marginTop:"28px"}}>
+                    <Button type="submit" className="btn btn-danger" style={{marginTop:"28px"}} onClick={()=>handleManagePlan()}>
                         Go
                     </Button>
                    </FormGroup>
@@ -86,9 +198,7 @@ const ProductionPlan = () => {
               </Card>
             </Collapse>
 
-      <Button className='my-btn-color' onClick={toggle.bind(null)} style={{ marginBottom: '1rem' }}>
-              Search
-            </Button>
+      
             <Collapse isOpen={collapse}>
               <Card className="border">
                 <CardBody>

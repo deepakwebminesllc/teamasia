@@ -175,7 +175,6 @@ const handleInputChange = (index, event) => {
         ...prevState,
         items:newItems
     }))
-  
 };
 
   const addCompdoc= () => {

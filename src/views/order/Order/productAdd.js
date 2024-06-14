@@ -87,6 +87,7 @@ const removeItem = index => {
   newItems.splice(index, 1);
   setItems(newItems);
 };
+
 const addItem1 = () => {
   console.log('mega',items1);
   const newItems = items1.slice();
