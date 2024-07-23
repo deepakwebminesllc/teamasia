@@ -22,13 +22,14 @@ const JumbotronComponent = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [collapse, setCollapse] = useState([]);
-  const {id,data1,data2,data3,data4,data5}    = location.state || {}; 
+  const {id,managePlanDate,data1,data2,data3,data4,data5}    = location.state || {}; 
   const [data,setData] = useState([]);
   const [CustomerData,setCustomerData] = useState([]);
   const [line1, setLine1] = useState([]);
   const [line2, setLine2] = useState([]);
   const [line3, setLine3] = useState([]);
   const [line4, setLine4] = useState([]);
+  const [errorMessageFromApi, setErrorMessageFromApi] = useState([]);
 
   const [activeTab, setActiveTab] = useState('1');
 
@@ -36,7 +37,7 @@ const JumbotronComponent = () => {
     if (activeTab !== tab) setActiveTab(tab);
   };
 
-  console.log('location',location.state,id);
+  console.log('location',id);
   const toggle = (index) => {
     const newArray = [...collapse];
     newArray[index]= !newArray[index];
@@ -45,7 +46,7 @@ const JumbotronComponent = () => {
 
   const addItemToLine = (product) => {
     let newItems;
-    console.log('mega in additemline',line1,product);
+    // console.log('mega in additemline',line1,product);
     if(activeTab === '1'){
        newItems = line1.slice();
     }
@@ -59,9 +60,9 @@ const JumbotronComponent = () => {
        newItems = line4.slice();
     }
 
-    newItems.push({...product,quantity:'',preSkin:'',skin:'',topCoat:'',fillerInTopCoat:'',form:'',fillerInForm:'',adhesive:'',fillerInAdhesive:'',finalGsm:''});
+    newItems.push({...product,product_id:product.id,plan_date:managePlanDate,quantity:'',pre_skin:'',skin:'',top_coat:'',filler_in_top_coat:'',foam:'',filler_in_foam:'',adhesive:'',filler_in_adhesive:'',final_gsm:'',line_id:activeTab});
 
-    console.log('mega',newItems);
+    // console.log('mega',newItems);
     if(activeTab === '1'){
        setLine1(newItems);
    }
@@ -78,7 +79,7 @@ const JumbotronComponent = () => {
   
   const removeItemFromLine = index => {
     let newItems;
-    console.log('mega in removeitemline',line1);
+    // console.log('mega in removeitemline',line1);
     if(activeTab === '1'){
        newItems = line1.slice();
     }
@@ -93,7 +94,7 @@ const JumbotronComponent = () => {
     }
     newItems.splice(index, 1);
 
-    console.log('mega',newItems);
+    // console.log('mega',newItems);
     if(activeTab === '1'){
        setLine1(newItems);
    }
@@ -124,7 +125,8 @@ const JumbotronComponent = () => {
       newItems = line4.slice();
    }
 
-  console.log("data",index,newItems[index]);
+  // console.log("data",index,newItems[index]);
+
   newItems[index][name] =  value;
 
 if(activeTab === '1'){
@@ -146,7 +148,7 @@ else if(activeTab === '4'){
   };
   
 const CustomerName =(customerId)=>{
-    console.log('customerData',CustomerData);
+    // console.log('customerData',CustomerData);
     const result =  CustomerData.find((item)=> item.id === customerId);
     if(!result){
       return 'unknown customer'
@@ -162,6 +164,53 @@ function formatDate(inputDate) {
     return new Intl.DateTimeFormat('en-GB', options).format(date);
 
 }
+const closer =()=>{
+  setErrorMessageFromApi([]);
+}
+
+async function apiCall() {
+  try {
+      
+      console.log('item1',line1);
+      console.log('item2',line2);
+      console.log('item3',line3);
+      console.log('item4',line4);
+     
+
+
+      const token = localStorage.getItem('userToken');
+      const response = await fetch(`https://factory.teamasia.in/api/public/productionplan`, {
+          method: "POST",
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+         
+          body: JSON.stringify([...line1,...line2,...line3,...line4]),
+      });
+
+      const datas = await response.json();
+      // console.log("dataapi",datas,response);
+      if (response.status === 201) {
+        console.log('product is added successfully ,please use this product id as ref_id in back side product')
+        navigate(-1);
+      } else {
+        console.error("Authentication failed:", Object.values(datas.messages.errors));
+        if (datas.error) {
+          setErrorMessageFromApi(Object.values(datas.messages.errors));
+        }
+      }  
+      return null;
+    } catch (error) {
+      console.log('error',error);
+       setErrorMessageFromApi(["Network error"]);
+      return null;
+    }
+}
+
+const handleSubmit = async () => {
+  apiCall();
+};
 
 useEffect(()=>{
     const fetchData = async ()=>{
@@ -177,9 +226,8 @@ useEffect(()=>{
       throw new Error(`HTTP error! status: ${response.status}`);
     }
    const result = await response.json();
-   console.log('responsejson',result);
+  //  console.log('responsejson',result);
    if(result.orders.length !== 0){
-    
      setCollapse(Array(result.orders.length).fill(false));
      setData(result.orders);
    }
@@ -197,21 +245,15 @@ useEffect(()=>{
       throw new Error(`HTTP error! status: ${response.status}`);
     }
    const result = await response.json();
-   console.log('responsejson',result);
+  //  console.log('responsejson',result);
      setCustomerData(result.customers);
-     console.log('CustomerData',CustomerData);
-     console.log('data1',data1);
-     console.log('data2',data2);
-     console.log('data3',data3);
-     console.log('data4',data4);
-     console.log('data5',data5);
   
   }
     fetchCustomerData();
     fetchData();
   },[]);
   
-  console.log('data',data);
+  // console.log('data',data);
 
   return (
     <>
@@ -220,10 +262,11 @@ useEffect(()=>{
                 <Col md="12">
                     <ComponentCard4>
                         <div className="order-view-page-flex">
-                          <div style={{fontSize:'17px',fontWeight:'500',textTransform:'uppercase'}}> Manage Production Plan @ <span style={{fontWeight:'800'}}>11 Jun, 2024 </span>
-                            <span style={{marginLeft:'17px'}}><Button className='my-btn-color' onClick={() => handleEditcustomer()}>
+                          <div style={{fontSize:'17px',fontWeight:'500',textTransform:'uppercase'}}> Manage Production Plan @ <span style={{fontWeight:'800'}}>{formatDate(managePlanDate)} </span>
+                            <span style={{marginLeft:'17px'}}>
+                                    {/* <Button className='my-btn-color' onClick={() => handleEditcustomer()}>
                                         Change Date
-                                    </Button>
+                                    </Button> */}
                             </span>
                           </div>
                         </div>
@@ -243,18 +286,30 @@ useEffect(()=>{
                                  Order Date: {formatDate(AddressItem.created_at)} | Nearest Expected Date: {formatDate(AddressItem.expected_delivery_date)}</div>
                             <Collapse isOpen={collapse[index]}>
                             
-                                <OrderProduct orderID ={AddressItem.id} formatDate = {formatDate} data1={data1} data2={data2} data3={data3} data4={data4} data5={data5} addItemToLine={addItemToLine} removeItemFromLine = {removeItemFromLine} customerNameFromManagePlan={CustomerName(AddressItem.customer_id)}/>
+                                <OrderProduct orderID ={AddressItem.id} formatDate = {formatDate} data1={data1} data2={data2} data3={data3} data4={data4} data5={data5} addItemToLine={addItemToLine} removeItemFromLine = {removeItemFromLine} customerNameFromManagePlan={CustomerName(AddressItem.customer_id)} customerID={AddressItem.customer_id}/>
                         </Collapse>
                         </div>
                           ))
-                        
-                          :"" } 
-
-                        
+                          :""}
                  </Col>
-
                 <Col md="7">
                     <ComponentCard4 title="">
+                      <div>{errorMessageFromApi.length !== 0 && (
+                        <div style={{ background:'#ff9c7a',color: 'black', marginBottom: '10px', padding:"5px 10px"}}>
+                          <div style={{display:'flex',justifyContent:'space-between'}}>
+                            Following errors were found:
+                            <span onClick={closer} style={{cursor:'pointer'}}>X</span>
+                          </div>
+                          <ul>
+                            {errorMessageFromApi.map((item)=>
+                            <li>
+                                {item}
+                            </li>
+                            )}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
                       <Nav tabs>
                         <NavItem>
                           <NavLink
@@ -297,9 +352,10 @@ useEffect(()=>{
                           </NavLink>
                         </NavItem>
                         <Button ><i className='bi bi-arrow-down-square'></i></Button>
-                        <Button className='my-btn-color' >Save Plan</Button>
+                        <Button className='my-btn-color' onClick={()=>handleSubmit()}>Save Plan</Button>
                       </Nav>
                       <TabContent className="p-2" activeTab={activeTab}>
+
                         <TabPane tabId="1">
                           {
                             line1.map((product,index)=>
@@ -349,8 +405,8 @@ useEffect(()=>{
                                               </td>
                                               <td title="">
                                                 <Input 
-                                                  name="preSkin" 
-                                                  value={product.preSkin} 
+                                                  name="pre_skin" 
+                                                  value={product.pre_skin} 
                                                   type="text" 
                               
                                                   placeholder="pre Skin"
@@ -369,8 +425,8 @@ useEffect(()=>{
                                               </td>
                                               <td title="">
                                                 <Input 
-                                                  name="topCoat" 
-                                                  value={product.topCoat} 
+                                                  name="top_coat" 
+                                                  value={product.top_coat} 
                                                   type="text" 
                                                   
                                                   placeholder="topCoat"
@@ -379,8 +435,8 @@ useEffect(()=>{
                                               </td>
                                               <td title="">
                                                 <Input 
-                                                  name="fillerInTopCoat" 
-                                                  value={product.fillerInTopCoat} 
+                                                  name="filler_in_top_coat" 
+                                                  value={product.filler_in_top_coat} 
                                                   type="text" 
                                                    
                                                   placeholder="filler In TopCoat" 
@@ -393,18 +449,18 @@ useEffect(()=>{
                                             <tr>
                                               <td title="">
                                                 <Input 
-                                                  name="form" 
-                                                  value={product.form} 
+                                                  name="foam" 
+                                                  value={product.foam} 
                                                   type="text" 
                                                    
-                                                  placeholder="form" 
+                                                  placeholder="foam" 
                                                   onChange={e => handleInputChangeOfPlan(index, e)}
                                                   />
                                               </td>
                                               <td title="">
                                                 <Input 
-                                                  name="fillerInForm" 
-                                                  value={product.fillerInForm} 
+                                                  name="filler_in_foam" 
+                                                  value={product.filler_in_foam} 
                                                   type="text" 
                                                   
                                                   placeholder="filler In Form" 
@@ -422,8 +478,8 @@ useEffect(()=>{
                                               </td>
                                               <td title="">
                                                 <Input 
-                                                  name="fillerInAdhesive" 
-                                                  value={product.fillerInAdhesive} 
+                                                  name="filler_in_adhesive" 
+                                                  value={product.filler_in_adhesive} 
                                                   type="text" 
                                                    
                                                   placeholder="filler In Adhesive" 
@@ -432,8 +488,8 @@ useEffect(()=>{
                                               </td>
                                               <td title="">
                                                 <Input 
-                                                  name="finalGsm" 
-                                                  value={product.finalGsm} 
+                                                  name="final_gsm" 
+                                                  value={product.final_gsm} 
                                                   type="text" 
                                                    
                                                   placeholder="finalGsm"
@@ -500,8 +556,8 @@ useEffect(()=>{
                                               </td>
                                               <td title="">
                                                 <Input 
-                                                  name="preSkin" 
-                                                  value={product.preSkin} 
+                                                  name="pre_skin" 
+                                                  value={product.pre_skin} 
                                                   type="text" 
                               
                                                   placeholder="pre Skin"
@@ -520,8 +576,8 @@ useEffect(()=>{
                                               </td>
                                               <td title="">
                                                 <Input 
-                                                  name="topCoat" 
-                                                  value={product.topCoat} 
+                                                  name="top_coat" 
+                                                  value={product.top_coat} 
                                                   type="text" 
                                                   
                                                   placeholder="topCoat"
@@ -530,8 +586,8 @@ useEffect(()=>{
                                               </td>
                                               <td title="">
                                                 <Input 
-                                                  name="fillerInTopCoat" 
-                                                  value={product.fillerInTopCoat} 
+                                                  name="filler_in_top_coat" 
+                                                  value={product.filler_in_top_coat} 
                                                   type="text" 
                                                    
                                                   placeholder="filler In TopCoat" 
@@ -544,18 +600,18 @@ useEffect(()=>{
                                             <tr>
                                               <td title="">
                                                 <Input 
-                                                  name="form" 
-                                                  value={product.form} 
+                                                  name="foam" 
+                                                  value={product.foam} 
                                                   type="text" 
                                                    
-                                                  placeholder="form" 
+                                                  placeholder="foam" 
                                                   onChange={e => handleInputChangeOfPlan(index, e)}
                                                   />
                                               </td>
                                               <td title="">
                                                 <Input 
-                                                  name="fillerInForm" 
-                                                  value={product.fillerInForm} 
+                                                  name="filler_in_foam" 
+                                                  value={product.filler_in_foam} 
                                                   type="text" 
                                                   
                                                   placeholder="filler In Form" 
@@ -573,8 +629,8 @@ useEffect(()=>{
                                               </td>
                                               <td title="">
                                                 <Input 
-                                                  name="fillerInAdhesive" 
-                                                  value={product.fillerInAdhesive} 
+                                                  name="filler_in_adhesive" 
+                                                  value={product.filler_in_adhesive} 
                                                   type="text" 
                                                    
                                                   placeholder="filler In Adhesive" 
@@ -583,8 +639,8 @@ useEffect(()=>{
                                               </td>
                                               <td title="">
                                                 <Input 
-                                                  name="finalGsm" 
-                                                  value={product.finalGsm} 
+                                                  name="final_gsm" 
+                                                  value={product.final_gsm} 
                                                   type="text" 
                                                    
                                                   placeholder="finalGsm"
@@ -650,8 +706,8 @@ useEffect(()=>{
                                               </td>
                                               <td title="">
                                                 <Input 
-                                                  name="preSkin" 
-                                                  value={product.preSkin} 
+                                                  name="pre_skin" 
+                                                  value={product.pre_skin} 
                                                   type="text" 
                               
                                                   placeholder="pre Skin"
@@ -670,8 +726,8 @@ useEffect(()=>{
                                               </td>
                                               <td title="">
                                                 <Input 
-                                                  name="topCoat" 
-                                                  value={product.topCoat} 
+                                                  name="top_coat" 
+                                                  value={product.top_coat} 
                                                   type="text" 
                                                   
                                                   placeholder="topCoat"
@@ -680,8 +736,8 @@ useEffect(()=>{
                                               </td>
                                               <td title="">
                                                 <Input 
-                                                  name="fillerInTopCoat" 
-                                                  value={product.fillerInTopCoat} 
+                                                  name="filler_in_top_coat" 
+                                                  value={product.filler_in_top_coat} 
                                                   type="text" 
                                                    
                                                   placeholder="filler In TopCoat" 
@@ -694,18 +750,18 @@ useEffect(()=>{
                                             <tr>
                                               <td title="">
                                                 <Input 
-                                                  name="form" 
-                                                  value={product.form} 
+                                                  name="foam" 
+                                                  value={product.foam} 
                                                   type="text" 
                                                    
-                                                  placeholder="form" 
+                                                  placeholder="foam" 
                                                   onChange={e => handleInputChangeOfPlan(index, e)}
                                                   />
                                               </td>
                                               <td title="">
                                                 <Input 
-                                                  name="fillerInForm" 
-                                                  value={product.fillerInForm} 
+                                                  name="filler_in_foam" 
+                                                  value={product.filler_in_foam} 
                                                   type="text" 
                                                   
                                                   placeholder="filler In Form" 
@@ -723,8 +779,8 @@ useEffect(()=>{
                                               </td>
                                               <td title="">
                                                 <Input 
-                                                  name="fillerInAdhesive" 
-                                                  value={product.fillerInAdhesive} 
+                                                  name="filler_in_adhesive" 
+                                                  value={product.filler_in_adhesive} 
                                                   type="text" 
                                                    
                                                   placeholder="filler In Adhesive" 
@@ -733,8 +789,8 @@ useEffect(()=>{
                                               </td>
                                               <td title="">
                                                 <Input 
-                                                  name="finalGsm" 
-                                                  value={product.finalGsm} 
+                                                  name="final_gsm" 
+                                                  value={product.final_gsm} 
                                                   type="text" 
                                                    
                                                   placeholder="finalGsm"
@@ -800,8 +856,8 @@ useEffect(()=>{
                                               </td>
                                               <td title="">
                                                 <Input 
-                                                  name="preSkin" 
-                                                  value={product.preSkin} 
+                                                  name="pre_skin" 
+                                                  value={product.pre_skin} 
                                                   type="text" 
                               
                                                   placeholder="pre Skin"
@@ -820,8 +876,8 @@ useEffect(()=>{
                                               </td>
                                               <td title="">
                                                 <Input 
-                                                  name="topCoat" 
-                                                  value={product.topCoat} 
+                                                  name="top_coat" 
+                                                  value={product.top_coat} 
                                                   type="text" 
                                                   
                                                   placeholder="topCoat"
@@ -830,8 +886,8 @@ useEffect(()=>{
                                               </td>
                                               <td title="">
                                                 <Input 
-                                                  name="fillerInTopCoat" 
-                                                  value={product.fillerInTopCoat} 
+                                                  name="filler_in_top_coat" 
+                                                  value={product.filler_in_top_coat} 
                                                   type="text" 
                                                    
                                                   placeholder="filler In TopCoat" 
@@ -844,18 +900,18 @@ useEffect(()=>{
                                             <tr>
                                               <td title="">
                                                 <Input 
-                                                  name="form" 
-                                                  value={product.form} 
+                                                  name="foam" 
+                                                  value={product.foam} 
                                                   type="text" 
                                                    
-                                                  placeholder="form" 
+                                                  placeholder="foam" 
                                                   onChange={e => handleInputChangeOfPlan(index, e)}
                                                   />
                                               </td>
                                               <td title="">
                                                 <Input 
-                                                  name="fillerInForm" 
-                                                  value={product.fillerInForm} 
+                                                  name="filler_in_foam" 
+                                                  value={product.filler_in_foam} 
                                                   type="text" 
                                                   
                                                   placeholder="filler In Form" 
@@ -873,8 +929,8 @@ useEffect(()=>{
                                               </td>
                                               <td title="">
                                                 <Input 
-                                                  name="fillerInAdhesive" 
-                                                  value={product.fillerInAdhesive} 
+                                                  name="filler_in_adhesive" 
+                                                  value={product.filler_in_adhesive} 
                                                   type="text" 
                                                    
                                                   placeholder="filler In Adhesive" 
@@ -883,8 +939,8 @@ useEffect(()=>{
                                               </td>
                                               <td title="">
                                                 <Input 
-                                                  name="finalGsm" 
-                                                  value={product.finalGsm} 
+                                                  name="final_gsm" 
+                                                  value={product.final_gsm} 
                                                   type="text" 
                                                    
                                                   placeholder="finalGsm"

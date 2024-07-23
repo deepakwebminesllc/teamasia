@@ -2,6 +2,7 @@ import React,{ useState,useEffect} from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Button,
+  Table
 } from 'reactstrap';
 import ComponentCard from '../../../components/ComponentCard';
 
@@ -25,7 +26,7 @@ const FactorySurplus = () => {
   };
   const handleView = (item) => {
 
-    navigate('/order/factory-surplus/view',{state: item});
+    navigate('/order/factory-surplus/view',{state: { item,data1,data2,data3,data4,data5}});
   };
   
   const handleEditAdd = () => {
@@ -250,8 +251,7 @@ const FactorySurplus = () => {
      <Button className='my-btn-color' style={{ marginBottom: '1rem',marginRight:'10px' }} onClick={() => handleEditAdd()}>
       Add Surplus Product
             </Button>
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-      <table className="table" style={tableStyle}>
+      <Table style={tableStyle} responsive>
               <thead>
               <tr>
             <th>Grain</th>
@@ -279,9 +279,8 @@ const FactorySurplus = () => {
                 </tr>
                 ))}
               </tbody>
-            </table>
+            </Table>
             
-    </div>
    
   </ComponentCard>
 

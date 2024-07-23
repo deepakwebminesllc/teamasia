@@ -192,7 +192,7 @@ const handleSubmit = async (event) => {
                      <Input type="text" 
                      name="title" 
                      id="name"
-                     placeholder="Enter name" 
+                     placeholder="Enter title" 
                      value={formDatas.title}
                      onChange={handleChange} 
                      className={errors.title ? "is-invalid":""}

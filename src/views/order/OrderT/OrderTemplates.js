@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 
 import {
   Button,
+  Table
 } from 'reactstrap';
 
 import ComponentCard from '../../../components/ComponentCard';
@@ -45,7 +46,7 @@ const OrderTemplates = () => {
       }
   
       // Filter out the deleted item from your data state
-      const updatedData = data.filter((item) => item.id !== itemId);
+      const updatedData = templateWithNames.filter((item) => item.id !== itemId);
       setTemplateWithNames(updatedData);
       console.log('Item deleted successfully',updatedData);
     } catch (error) {
@@ -59,7 +60,7 @@ const OrderTemplates = () => {
   useEffect(() => {
     function getCustomerNameById(customerId) {
       const customerName = data1.filter(customer => customer.id === customerId);
-      console.log('Customer',customerName);
+      // console.log('Customer',customerName);
       return customerName.length > 0 ? customerName[0].company_name : 'Unknown Customer';
     }
   
@@ -68,7 +69,7 @@ const OrderTemplates = () => {
         ...template,
         customerName: getCustomerNameById(template.customer_id)
       }));
-      console.log('hi',data);
+      // console.log('hi',data);
       setTemplateWithNames(templateWithNames1)
     }
 
@@ -76,7 +77,6 @@ const OrderTemplates = () => {
     {
       templateWithNamesFunction();
     }
-
   },[data,data1]);
 
 
@@ -136,8 +136,7 @@ const OrderTemplates = () => {
       Add Template
             </Button>
 
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-      <table className="table" style={tableStyle}>
+      <Table  style={tableStyle} responsive>
               <thead>
               <tr>
                   <th>Template Title</th>
@@ -160,8 +159,7 @@ const OrderTemplates = () => {
                 </tr>
                 ))}
               </tbody>
-            </table>
-    </div>
+            </Table>
   </ComponentCard>
   );
 };

@@ -25,6 +25,7 @@ const Edit = () => {
   const [CustomerData, setCustomerData] = useState([]);
 
   const [ProductData, setProductData] = useState([]);
+  const [productwithNames, setProductWithNames] = useState([]);
   const [data1, setData1] = useState([]);
   const [data2, setData2] = useState([]);
   const [data3, setData3] = useState([]);
@@ -167,13 +168,17 @@ function getColorNameById(colorId) {
 }
 
 
-const productwithNames = ProductData.map(product => ({
-  ...product,
-  grainName: getGrainNameById(product.grain_id),
-  fabricName: getFabricNameById(product.fabric_id),
-  qualityName: getQualityNameById(product.quality_id),
-  colorName: getColorNameById(product.color_id)
-}));
+useEffect(()=>{
+  const productwithNameslist = ProductData.map(product => ({
+    ...product,
+    grainName: getGrainNameById(product.grain_id),
+    fabricName: getFabricNameById(product.fabric_id),
+    qualityName: getQualityNameById(product.quality_id),
+    colorName: getColorNameById(product.color_id)
+  }));
+  setProductWithNames(productwithNameslist)
+},[ProductData,data1,data2,data3,data4])
+
 
   useEffect(() => {
 
@@ -376,7 +381,6 @@ const productwithNames = ProductData.map(product => ({
                           <td>
                             {/* Action buttons or icons */}
                               <button type="button" className="btn mybtncustomer btn-secondary btn-sm mr-2" onClick={() => editProductItem(product)}><i className="bi bi-pencil-fill my-pen-color" /></button>
-                              <button type="button" className="btn mybtncustomer btn-secondary btn-sm mr-2"><i className="bi bi-eye-fill my-eye-color" /></button>
                               <button type="button" className="btn mybtncustomer btn-secondary btn-sm mr-2" onClick={() => handleDeleteClick(product.id)} ><i className="bi bi-trash-fill my-trash-color" /></button>
                           </td>
                         </tr>

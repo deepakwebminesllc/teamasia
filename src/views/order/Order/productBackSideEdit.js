@@ -27,7 +27,7 @@ const ProductBackSideEdit = ({productIdOfParent,frontSidedata,data1, data3, data
     productadditionaltreatments:[{description: ''}]
   });
 
-  console.log('productIdOfParent in order-product-edit-backside',productIdOfParent);
+  console.log('productIdOfParent in order-product-edit-backside',productIdOfParent,frontSidedata);
 
   const addItem = () => {
     const newItems = items.slice();
@@ -282,6 +282,7 @@ const handleSubmit = async (event) => {
       }
       const resultjson = await response.json();
       const result = resultjson.products[0];
+      console.log('result in product back side',result);
       if(result){
         const embossArray = result.emboss_ids.split(',');
         if(embossArray.length !== 0 && embossArray[0] !== ''){

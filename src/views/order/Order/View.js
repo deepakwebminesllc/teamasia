@@ -116,7 +116,7 @@ useEffect(()=>{
                 </Col>
                 
               </Row>
-           <ComponentCard>
+            <ComponentCard>
                <div className="order-view-page-flex">
                 <div><i className="bi-hash my-trash-color" style={{fontSize:'19px'}}/>Order No : #{id}</div>
                 <div> <i className="bi-calendar2-event-fill my-eye-color"/>Expected Date : {formatDate(expectedDeliveryDate)}</div>

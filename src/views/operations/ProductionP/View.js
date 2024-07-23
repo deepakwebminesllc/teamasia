@@ -1,37 +1,191 @@
-import React, { useState } from 'react';
+import React, {useState,useEffect } from 'react';
 import {
   TabContent,
   TabPane,
   Nav,
   NavItem,
   NavLink,
-  Card,
   Button,
-  CardTitle,
-  CardText,
-  Row,
-  Col,
   Table
 } from 'reactstrap';
-import ProgressBar from 'react-bootstrap/ProgressBar';
+import {useLocation, useNavigate} from 'react-router-dom';
 import ComponentCard from '../../../components/ComponentCard';
 import ComponentCard4 from '../../../components/ComponentCard2';
 import 'react-table-v6/react-table.css';
-import Barcode from "../../../assets/images/bg/barcode.png"
+import CreateJumboRoll from './createJumboRoll'
+import UpdateJumboRoll from './UpdateJumboRoll'
+import PasteConsumption from './pasteConsumption'
+import PlanViewProduct from "./planViewProduct";
+import PlanViewJumbo from "./planViewJumbo";
 
 const JumbotronComponent = () => {
   const [activeTab, setActiveTab] = useState('1');
+  const navigate = useNavigate();
+  const location = useLocation();
+  const {Customerdata,data1,data2,data3,data4,data5,data6} = location.state
+  const { date: planDate } = location.state.item
+  const [modal, setModal] = useState(false);
+  const [modal1, setModal1] = useState(false);
+  const [modal2, setModal2] = useState(false);
+  const [QaData, setQaData] = useState([]);
+  const [line1, setLine1] = useState([]);
+  const [line2, setLine2] = useState([]);
+  const [line3, setLine3] = useState([]);
+  const [line4, setLine4] = useState([]);
+  const [JumboDataFromPlan, setJumboDataFromPlan] = useState({});
+  const [JumboUpdateDataFromPlan, setJumboUpdateDataFromPlan] = useState({});
+  const [refreshKey, setRefreshKey] = useState(0); // New state to trigger re-render
 
   const toggle = (tab) => {
     if (activeTab !== tab) setActiveTab(tab);
   };
 
- const var1 = " Combit Footwear Pvt. Ltd. (#1409) , Product(1409_1)"
- const var2 = "Delivery Date : 04 Jun, 2022 Total : 200 m | Remaining : 30.00 m"
 
+ console.log('data.....',location.state.item,location,data1,data2,data3,data4,data5);
+
+ function formatDate(inputDate) {
+  const date = new Date(inputDate);
+
+  // Use Intl.DateTimeFormat to format the date
+  const options = { day: 'numeric', month: 'short', year: 'numeric' };
+  return new Intl.DateTimeFormat('en-GB', options).format(date);
+}
+
+ const CustomerName =(customerId)=>{
+  const result =  Customerdata.find((item)=> item.id === customerId);
+  if(!result){
+    return 'unknown customer'
+  }
+  return result.company_name;
+}
+
+ const addRollTogglefunction = ()=>{
+  console.log('click');
+  setModal1(!modal1);
+}
+ const setterJumboDataFromPlan = (product)=>{
+  console.log('productxxxxxxxxxxxxxx',product)
+  setJumboDataFromPlan(product);
+  addRollTogglefunction();
+}
+
+ const  updateRollTogglefunction = ()=>{
+  console.log('click');
+  setModal2(!modal2);
+}
+
+const handleCreateJumboRoll = () => {
+  // Callback function to handle jumbo roll creation
+  console.log('something happened !');
+  setRefreshKey(oldKey => oldKey + 1);
+};
+
+const setterJumboUpdateDataFromPlan = (product)=>{
+  console.log('product',product);
+  setJumboUpdateDataFromPlan(product);
+  updateRollTogglefunction();
+}
+
+
+
+ const addPasteConsumption = ()=>{
+  console.log('click');
+  setModal(!modal);
+}
+
+const setterPasteDataFromPlan = (product)=>{
+  console.log('hi',product)
+  setJumboUpdateDataFromPlan(product);
+  addPasteConsumption();
+}
+
+ const LabReport = (product)=>{
+  console.log('click');
+  navigate('/operations/production-plans/manage-plan/lab-report',{state:{product}})
+}
+
+useEffect(()=>{
+  const fetchQaData = async () => {
+    const token = localStorage.getItem('userToken');
+    // console.log('token',token);
+    const response = await fetch('https://factory.teamasia.in/api/public/qapateams/?is_trashed=0', {
+      method: 'GET', 
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    // console.log('result',response);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const result = await response.json();
+    console.log("responsejson1",result);
+    const resultX = result.qapateams.slice();
+    resultX.push({id:'x',name:'Choose'});
+    setQaData(resultX); 
+  };
+  const fetchDataPlan = async () => {
+    const token = localStorage.getItem('userToken');
+    // console.log('token',token);
+    const response = await fetch(`https://factory.teamasia.in/api/public/productionplan/?plan_date=${planDate}`, {
+      method: 'GET', 
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    // console.log('result',response);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const result = await response.json();
+    console.log("responsejson1 producton",result);
+    const plans = result.production_plan;
+
+    const line1Data = plans.filter(plan => plan.line_id === '1');
+    const line2Data = plans.filter(plan => plan.line_id === '2');
+    const line3Data = plans.filter(plan => plan.line_id === '3');
+    const line4Data = plans.filter(plan => plan.line_id === '4');
+
+    // Set state
+    setLine1(line1Data);
+    setLine2(line2Data);
+    setLine3(line3Data);
+    setLine4(line4Data);
+
+  };
+
+  fetchDataPlan();
+  fetchQaData();
+},[]);
   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+console.log(line1,line2,line3,line4);
   return (
     <>
+       {/* <CreateJumboRoll modal={modal1} JumboDataFromPlan={JumboDataFromPlan} setModal1={setModal1} toggle={addRollTogglefunction}   data2={QaData} data6={data6}/>
+       <UpdateJumboRoll modal={modal2} JumboUpdateDataFromPlan={JumboUpdateDataFromPlan} setModal1={setModal2} toggle={updateRollTogglefunction}   data2={QaData} data6={data6}/>
+       <PasteConsumption modal={modal}  toggle={addPasteConsumption }  data2={QaData} data3={data3} data4={data4} data6={data6}/> */}
+
+       {modal1 && <CreateJumboRoll handleCreateJumboRoll ={handleCreateJumboRoll} modal={modal1} JumboDataFromPlan={JumboDataFromPlan} setModal1={setModal1} toggle={addRollTogglefunction} data2={QaData} data6={data6} />}
+      {modal2 && <UpdateJumboRoll modal={modal2} JumboUpdateDataFromPlan={JumboUpdateDataFromPlan} setModal1={setModal2} toggle={updateRollTogglefunction} data2={QaData} data6={data6} />}
+      {modal && <PasteConsumption modal={modal} toggle={addPasteConsumption} JumboDataFromPlan={JumboUpdateDataFromPlan} data2={QaData} data3={data3} data4={data4} data6={data6} />}
+      
       <ComponentCard title="">
         <Nav tabs>
           <NavItem>
@@ -78,15 +232,18 @@ const JumbotronComponent = () => {
         </Nav>
         <TabContent className="p-4" activeTab={activeTab}>
           <TabPane tabId="1">
-            <Table responsive size="sm">
-                  <thead>
-                    <tr>
-                      <th scope="col"><Button className='my-btn-color'>{"Total Jumbo Rolls => Count : 16, Qty : 4983 m"}</Button></th>
-                      <th scope="col"><Button className='my-btn-color-red'>{"Total Small Rolls => Count : 208, Qty : 4871.7 m"}</Button></th>
-                    </tr>
-                  </thead>
-                  
-                </Table>
+            
+              <Table responsive size="sm">
+                <thead>
+                  <tr>
+                    <th scope="col"><Button className='my-btn-color'>{"Total Jumbo Rolls => Count : 0, Qty : 0 m"}</Button></th>
+                    <th scope="col"><Button className='my-btn-color-red'>{"Total Small Rolls => Count : 0, Qty : 0 m"}</Button></th>
+                  </tr>
+                </thead>
+            </Table>
+            {line1.map((product)=>{
+                return <React.Fragment key={product.id}>
+                
             
             <ComponentCard4>
 
@@ -95,58 +252,23 @@ const JumbotronComponent = () => {
                   <thead>
                     <tr>
                       <th scope="col">
-                        <div>{var1}</div>
-                        <div>{var2}</div>
+                        <div>{CustomerName(product.customer_id)}  Product({product.product_id})</div>
+                        <div>Delivery Date :{ formatDate(product.created_at)} Total : 200 m | Remaining : 30.00 m</div>
                         </th>
-                      <th scope="col"><Button className='my-btn-color'>Create Jumbo Roll</Button></th>
-                      <th scope="col"><Button className='my-btn-color-red'>Paste Consumption</Button></th>
+                      <th scope="col"><Button className='my-btn-color' onClick={()=>setterJumboDataFromPlan(product)}>Create Jumbo Roll</Button></th>
+                      <th scope="col"><Button className='my-btn-color-red' onClick={()=>setterPasteDataFromPlan(product)}>Paste Consumption</Button></th>
                       <th scope="col"><Button className='my-btn-color-red'>Manage daily Usage</Button></th>
-                      <th scope="col"><Button className='my-btn-color-red'>Lab Report</Button></th>
+                      <th scope="col"><Button className='my-btn-color-red' onClick={()=>LabReport(product)}>Lab Report</Button></th>
                       <th scope="col"><Button className='my-btn-mo-color'>More</Button></th>
-                      
+
                     </tr>
                   </thead>
                   
                 </Table>
 
-                <Table className='table-margin-zero' responsive size="sm">
-                  <thead>
-                    <tr>
-                      <th scope="col">Grain</th>
-                      <th scope="col">Color</th>
-                      <th scope="col">Quality</th>
-                      <th scope="col">Thickness</th>
-                      <th scope="col">Fabric</th>
-                      <th scope="col">Fabric Color</th>
-                      <th scope="col">HSN</th>
-                      <th scope="col">Price($)</th>
-                      <th scope="col">Tax</th>
-                      <th scope="col">Embossing</th>
-                      <th scope="col">Printing</th>
-                      <th scope="col">CIR.</th>
-                      <th scope="col">AT</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td >1001 A</td>
-                              <td>black</td>
-                              <td>Q2/CX0Y13Z03</td>
-                              <td>1.7 mm </td>
-                              <td>WP.matty_185g_120gsm</td>
-                              <td>black</td>
-                              <td>59031090</td>
-                              <td>313.6</td>
-                              <td>12%</td>
-                              <td>N/A</td>
-                              <td>N/A</td>
-                              <td>N/A</td>
-                              <td>N/A</td>
-
-                    </tr>
-                  
-                  </tbody>
-                </Table>
+                <PlanViewProduct productID ={product.product_id} data1={data1} data2={data2} data3={data3} data4={data4} data5={data5}/>
+              
+                
                 <Table responsive size="sm">
                   <thead>
                     <tr>
@@ -163,96 +285,256 @@ const JumbotronComponent = () => {
                   </thead>
                   <tbody>
                     <tr>
-                      <td>N/A</td>
-                              <td>200 gsm</td>
-                              <td>N/A</td>
-                              <td>N/A</td>
-                              <td>910 gsm</td>
-                              <td>175 PHR</td>
-                              <td>120 gsm</td>
-                              <td>75 PHR</td>
-                              <td>1350 gsm</td>
-                              
-
+                      <td>{product.pre_skin}</td>
+                      <td>{product.skin}gsm</td>
+                      <td>{product.top_coat}</td>
+                      <td>{product.filler_in_top_coat}</td>
+                      <td>{product.foam} gsm</td>
+                      <td>{product.filler_in_foam} PHR</td>
+                      <td>{product.adhesive} gsm</td>
+                      <td>{product.filler_in_adhesive} PHR</td>
+                      <td>{product.final_gsm} gsm</td>
                     </tr>
                   
                   </tbody>
                 </Table>
-
-                  <>{"Jumbo Rolls (Total : 1, Qty : 170 m, Small Rolls => Count : 8 , Qty : 161 m, Avg GSM : 1334.69 g/m2"}</>
-                <Table responsive size="sm">
-                  <thead>
-                    <tr>
-                      <th scope="col">S. No.</th>
-                      <th scope="col">Quantity</th>
-                      <th scope="col">Code</th>
-                      <th scope="col">LCA</th>
-                      <th scope="col">Action</th>
-                     
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>1</td>
-                      <td>170 m</td>
-                      <td><img src={Barcode} alt='barcode'/></td>
-                      <td><ProgressBar now={220} label={`${220}`} style={{width:"300px",height:"25px"}}/></td>
-                      <td>
-                        <td ><Button ><i className="bi bi-printer-fill my-bell-color" /></Button></td>
-                        <td ><Button ><i className="bi bi-pencil-fill my-pen-color" /></Button></td>
-                        <td ><Button ><i className="bi bi-trash-fill my-trash-color" /></Button></td>
-                     
-                      </td>
-                              
-
-                    </tr>
-                  
-                  </tbody>
-                </Table>
+                  {activeTab === '1' &&  <PlanViewJumbo Refreshkey={refreshKey} product={product} updateRollTogglefunction={setterJumboUpdateDataFromPlan}/>}
                </div>
                 
                
 
              </ComponentCard4>
-           
-              
-            
+             </React.Fragment>
+              })
+            }
           </TabPane>
           <TabPane tabId="2">
-            <Row>
-              <Col sm="12">
-                <h4>Tab 2 Contents</h4>
-              </Col>
-            </Row>
+                <Table responsive size="sm">
+                  <thead>
+                    <tr>
+                      <th scope="col"><Button className='my-btn-color'>{"Total Jumbo Rolls => Count : 0, Qty : 0 m"}</Button></th>
+                      <th scope="col"><Button className='my-btn-color-red'>{"Total Small Rolls => Count : 0, Qty : 0 m"}</Button></th>
+                    </tr>
+                  </thead>
+                  
+                </Table>
+          {
+              line2.map((product)=>{
+                return <React.Fragment key={product.id}>
+            <ComponentCard4>
+
+              <div className='table-margin'>
+               <Table className='table-margin-zero' responsive size="sm">
+                  <thead>
+                    <tr>
+                      <th scope="col">
+                        <div>{CustomerName(product.customer_id)}  Product({product.product_id})</div>
+                        <div>Delivery Date :{ formatDate(product.created_at)} Total : 200 m | Remaining : 30.00 m</div>
+                        </th>
+                      <th scope="col"><Button className='my-btn-color' onClick={()=>setterJumboDataFromPlan(product)}>Create Jumbo Roll</Button></th>
+                      <th scope="col"><Button className='my-btn-color-red' onClick={()=>setterPasteDataFromPlan(product)}>Paste Consumption</Button></th>
+                      <th scope="col"><Button className='my-btn-color-red'>Manage daily Usage</Button></th>
+                      <th scope="col"><Button className='my-btn-color-red' onClick={()=>LabReport(product)}>Lab Report</Button></th>
+                      <th scope="col"><Button className='my-btn-mo-color'>More</Button></th>
+
+                    </tr>
+                  </thead>
+                  
+                </Table>
+
+                <PlanViewProduct productID ={product.product_id} data1={data1} data2={data2} data3={data3} data4={data4} data5={data5}/>
+              
+                
+                <Table responsive size="sm">
+                  <thead>
+                    <tr>
+                      <th scope="col">Pre Skin</th>
+                      <th scope="col">Skin</th>
+                      <th scope="col">Top Coat</th>
+                      <th scope="col">Filler In Top Coat</th>
+                      <th scope="col">Foam</th>
+                      <th scope="col">Filler In Foam</th>
+                      <th scope="col">Adhesive</th>
+                      <th scope="col">Filler In Adhesive</th>
+                      <th scope="col">Final GSM</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>{product.pre_skin}</td>
+                      <td>{product.skin}gsm</td>
+                      <td>{product.top_coat}</td>
+                      <td>{product.filler_in_top_coat}</td>
+                      <td>{product.foam} gsm</td>
+                      <td>{product.filler_in_foam} PHR</td>
+                      <td>{product.adhesive} gsm</td>
+                      <td>{product.filler_in_adhesive} PHR</td>
+                      <td>{product.final_gsm} gsm</td>
+                    </tr>
+                  
+                  </tbody>
+                </Table>
+                  {activeTab === '2' &&  <PlanViewJumbo Refreshkey={refreshKey} product={product} updateRollTogglefunction={setterJumboUpdateDataFromPlan}/>}
+               </div>
+                
+               
+
+             </ComponentCard4>
+             </React.Fragment>
+              })
+            }
           </TabPane>
           <TabPane tabId="3">
-            <Row>
-              <Col sm="12">
-                <h4>Tab 3 Contents</h4>
-              </Col>
-            </Row>
+                <Table responsive size="sm">
+                  <thead>
+                    <tr>
+                       <th scope="col"><Button className='my-btn-color'>{"Total Jumbo Rolls => Count : 0, Qty : 0 m"}</Button></th>
+                       <th scope="col"><Button className='my-btn-color-red'>{"Total Small Rolls => Count : 0, Qty : 0 m"}</Button></th>
+                    </tr>
+                  </thead>
+                  
+                </Table>
+          {
+              line3.map((product)=>{
+                return <React.Fragment key={product.id}>
+            <ComponentCard4>
+
+              <div className='table-margin'>
+               <Table className='table-margin-zero' responsive size="sm">
+                  <thead>
+                    <tr>
+                      <th scope="col">
+                        <div>{CustomerName(product.customer_id)}  Product({product.product_id})</div>
+                        <div>Delivery Date :{ formatDate(product.created_at)} Total : 200 m | Remaining : 30.00 m</div>
+                        </th>
+                      <th scope="col"><Button className='my-btn-color' onClick={()=>setterJumboDataFromPlan(product)}>Create Jumbo Roll</Button></th>
+                      <th scope="col"><Button className='my-btn-color-red' onClick={()=>setterPasteDataFromPlan(product)}>Paste Consumption</Button></th>
+                      <th scope="col"><Button className='my-btn-color-red'>Manage daily Usage</Button></th>
+                      <th scope="col"><Button className='my-btn-color-red' onClick={()=>LabReport(product)}>Lab Report</Button></th>
+                      <th scope="col"><Button className='my-btn-mo-color'>More</Button></th>
+
+                    </tr>
+                  </thead>
+                  
+                </Table>
+
+                <PlanViewProduct productID ={product.product_id} data1={data1} data2={data2} data3={data3} data4={data4} data5={data5}/>
+              
+                
+                <Table responsive size="sm">
+                  <thead>
+                    <tr>
+                      <th scope="col">Pre Skin</th>
+                      <th scope="col">Skin</th>
+                      <th scope="col">Top Coat</th>
+                      <th scope="col">Filler In Top Coat</th>
+                      <th scope="col">Foam</th>
+                      <th scope="col">Filler In Foam</th>
+                      <th scope="col">Adhesive</th>
+                      <th scope="col">Filler In Adhesive</th>
+                      <th scope="col">Final GSM</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>{product.pre_skin}</td>
+                      <td>{product.skin}gsm</td>
+                      <td>{product.top_coat}</td>
+                      <td>{product.filler_in_top_coat}</td>
+                      <td>{product.foam} gsm</td>
+                      <td>{product.filler_in_foam} PHR</td>
+                      <td>{product.adhesive} gsm</td>
+                      <td>{product.filler_in_adhesive} PHR</td>
+                      <td>{product.final_gsm} gsm</td>
+                    </tr>
+                  
+                  </tbody>
+                </Table>
+                  {activeTab === '3' &&  <PlanViewJumbo Refreshkey={refreshKey} product={product} updateRollTogglefunction={setterJumboUpdateDataFromPlan}/>}
+               </div>
+                
+               
+
+             </ComponentCard4>
+             </React.Fragment>
+              })
+            }
           </TabPane>
           <TabPane tabId="4">
-            <Row>
-              <Col sm="6">
-                <Card body>
-                  <CardTitle>Special Title Treatment</CardTitle>
-                  <CardText>
-                    With supporting text below as a natural lead-in to additional content.
-                  </CardText>
-                  <Button>Go somewhere</Button>
-                </Card>
-              </Col>
-              <Col sm="6">
-                <Card body>
-                  <CardTitle>Special Title Treatment</CardTitle>
-                  <CardText>
-                    With supporting text below as a natural lead-in to additional content.
-                  </CardText>
-                  <Button>Go somewhere</Button>
-                </Card>
-              </Col>
-            </Row>
+                <Table responsive size="sm">
+                  <thead>
+                    <tr>
+                       <th scope="col"><Button className='my-btn-color'>{"Total Jumbo Rolls => Count : 0, Qty : 0 m"}</Button></th>
+                       <th scope="col"><Button className='my-btn-color-red'>{"Total Small Rolls => Count : 0, Qty : 0 m"}</Button></th>
+                    </tr>
+                  </thead>
+                  
+                </Table>
+          {
+              line4.map((product)=>{
+                return <React.Fragment key={product.id}>
+            <ComponentCard4>
+
+              <div className='table-margin'>
+               <Table className='table-margin-zero' responsive size="sm">
+                  <thead>
+                    <tr>
+                      <th scope="col">
+                        <div>{CustomerName(product.customer_id)}  Product({product.product_id})</div>
+                        <div>Delivery Date :{ formatDate(product.created_at)} Total : 200 m | Remaining : 30.00 m</div>
+                        </th>
+                      <th scope="col"><Button className='my-btn-color' onClick={()=>setterJumboDataFromPlan(product)}>Create Jumbo Roll</Button></th>
+                      <th scope="col"><Button className='my-btn-color-red' onClick={()=>setterPasteDataFromPlan(product)}>Paste Consumption</Button></th>
+                      <th scope="col"><Button className='my-btn-color-red'>Manage daily Usage</Button></th>
+                      <th scope="col"><Button className='my-btn-color-red' onClick={()=>LabReport(product)}>Lab Report</Button></th>
+                      <th scope="col"><Button className='my-btn-mo-color'>More</Button></th>
+
+                    </tr>
+                  </thead>
+                  
+                </Table>
+
+                <PlanViewProduct productID ={product.product_id} data1={data1} data2={data2} data3={data3} data4={data4} data5={data5}/>
+              
+                
+                <Table responsive size="sm">
+                  <thead>
+                    <tr>
+                      <th scope="col">Pre Skin</th>
+                      <th scope="col">Skin</th>
+                      <th scope="col">Top Coat</th>
+                      <th scope="col">Filler In Top Coat</th>
+                      <th scope="col">Foam</th>
+                      <th scope="col">Filler In Foam</th>
+                      <th scope="col">Adhesive</th>
+                      <th scope="col">Filler In Adhesive</th>
+                      <th scope="col">Final GSM</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>{product.pre_skin}</td>
+                      <td>{product.skin}gsm</td>
+                      <td>{product.top_coat}</td>
+                      <td>{product.filler_in_top_coat}</td>
+                      <td>{product.foam} gsm</td>
+                      <td>{product.filler_in_foam} PHR</td>
+                      <td>{product.adhesive} gsm</td>
+                      <td>{product.filler_in_adhesive} PHR</td>
+                      <td>{product.final_gsm} gsm</td>
+                    </tr>
+                  
+                  </tbody>
+                </Table>
+                  {activeTab === '4' &&  <PlanViewJumbo Refreshkey={refreshKey} product={product} updateRollTogglefunction={setterJumboUpdateDataFromPlan}/>}
+               </div>
+                
+               
+
+             </ComponentCard4>
+             </React.Fragment>
+              })
+            }
           </TabPane>
         </TabContent>
       </ComponentCard>

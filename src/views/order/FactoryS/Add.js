@@ -558,10 +558,10 @@ const handleSubmit = async (event) => {
                   <Col md="10" >
                    <FormGroup>
                      <Label>Quantity (in meters)</Label>
-                     <Input type="text" 
+                     <Input type="number" 
                      name="quantity" 
                      id="name"
-                     placeholder="Enter name" 
+                     placeholder="Enter number" 
                      value={formDatas.quantity}
                      onChange={handleChange}
                      disabled={submitBlock} 
@@ -574,10 +574,10 @@ const handleSubmit = async (event) => {
                  <Col md="10" >
                    <FormGroup>
                      <Label>Price Per Unit (Inclusive of Tax)</Label>
-                     <Input type="text" 
+                     <Input type="number" 
                      name="PricePerUnit" 
                      id="name"
-                     placeholder="Enter name" 
+                     placeholder="Enter number" 
                      value={formDatas.PricePerUnit}
                      onChange={handleChange} 
                      disabled={submitBlock}
@@ -588,10 +588,10 @@ const handleSubmit = async (event) => {
                  <Col md="10" >
                    <FormGroup>
                      <Label>Thickness (in mm)</Label>
-                     <Input type="text" 
+                     <Input type="number" 
                      name="Thickness" 
                      id="name"
-                     placeholder="Enter name" 
+                     placeholder="Enter number" 
                      value={formDatas.Thickness}
                      onChange={handleChange} 
                      disabled={submitBlock}
@@ -602,10 +602,10 @@ const handleSubmit = async (event) => {
                  <Col md="10" >
                    <FormGroup>
                      <Label>Tax Rate (in %)</Label>
-                     <Input type="text" 
+                     <Input type="number" 
                      name="TaxRate" 
                      id="name"
-                     placeholder="Enter name" 
+                     placeholder="Enter number" 
                      value={formDatas.TaxRate}
                      onChange={handleChange} 
                      disabled={submitBlock}
@@ -633,7 +633,7 @@ const handleSubmit = async (event) => {
                      <Input type="text" 
                      name="CustomerItemRefernce" 
                      id="name"
-                     placeholder="Enter name" 
+                     placeholder="Enter" 
                      value={formDatas.CustomerItemRefernce}
                      onChange={handleChange}
                      disabled={submitBlock} 

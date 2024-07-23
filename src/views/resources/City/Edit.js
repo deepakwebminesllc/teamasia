@@ -1,4 +1,4 @@
-import React,{useState,useEffect} from 'react';
+import React,{useState} from 'react';
 
 import {
   Card,
@@ -22,12 +22,11 @@ import {useLocation, useNavigate } from 'react-router-dom';
 const Edit = () => {
   const navigate = useNavigate(); 
   const location = useLocation();
-  const {id,name:CityName,country_id:CountryId,state_id:StateId,is_trashed:isTrashed} = location.state || {};
+  const {id,name:CityName,country_id:CountryId,state_id:StateId,is_trashed:isTrashed} = location.state.item;
+  const {data2,data3} = location.state;
+  const [data3x,setData3x] =useState(data3);
   const [errorMessageFromApi, setErrorMessageFromApi] = useState([]);
 
-  const [data2, setData2] = useState([]);
-  const [data3, setData3] = useState([]);
-  const [data3x, setData3x] = useState([]);
   const [errors,setErrors] = useState({});
   
   const [formDatas, setFormDataS] = useState({
@@ -69,7 +68,7 @@ const Edit = () => {
     }));
     
     const newdata3 = data3.filter((item) => item.country_id === e.target.value);
-    newdata3.push({id:'',name:'choose'})
+    newdata3.push({id:'',name:'choose'});
     setData3x(newdata3);
   };
 
@@ -146,56 +145,7 @@ const validateForm=()=>{
     }
 };
 
-useEffect(() => {
 
-  const fetchData2 = async () => {
-    const token = localStorage.getItem('userToken');
-    // console.log('token',token);
-    const response = await fetch(`https://factory.teamasia.in/api/public/countries/?is_trashed=0`, {
-      method: 'GET', 
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    });
-    // console.log('result',response);
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const result = await response.json();
-    console.log("responsejson2",result.countries[0].name);
- 
-    setData2(result.countries); 
-  };
-
-  const fetchData3 = async () => {
-    const token = localStorage.getItem('userToken');
-    // console.log('token',token);
-    const response = await fetch(`https://factory.teamasia.in/api/public/states/?is_trashed=0`, {
-      method: 'GET', 
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    });
-    // console.log('result',response);
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const result = await response.json();
-    
-    console.log("responsejson3",result.states[0].name);
-    const resultX = result.states.slice();
-    console.log('resultX',resultX);
-    resultX.push({id:'',name:'choose'})
-    console.log('resultX',resultX);
-    setData3(result.states); 
-    setData3x(result.states); 
-  };
-
-  fetchData3()
-  fetchData2();
-
-
-},[]);
 
   return (
 <div>
@@ -262,11 +212,10 @@ useEffect(() => {
                     <FormGroup>
                       <Label>State</Label>
                       <Input type="select"
-                         name="countryId" 
+                         name="stateId" 
                          value={formDatas.StateId}
                         onChange={handleTypeChange1}>
                            {data3x.map((item)=>{
-   
                              return <option key={item.id} value={item.id}>{item.name}</option>
                            })}
                       </Input>

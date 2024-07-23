@@ -92,7 +92,6 @@ const Edit = () => {
       items: newItems
     }));
     setErrors((prev)=>({...prev,"lab_test_name": ""}));
-
   };
 
   const closer =()=>{

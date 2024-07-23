@@ -45,7 +45,6 @@ const JumbotronComponent = (props) => {
 
 
   useEffect(() => {
-    
     // Fetch the data from the API
     const fetchData = async () => {
       const token = localStorage.getItem('userToken');
@@ -64,7 +63,6 @@ const JumbotronComponent = (props) => {
       console.log("responsejson",result);
       const resultFiltered = result.products.filter(product => product.ref_product_id === '0');
       setData(resultFiltered);
-
     };
     fetchData();  
   },[]);

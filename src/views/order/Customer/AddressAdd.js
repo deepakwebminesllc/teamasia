@@ -250,34 +250,34 @@ const validateForm = () => {
     // eslint-disable-next-line dot-notation
     errors1["cityId"] = "Please select a city.";
   }
-  formDatas.items.forEach((element) => {
-    console.log('element',element);
-          if(element.name === ''){
-             formIsValid = false;
-      // eslint-disable-next-line dot-notation
-            errors1["representName"] ="Required"
-          }
-          if(element.designation === ''){
-             formIsValid = false;
-      // eslint-disable-next-line dot-notation
-            errors1["representDesignation"] ="Required"
-          }
-          if(element.email === ''){
-             formIsValid = false;
-      // eslint-disable-next-line dot-notation
-            errors1["representEmail"] ="Required"
-          }
-          if(element.country_code === ''){
-             formIsValid = false;
-      // eslint-disable-next-line dot-notation
-            errors1["representCountryCode"] ="Required"
-          }
-          if(element.mobile === ''){
-             formIsValid = false;
-      // eslint-disable-next-line dot-notation
-            errors1["representMobile"] ="Required"
-          }
-      });
+  // formDatas.items.forEach((element) => {
+  //   console.log('element',element);
+  //         if(element.name === ''){
+  //            formIsValid = false;
+  //     // eslint-disable-next-line dot-notation
+  //           errors1["representName"] ="Required"
+  //         }
+  //         if(element.designation === ''){
+  //            formIsValid = false;
+  //     // eslint-disable-next-line dot-notation
+  //           errors1["representDesignation"] ="Required"
+  //         }
+  //         if(element.email === ''){
+  //            formIsValid = false;
+  //     // eslint-disable-next-line dot-notation
+  //           errors1["representEmail"] ="Required"
+  //         }
+  //         if(element.country_code === ''){
+  //            formIsValid = false;
+  //     // eslint-disable-next-line dot-notation
+  //           errors1["representCountryCode"] ="Required"
+  //         }
+  //         if(element.mobile === ''){
+  //            formIsValid = false;
+  //     // eslint-disable-next-line dot-notation
+  //           errors1["representMobile"] ="Required"
+  //         }
+  //     });
 
   setErrors(errors1);
   return formIsValid;

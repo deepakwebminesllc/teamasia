@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState ,useEffect} from 'react';
 import {
   Collapse,
   Button,
@@ -11,27 +11,24 @@ import {
   Form,
   Row,
   CardBody,
+  Table
 } from 'reactstrap';
 
 import { useNavigate } from 'react-router-dom';
 import ComponentCard from '../../../components/ComponentCard';
 
-const QaPack = () => {
-  const navigate = useNavigate();
+const AdditionalTreat = () => {
   const [collapse, setCollapse] = useState(false);
-  const data = [
-    { id: 1, code: 'JR-001', planDate: '2024-01-01', companyName: 'ABC Textiles', quantity: 1000, orderId: 'O-201', productId: 'P-101' },
-    { id: 2, code: 'JR-002', planDate: '2024-01-02', companyName: 'XYZ Fabrics', quantity: 850, orderId: 'O-202', productId: 'P-102' },
-    { id: 3, code: 'JR-003', planDate: '2024-01-03', companyName: 'Looms & Weaves', quantity: 1200, orderId: 'O-203', productId: 'P-103' },
-    { id: 4, code: 'JR-003', planDate: '2024-01-03', companyName: 'Looms & Weaves', quantity: 1200, orderId: 'O-203', productId: 'P-103' },
-    { id: 5, code: 'JR-003', planDate: '2024-01-03', companyName: 'Looms & Weaves', quantity: 1200, orderId: 'O-203', productId: 'P-103' },
-    { id: 6, code: 'JR-003', planDate: '2024-01-03', companyName: 'Looms & Weaves', quantity: 1200, orderId: 'O-203', productId: 'P-103' },
-    { id: 7, code: 'JR-003', planDate: '2024-01-03', companyName: 'Looms & Weaves', quantity: 1200, orderId: 'O-203', productId: 'P-103' },
-    { id: 8, code: 'JR-003', planDate: '2024-01-03', companyName: 'Looms & Weaves', quantity: 1200, orderId: 'O-203', productId: 'P-103' },
-    { id: 9, code: 'JR-003', planDate: '2024-01-03', companyName: 'Looms & Weaves', quantity: 1200, orderId: 'O-203', productId: 'P-103' },
-    { id: 10, code: 'JR-003', planDate: '2024-01-03', companyName: 'Looms & Weaves', quantity: 1200, orderId: 'O-203', productId: 'P-103' },
+  // const data = [
+  //   { id: 1, code: 'JR-001', planDate: '2024-01-01', companyName: 'ABC Textiles', quantity: 1000, orderId: 'O-201', productId: 'P-101' },
+  // ];
 
-  ];
+  const [data, setData] = useState([]);
+  const [plans, setPlans] = useState([]);
+  const [Customerdata,setCustomerData] = useState([]);
+  const [QaData, setQaData] = useState([]);
+
+  const navigate = useNavigate();
   const tableStyle = {
     // margin: 'auto', 
     // width: '60%',  
@@ -40,9 +37,117 @@ const QaPack = () => {
 
   const toggle = () => setCollapse(!collapse);
 
-const handleJumboSearch = ()=>{
-  navigate('/operations/qa-packaging/jumboroll');
-}
+
+
+  const planDate = (planId)=>{
+    console.log('hi',planId,plans);
+    const date = plans.find((p)=> p.id === planId);
+    console.log('date',date);
+    return date? date.plan_date:'unknown date'
+  }
+
+  const customerNames = (planId) => {
+    const PlanData = plans.find((p)=> p.id === planId);
+    console.log('ordervalue',PlanData);
+    if (PlanData) {
+      const customerValue = Customerdata.find(customer => customer.id === PlanData.customer_id);
+    console.log('ordervalue 2',customerValue);
+      return customerValue ? customerValue.company_name : 'customer not found';
+    }
+    return 'customer not found';
+  };
+
+  const AdditionalTreatView = (rollItem)=>{
+    const customerName =customerNames(rollItem.production_plan_id)
+    navigate('/operations/qa-packaging/view',{state: { rollItem, customerName,plans,QaData}})
+  }
+
+  // const handleJumboSearch = ()=>{
+  //   navigate('/operations/qa-packaging/view-old');
+  // }
+
+  useEffect(()=>{
+    const fetchDispatch = async () => {
+      const token = localStorage.getItem('userToken');
+      // console.log('token',token);
+      const response = await fetch(`https://factory.teamasia.in/api/public/jumboroll/?send_for_additional_treatment=1`, {
+        method: 'GET', 
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      // console.log('result',response);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const result = await response.json();
+      // console.log("responsejson1",result.dispatch);
+      setData(result.jumborolls); 
+    };
+
+  
+    const fetchPlans = async () => {
+      const token = localStorage.getItem('userToken');
+      // console.log('token',token);
+      const response = await fetch(`https://factory.teamasia.in/api/public/productionplan`, {
+        method: 'GET', 
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      // console.log('result',response);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const result = await response.json();
+      // console.log("responsejson1",result.dispatch);
+      setPlans(result.production_plan); 
+    };
+    
+    const fetchCustomerData = async ()=>{
+
+      const token = localStorage.getItem('userToken');
+      const response =await  fetch(`https://factory.teamasia.in/api/public/customers`,{
+        method: "GET",
+        headers:{
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if(!response.ok){
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const datas = await response.json();
+      // console.log('result customer',datas.customers);
+      setCustomerData(datas.customers);
+    }
+    const fetchQaData = async () => {
+      const token = localStorage.getItem('userToken');
+      // console.log('token',token);
+      const response = await fetch('https://factory.teamasia.in/api/public/qapateams/?is_trashed=0', {
+        method: 'GET', 
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      // console.log('result',response);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const result = await response.json();
+      console.log("responsejson1",result);
+      const resultX = result.qapateams.slice();
+      resultX.push({id:'x',name:'Choose'});
+      setQaData(resultX); 
+    };
+
+    fetchQaData();
+    fetchCustomerData();
+    fetchPlans();
+    fetchDispatch();
+  },[])
+
   return (
     <ComponentCard
     title=""
@@ -52,9 +157,12 @@ const handleJumboSearch = ()=>{
       </p>
     }
   >
-    <Button className='my-btn-color' style={{ marginBottom: '1rem',marginRight:'10px' }} onClick={() => handleJumboSearch()}>
+     {/* <Button className='my-btn-color' style={{ marginBottom: '1rem',marginRight:'10px' }} onClick={() => handleJumboSearch()}>
            Load By Code
-            </Button>
+     </Button> */}
+     <Button className='my-btn-color' style={{ marginBottom: '1rem',marginRight:'10px' }} disabled>
+           Load By Code
+     </Button>
            
 
       <Button className='my-btn-color' onClick={toggle.bind(null)} style={{ marginBottom: '1rem' }}>
@@ -82,10 +190,10 @@ const handleJumboSearch = ()=>{
                  </Col>
                  <Col md="4">
                    <FormGroup>
-                    <Button type="submit" className="btn btn-info" style={{marginTop:"28px"}}>
+                    <Button type="submit" className="btn btn-info" style={{marginTop:"28px"}} disabled>
                         Search
                     </Button>
-                    <Button type="reset" className="btn btn-info" style={{marginTop:"28px",marginLeft:"10px"}}>
+                    <Button type="reset" className="btn btn-info" style={{marginTop:"28px",marginLeft:"10px"}} disabled>
                         Reset
                     </Button>
                    </FormGroup>
@@ -97,9 +205,7 @@ const handleJumboSearch = ()=>{
                 </CardBody>
               </Card>
             </Collapse>
-
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-      <table className="table" style={tableStyle}>
+      <Table  style={tableStyle} responsive>
       <thead>
             <tr>
               <th>Jumbo Roll Code</th>
@@ -117,28 +223,24 @@ const handleJumboSearch = ()=>{
               <tbody>
                 {data.map((roll) => (
                   <tr key={roll.id}>
-                    <td>{roll.code}</td>
-                    <td>{roll.planDate}</td>
-                    <td>{roll.companyName}</td>
+                    <td>JUMBO{roll.id}</td>
+                    <td>{planDate(roll.production_plan_id)}</td>
+                    <td style={{display:'none'}}>{customerNames(roll.production_plan_id)}</td>
+                    <td>testing team</td>
                     <td>{roll.quantity}</td>
-                    <td>{roll.orderId}</td>
-                    <td>{roll.productId}</td>
+                    <td>{roll.order_id}</td>
+                    <td>{roll.product_id}</td>
                   <td>
-                    {/* Action buttons or icons */}
-                      <button type="button" className="btn mybtncustomer btn-secondary btn-sm mr-2"><i className="bi bi-eye-fill my-eye-color" /></button>
+                      <button type="button" className="btn mybtncustomer btn-secondary btn-sm mr-2"><i className="bi bi-eye-fill my-eye-color" onClick={()=>{AdditionalTreatView(roll)}}/></button>
                   </td>
                 </tr>
                 ))}
               </tbody>
-            </table>
+            </Table>
             
-    </div>
    
   </ComponentCard>
-
-   
-   
   );
 };
 
-export default QaPack;
+export default AdditionalTreat;

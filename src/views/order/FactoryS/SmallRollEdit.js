@@ -213,7 +213,7 @@ const Add = () => {
                     <FormGroup>
                       <Label>Quantity (in meters)</Label>
                       <Input
-                        type="text"
+                        type="number"
                         name="quantity"
                         placeholder="Enter quantity"
                         value={formDatas.quantity}
@@ -255,7 +255,7 @@ const Add = () => {
                     <FormGroup>
                       <Label>Weight</Label>
                       <Input
-                        type="text"
+                        type="number"
                         name="weight"
                         placeholder="Enter weight"
                         value={formDatas.weight}
@@ -268,7 +268,7 @@ const Add = () => {
                     <FormGroup>
                       <Label>Width</Label>
                       <Input
-                        type="text"
+                        type="number"
                         name="width"
                         placeholder="Enter width"
                         value={formDatas.width}

@@ -540,10 +540,10 @@ const handleSubmit = async (event) => {
                   <Col md="10" >
                    <FormGroup>
                      <Label>Quantity (in meters)</Label>
-                     <Input type="text" 
+                     <Input type="number" 
                      name="quantity" 
                      id="name"
-                     placeholder="Enter name" 
+                     placeholder="Enter number" 
                      value={formDatas.quantity}
                      onChange={handleChange} 
                      disabled={submitBlock}
@@ -556,10 +556,10 @@ const handleSubmit = async (event) => {
                  <Col md="10" >
                    <FormGroup>
                      <Label>Price Per Unit (Inclusive of Tax)</Label>
-                     <Input type="text" 
+                     <Input type="number" 
                      name="PricePerUnit" 
                      id="name"
-                     placeholder="Enter name" 
+                     placeholder="Enter number" 
                      value={formDatas.PricePerUnit}
                      onChange={handleChange} 
                      disabled={submitBlock}
@@ -570,10 +570,10 @@ const handleSubmit = async (event) => {
                  <Col md="10" >
                    <FormGroup>
                      <Label>Thickness (in mm)</Label>
-                     <Input type="text" 
+                     <Input type="number" 
                      name="Thickness" 
                      id="name"
-                     placeholder="Enter name" 
+                     placeholder="Enter number" 
                      value={formDatas.Thickness}
                      onChange={handleChange}
                      disabled={submitBlock} 
@@ -584,10 +584,10 @@ const handleSubmit = async (event) => {
                  <Col md="10" >
                    <FormGroup>
                      <Label>Tax Rate (in %)</Label>
-                     <Input type="text" 
+                     <Input type="number" 
                      name="TaxRate" 
                      id="name"
-                     placeholder="Enter name" 
+                     placeholder="Enter number" 
                      value={formDatas.TaxRate}
                      onChange={handleChange}
                      disabled={submitBlock} 
@@ -601,7 +601,7 @@ const handleSubmit = async (event) => {
                      <Input type="text" 
                      name="Topcoat" 
                      id="name"
-                     placeholder="Enter name" 
+                     placeholder="Enter" 
                      value={formDatas.Topcoat}
                      onChange={handleChange} 
                      disabled={submitBlock}
@@ -615,7 +615,7 @@ const handleSubmit = async (event) => {
                      <Input type="text" 
                      name="FoamI" 
                      id="name"
-                     placeholder="Enter name" 
+                     placeholder="Enter" 
                      value={formDatas.FoamI}
                      onChange={handleChange} 
                      disabled={submitBlock}
@@ -629,7 +629,7 @@ const handleSubmit = async (event) => {
                      <Input type="text" 
                      name="FillerInFoamI" 
                      id="name"
-                     placeholder="Enter name" 
+                     placeholder="Enter" 
                      value={formDatas.FillerInFoamI}
                      onChange={handleChange} 
                      disabled={submitBlock}
@@ -643,7 +643,7 @@ const handleSubmit = async (event) => {
                      <Input type="text" 
                      name="FoamII" 
                      id="name"
-                     placeholder="Enter name" 
+                     placeholder="Enter" 
                      value={formDatas.FoamII}
                      onChange={handleChange} 
                      disabled={submitBlock}
@@ -657,7 +657,7 @@ const handleSubmit = async (event) => {
                      <Input type="text" 
                      name="FillerInFoamII" 
                      id="name"
-                     placeholder="Enter name" 
+                     placeholder="Enter" 
                      value={formDatas.FillerInFoamII}
                      onChange={handleChange} 
                      disabled={submitBlock}
@@ -671,7 +671,7 @@ const handleSubmit = async (event) => {
                      <Input type="text" 
                      name="Adhesive" 
                      id="name"
-                     placeholder="Enter name" 
+                     placeholder="Enter" 
                      value={formDatas.Adhesive}
                      onChange={handleChange} 
                      disabled={submitBlock}
@@ -685,7 +685,7 @@ const handleSubmit = async (event) => {
                      <Input type="text" 
                      name="FillerInAdhesive" 
                      id="name"
-                     placeholder="Enter name" 
+                     placeholder="Enter" 
                      value={formDatas.FillerInAdhesive}
                      onChange={handleChange} 
                      disabled={submitBlock}
@@ -700,7 +700,7 @@ const handleSubmit = async (event) => {
                      <Input type="text" 
                      name="FinalGsm" 
                      id="name"
-                     placeholder="Enter name" 
+                     placeholder="Enter" 
                      value={formDatas.FinalGsm}
                      onChange={handleChange} 
                      disabled={submitBlock}

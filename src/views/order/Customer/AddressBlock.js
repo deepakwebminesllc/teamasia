@@ -8,9 +8,9 @@ import 'react-table-v6/react-table.css';
 
 const JumbotronComponent = (props) => {
   const location = useLocation();
-  const [data1,setData1] = useState('');
-  const [data2,setData2] = useState('');
-  const [data3,setData3] = useState('');
+  const [data1,setData1] = useState('unknown city');
+  const [data2,setData2] = useState('unknown state');
+  const [data3,setData3] = useState('unknown country');
   const [data4,setData4] = useState('');
   const { data } = props;
 
@@ -49,7 +49,7 @@ const JumbotronComponent = (props) => {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
    const result = await response.json();
-   console.log('responsejsonHYBRID',result);
+   console.log('responsejsonHYBRID state',result);
    if(result.length !==0){
     setData2(result[0].name);
   }
@@ -68,7 +68,7 @@ const JumbotronComponent = (props) => {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
    const result = await response.json();
-   console.log('responsejsonHYBRID',result);
+  //  console.log('responsejsonHYBRID',result);
    if(result.length !==0){
     setData3(result[0].name);
   }
@@ -116,7 +116,7 @@ const JumbotronComponent = (props) => {
                                 <div>{data.address_line_1}</div> 
                                 <div>{data.address_line_2}</div> 
                                 <div>{data1}</div> 
-                                <div>{data2} - 06</div> 
+                                <div>{data2} - 06</div>
                                 <div>{data.pincode}, {data4}</div> 
                                 <div> GST No. : {data.gst}</div> 
                               </div>

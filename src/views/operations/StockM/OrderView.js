@@ -39,6 +39,7 @@ const JumbotronComponent = () => {
     console.log('click');
     setModal(!modal)
   }
+  
   return (
     <>
        <SmallRollDetails modal={modal} toggle={smallRollDetailsTogglefunction}/>

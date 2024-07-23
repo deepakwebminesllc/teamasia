@@ -15,6 +15,7 @@ const Cities = () => {
   const [data, setData] = useState([]);
   const [data2, setData2] = useState([]);
   const [data3, setData3] = useState([]);
+
   const [istrashed, setIstrashed] = useState('0');
   
   
@@ -23,12 +24,13 @@ const Cities = () => {
   };
   const handleEditClick = (item) => {
     
-    navigate('/resources/cities/edit', { state: item });
+    navigate('/resources/cities/edit', { state: {item,data2,data3} });
   };
+  
   const handleEditAdd = () => {
     // Navigate to the edit page with the item's id
     // Navigate(`/resources/address-types/edit/${itemId}`);
-    navigate('/resources/cities/add');
+    navigate('/resources/cities/add',{state: {data2,data3}});
   };
   const handleTrash = ()=>{
      
@@ -138,8 +140,11 @@ const Cities = () => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const result = await response.json();
-      console.log("responsejson3",result);
-      setData3(result.states); 
+      const resultX = result.states.slice();
+      console.log('resultX',resultX);
+      resultX.push({id:'',name:'choose'})
+      console.log('resultX',resultX);
+      setData3(resultX); 
     };
   
     fetchData3();

@@ -218,10 +218,14 @@ const handleInputChange = (index, event) => {
         if(imageDetails){
           compdoctemp.push({name:formDatas.compdoc[0].name,file_path:imageDetails.image_path,image_id:imageDetails.image_id});
         }
-        const csvString = selectedOptions.map(item => item.value).join(', ');
+        const filtered =formDatas.items.filter((temp)=>{
+          return temp.name !== '';
+        });
+
+        const csvString = selectedOptions.map(item => item.value).join(',');
         console.log('csvString',csvString);
 
-        const csvString1 = regularTags.map(item => item).join(', ');
+        const csvString1 = regularTags.map(item => item).join(',');
         console.log(csvString1);
 
         console.log('formdataX',formDatas);
@@ -232,7 +236,7 @@ const handleInputChange = (index, event) => {
           company_description: formDatas.CompanyDescription,
           day_limit: formDatas.LimitforDaysAllowed,
           credit_limit: formDatas.LimitforCreditAllowed,
-          customer_company_representative: formDatas.items,
+          customer_company_representative: filtered,
           customer_company_document:compdoctemp,
           is_trashed:'0'
         }
@@ -274,49 +278,49 @@ const validateForm = () => {
     // eslint-disable-next-line dot-notation
     errors1["companyName"] = "Please select a companyName";
   }
-  if(formDatas.CompanyDescription === '') {
+  if(formDatas.CompanyDescriptionT === '') {
     formIsValid = false;
     // eslint-disable-next-line dot-notation
     errors1["CompanyDescription"] = "Please select description.";
   }
-  if(formDatas.LimitforDaysAllowed === '') {
+  if(formDatas.LimitforDaysAllowedT === '') {
     formIsValid = false;
     // eslint-disable-next-line dot-notation
     errors1["LimitforDaysAllowed"] = "Please select a LimitforDaysAllowed.";
   }
-  if(formDatas.LimitforCreditAllowed === '') {
+  if(formDatas.LimitforCreditAllowedT === '') {
     formIsValid = false;
     // eslint-disable-next-line dot-notation
     errors1["LimitforCreditAllowed"] = "Please select a LimitforCreditAllowed.";
   }
-  formDatas.items.forEach((element) => {
-    console.log('element',element);
-          if(element.name === ''){
-             formIsValid = false;
-      // eslint-disable-next-line dot-notation
-            errors1["representName"] ="Required"
-          }
-          if(element.designation === ''){
-             formIsValid = false;
-      // eslint-disable-next-line dot-notation
-            errors1["representDesignation"] ="Required"
-          }
-          if(element.email === ''){
-             formIsValid = false;
-      // eslint-disable-next-line dot-notation
-            errors1["representEmail"] ="Required"
-          }
-          if(element.country_code === ''){
-             formIsValid = false;
-      // eslint-disable-next-line dot-notation
-            errors1["representCountryCode"] ="Required"
-          }
-          if(element.mobile === ''){
-             formIsValid = false;
-      // eslint-disable-next-line dot-notation
-            errors1["representMobile"] ="Required"
-          }
-      });
+  // formDatas.items.forEach((element) => {
+  //   console.log('element',element);
+  //         if(element.name === ''){
+  //            formIsValid = false;
+  //     // eslint-disable-next-line dot-notation
+  //           errors1["representName"] ="Required"
+  //         }
+  //         if(element.designation === ''){
+  //            formIsValid = false;
+  //     // eslint-disable-next-line dot-notation
+  //           errors1["representDesignation"] ="Required"
+  //         }
+  //         if(element.email === ''){
+  //            formIsValid = false;
+  //     // eslint-disable-next-line dot-notation
+  //           errors1["representEmail"] ="Required"
+  //         }
+  //         if(element.country_code === ''){
+  //            formIsValid = false;
+  //     // eslint-disable-next-line dot-notation
+  //           errors1["representCountryCode"] ="Required"
+  //         }
+  //         if(element.mobile === ''){
+  //            formIsValid = false;
+  //     // eslint-disable-next-line dot-notation
+  //           errors1["representMobile"] ="Required"
+  //         }
+  //     });
 
       // formDatas.compdoc.forEach((element) => {
       //   console.log('element',element);

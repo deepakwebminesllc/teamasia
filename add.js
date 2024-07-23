@@ -313,33 +313,33 @@ Surplus Stock
      </Table> */}
 
 
-const invoice =(a,tempTarget)=>{
+// const invoice =(a,tempTarget)=>{
 
-  if(a.length == 1){
-    console.log('w',a[0])
-  }
-  else{
-    var target = (tempTarget % a.length);
-    var SpecialA = [],i=1;
-    var k=0,rem;
-    while(true){
-     rem = (target + i) % a.length;
+//   if(a.length == 1){
+//     console.log('w',a[0])
+//   }
+//   else{
+//     var target = (tempTarget % a.length);
+//     var SpecialA = [],i=1;
+//     var k=0,rem;
+//     while(true){
+//      rem = (target + i) % a.length;
    
-     if(rem == target){
-       break;
-     }
-      SpecialA[k] =a[rem];
-      i++;
-      k++;
-    }
-    console.log('special',SpecialA);
-    invoice(SpecialA,tempTarget);
-  }
+//      if(rem == target){
+//        break;
+//      }
+//       SpecialA[k] =a[rem];
+//       i++;
+//       k++;
+//     }
+//     console.log('special',SpecialA);
+//     invoice(SpecialA,tempTarget);
+//   }
 
-}
+// }
 
-var grade = ['a','b','c','d','e','f']
-invoice(grade,3);
+// var grade = ['a','b','c','d','e','f']
+// invoice(grade,3);
 
 
 

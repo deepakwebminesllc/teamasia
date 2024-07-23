@@ -224,10 +224,15 @@ const handleInputChange = (index, event) => {
         if(imageDetails){
           compdoctemp.push({name:formDatas.compdoc[0].name,file_path:imageDetails.image_path,image_id:imageDetails.image_id});
         }
-        const csvString = selectedOptions.map(item => item.value).join(', ');
-        console.log('csvString',csvString);
+        const filtered =formDatas.items.filter((temp)=>{
+          return temp.name !== '';
+        });
+         console.log("filetered data",filtered);
 
-        const csvString1 = regularTags.map(item => item).join(', ');
+         const csvString = selectedOptions.map(item => item.value).join(',');
+         console.log('csvString',csvString);
+
+        const csvString1 = regularTags.map(item => item).join(',');
         console.log(csvString1);
 
         console.log('formdataX',formDatas);
@@ -238,7 +243,7 @@ const handleInputChange = (index, event) => {
           company_description: formDatas.CompanyDescription,
           day_limit: formDatas.LimitforDaysAllowed,
           credit_limit: formDatas.LimitforCreditAllowed,
-          customer_company_representative: formDatas.items,
+          customer_company_representative: filtered,
           customer_company_document:compdoctemp,
           is_trashed:'0'
         }
@@ -295,34 +300,34 @@ const validateForm = () => {
     // eslint-disable-next-line dot-notation
     errors1["LimitforCreditAllowed"] = "Please select a LimitforCreditAllowed.";
   }
-  formDatas.items.forEach((element) => {
-    console.log('element',element);
-          if(element.name === ''){
-             formIsValid = false;
-      // eslint-disable-next-line dot-notation
-            errors1["representName"] ="Required"
-          }
-          if(element.designation === ''){
-             formIsValid = false;
-      // eslint-disable-next-line dot-notation
-            errors1["representDesignation"] ="Required"
-          }
-          if(element.email === ''){
-             formIsValid = false;
-      // eslint-disable-next-line dot-notation
-            errors1["representEmail"] ="Required"
-          }
-          if(element.country_code === ''){
-             formIsValid = false;
-      // eslint-disable-next-line dot-notation
-            errors1["representCountryCode"] ="Required"
-          }
-          if(element.mobile === ''){
-             formIsValid = false;
-      // eslint-disable-next-line dot-notation
-            errors1["representMobile"] ="Required"
-          }
-      });
+  // formDatas.items.forEach((element) => {
+  //   console.log('element',element);
+  //         if(element.name === ''){
+  //            formIsValid = false;
+  //     // eslint-disable-next-line dot-notation
+  //           errors1["representName"] ="Required"
+  //         }
+  //         if(element.designation === ''){
+  //            formIsValid = false;
+  //     // eslint-disable-next-line dot-notation
+  //           errors1["representDesignation"] ="Required"
+  //         }
+  //         if(element.email === ''){
+  //            formIsValid = false;
+  //     // eslint-disable-next-line dot-notation
+  //           errors1["representEmail"] ="Required"
+  //         }
+  //         if(element.country_code === ''){
+  //            formIsValid = false;
+  //     // eslint-disable-next-line dot-notation
+  //           errors1["representCountryCode"] ="Required"
+  //         }
+  //         if(element.mobile === ''){
+  //            formIsValid = false;
+  //     // eslint-disable-next-line dot-notation
+  //           errors1["representMobile"] ="Required"
+  //         }
+  //     });
 
       // formDatas.compdoc.forEach((element) => {
       //   console.log('element',element);
@@ -345,10 +350,9 @@ const handleSubmit = async (event) => {
   } else {
     console.log('Form is invalid, do not submit');
   }
-
 };
 
-  useEffect(()=>{
+useEffect(()=>{
     if(AddLabels)
       {
         setFormDataS(item =>(
@@ -411,7 +415,6 @@ const handleSubmit = async (event) => {
         }
       })
       
-
       console.log('obj1',obj1);
       setSelectedOptions(obj1);
   }
@@ -642,7 +645,7 @@ const handleSubmit = async (event) => {
                                 </td>   
                                     
                                 <td>
-                                  <button type="button"  style={{ backgroundColor:"red",marginTop:"5px"}} onClick={() => removeItem(index)} disabled={index === 0}>X</button>
+                                  <button type="button"  style={{ backgroundColor:"red",marginTop:"5px"}} onClick={() => removeItem(index)} >X</button>
                                 </td> 
                           </tr>
                           <tr><td></td></tr>

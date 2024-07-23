@@ -201,7 +201,7 @@ const closer =()=>{
         console.log("dataapi",dataZ,response);
         if (response.status === 200) {
           
-            navigate(-1);
+            navigate('order/orders');
         
         } else {
           console.error("Authentication failed:", Object.values(dataZ.messages.errors));

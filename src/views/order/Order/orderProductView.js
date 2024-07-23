@@ -55,15 +55,15 @@ const Products = (props) => {
   }
 
   
-  const productwithNames = data.map(product => ({
-    ...product,
-    grainName: getGrainNameById(product.grain_id),
-    fabricName: getFabricNameById(product.fabric_id),
-    fabricColorName: getFabricColorNameById(product.fabric_id,product.fabric_color_id),
-    qualityName: getQualityNameById(product.quality_id),
-    colorName: getColorNameById(product.color_id),
-    hsnName: getHsnNameById(product.hsn_id)
-  }));
+  // const productwithNames = data.map(product => ({
+  //   ...product,
+  //   grainName: getGrainNameById(product.grain_id),
+  //   fabricName: getFabricNameById(product.fabric_id),
+  //   fabricColorName: getFabricColorNameById(product.fabric_id,product.fabric_color_id),
+  //   qualityName: getQualityNameById(product.quality_id),
+  //   colorName: getColorNameById(product.color_id),
+  //   hsnName: getHsnNameById(product.hsn_id)
+  // }));
 
 
   useEffect(() => {
@@ -84,8 +84,34 @@ const Products = (props) => {
       }
       const result = await response.json();
       // console.log("responsejson in products",result);
-      const resultFiltered = result.products.filter(product => product.ref_product_id === '0');
-      setData(resultFiltered);
+      // const resultFiltered = result.products.filter(product => product.ref_product_id === '0');
+
+      const products = result.products.slice();
+
+      // Create an array to store the paired products
+      const pairedProducts = [];
+
+      // Create a function to find the back side of a product
+      const findBackside = (frontId) => {
+          return products.find(product => product.ref_product_id === frontId);
+      };
+
+      // Iterate over the products to create pairs
+      products.forEach(product => {
+          if (product.ref_product_id === "0") {
+              // If the product is a front side, create a pair object
+              const pair = {
+                  front: product,
+                  back: findBackside(product.id)
+              };
+              pairedProducts.push(pair);
+          }
+      });
+
+      console.log('pairedProducts',pairedProducts);
+
+      // setData(resultFiltered);
+      setData(pairedProducts);
 
     };
     fetchData();  
@@ -97,77 +123,108 @@ const Products = (props) => {
            </CardTitle>
           
            <CardBody>
-           {productwithNames.map((product) => (
-                <div key={product.id} className='table-margin'>
-                    <Table className='table-margin-zero order-table-button' size="sm">
-                      
-                      <Row  style={{background:'#e3e3e3',padding:'2px'}}>
-                        <Col md="2">
-                          <div style={{margin:'5px 0px'}}>
-                            <div className='fix-wid-1'><i className="bi-menu-button-wide-fill my-eye-color" style={{fontSize:'20px',marginRight:'1px'}}/><span style={{fontWeight:'900'}}> Product {product.id}</span></div> 
-                          </div>
-                        </Col>
-                        <Col md="10" style={{padding:'5px 0px'}}>
-
-                          {/* <Button  className="btn mybtncustomer btn-secondary" outline color="info"> Planned: 2000.00m</Button>
-                          <Button  className="btn mybtncustomer btn-secondary" outline color="danger"> Mfd Length: 996.70m</Button>
-                          <Button  className="btn mybtncustomer btn-secondary" outline color="info"> Dispatched: 0.00m</Button>
-                          <Button  className="btn mybtncustomer btn-secondary" outline color="danger"> Actual Pending: 3.30m</Button>
-                          <Button  className="btn mybtncustomer btn-secondary" outline color="info"> Delivery Date: 20 Dec, 2021</Button>
-                          <button type='button' className="btn mybtncustomer my-btn-color mr-1"> Total: 1000m</button> */}
-                        </Col>
-                      </Row>
-                      
-                    </Table>
-          
-                    <div>
-                      <Table className='table-margin-zero ' responsive size="sm">
-                              <thead>
-                            <tr>
-                                <th colSpan={20}>
-                                  <p style={{background:'#777',textAlign:'center',color:'white',marginBottom:'0px'}}> Front Side </p>
-                                </th>
-                            </tr>
-                            <tr >
-                              <th scope="col">Grain</th>
-                              <th scope="col">Color</th>
-                              <th scope="col">Quality</th>
-                              <th scope="col">Thickness</th>
-                              <th scope="col">Fabric</th>
-                              <th scope="col">FabricColor</th>
-                              <th scope="col">HSN</th>
-                              <th scope="col">Price($)</th>
-                              <th scope="col">Tax</th>
-                              <th scope="col">Embossing</th>
-                              <th scope="col">Printing</th>
-                              <th scope="col">CIR.</th>
-                              <th scope="col">AT</th>
-                            </tr>
-                      </thead>
-
-                      <tbody>
-                      
-                          <tr>
-                          <td title={product.grainName}>{product.grainName}</td>
-                          <td title={product.colorName}>{product.colorName}</td>
-                          <td title={product.qualityName}>{product.qualityName}</td>
-                          <td title={product.thickness}>{product.thickness}</td>
-                          <td title={product.fabricName}>{product.fabricName}</td>
-                          <td title={product.fabricColorName}>{product.fabricColorName}</td>
-                          <td title={product.hsnName}>{product.hsnName}</td>
-                          <td title={product.price}>{product.price}</td>
-                          <td title={product.tax_rate}>{product.tax_rate}%</td>
-                          <td>N/A</td>
-                          <td>N/A</td>
-                          <td>N/A</td>
-                          <td>N/A</td>
-                        </tr>
-                      </tbody>
-                    
-                      </Table>  
-                    </div>
-                </div>
-                ))}
+           {data.map(({ front, back }) => (
+          <div key={front.id} className='table-margin'>
+            <Table className='table-margin-zero order-table-button' size="sm">
+              <Row style={{ background: '#e3e3e3', padding: '2px' }}>
+                <Col md="2">
+                  <div style={{ margin: '5px 0px' }}>
+                    <div className='fix-wid-1'><i className="bi-menu-button-wide-fill my-eye-color" style={{ fontSize: '20px', marginRight: '1px' }} /><span style={{ fontWeight: '900' }}> Product {front.id}</span></div>
+                  </div>
+                </Col>
+                <Col md="10" style={{ padding: '5px 0px' }}>
+                  {/* Your buttons for product metrics */}
+                </Col>
+              </Row>
+            </Table>
+            <div>
+              <Table className='table-margin-zero ' responsive size="sm">
+                <thead>
+                  <tr>
+                    <th colSpan={20}>
+                      <p style={{ background: '#777', textAlign: 'center', color: 'white', marginBottom: '0px' }}> Front Side </p>
+                    </th>
+                  </tr>
+                  <tr>
+                    <th scope="col">Grain</th>
+                    <th scope="col">Color</th>
+                    <th scope="col">Quality</th>
+                    <th scope="col">Thickness</th>
+                    <th scope="col">Fabric</th>
+                    <th scope="col">FabricColor</th>
+                    <th scope="col">HSN</th>
+                    <th scope="col">Price($)</th>
+                    <th scope="col">Tax</th>
+                    <th scope="col">Embossing</th>
+                    <th scope="col">Printing</th>
+                    <th scope="col">CIR.</th>
+                    <th scope="col">AT</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td title={getGrainNameById(front.grain_id)}>{getGrainNameById(front.grain_id)}</td>
+                    <td title={getColorNameById(front.color_id)}>{getColorNameById(front.color_id)}</td>
+                    <td title={getQualityNameById(front.quality_id)}>{getQualityNameById(front.quality_id)}</td>
+                    <td title={front.thickness}>{front.thickness}</td>
+                    <td title={getFabricNameById(front.fabric_id)}>{getFabricNameById(front.fabric_id)}</td>
+                    <td title={getFabricColorNameById(front.fabric_id, front.fabric_color_id)}>{getFabricColorNameById(front.fabric_id, front.fabric_color_id)}</td>
+                    <td title={getHsnNameById(front.hsn_id)}>{getHsnNameById(front.hsn_id)}</td>
+                    <td title={front.price}>{front.price}</td>
+                    <td title={front.tax_rate}>{front.tax_rate}%</td>
+                    <td>N/A</td>
+                    <td>N/A</td>
+                    <td>N/A</td>
+                    <td>N/A</td>
+                  </tr>
+                </tbody>
+              </Table>
+              {back && (
+                <Table className='table-margin-zero ' responsive size="sm">
+                  <thead>
+                    <tr>
+                      <th colSpan={20}>
+                        <p style={{ background: '#777', textAlign: 'center', color: 'white', marginBottom: '0px' }}> Back Side </p>
+                      </th>
+                    </tr>
+                    <tr>
+                      <th scope="col">Grain</th>
+                      <th scope="col">Color</th>
+                      <th scope="col">Quality</th>
+                      <th scope="col">Thickness</th>
+                      <th scope="col">Fabric</th>
+                      <th scope="col">FabricColor</th>
+                      <th scope="col">HSN</th>
+                      <th scope="col">Price($)</th>
+                      <th scope="col">Tax</th>
+                      <th scope="col">Embossing</th>
+                      <th scope="col">Printing</th>
+                      <th scope="col">CIR.</th>
+                      <th scope="col">AT</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td title={getGrainNameById(back.grain_id)}>{getGrainNameById(back.grain_id)}</td>
+                      <td title={getColorNameById(back.color_id)}>{getColorNameById(back.color_id)}</td>
+                      <td title={getQualityNameById(back.quality_id)}>{getQualityNameById(back.quality_id)}</td>
+                      <td title={back.thickness}>{back.thickness}</td>
+                      <td title={getFabricNameById(back.fabric_id)}>{getFabricNameById(back.fabric_id)}</td>
+                      <td title={getFabricColorNameById(back.fabric_id, back.fabric_color_id)}>{getFabricColorNameById(back.fabric_id, back.fabric_color_id)}</td>
+                      <td title={getHsnNameById(back.hsn_id)}>{getHsnNameById(back.hsn_id)}</td>
+                      <td title={back.price}>{back.price}</td>
+                      <td title={back.tax_rate}>{back.tax_rate}%</td>
+                      <td>N/A</td>
+                      <td>N/A</td>
+                      <td>N/A</td>
+                      <td>N/A</td>
+                    </tr>
+                  </tbody>
+                </Table>
+              )}
+            </div>
+          </div>
+        ))}
    </CardBody>
    </Card>
    

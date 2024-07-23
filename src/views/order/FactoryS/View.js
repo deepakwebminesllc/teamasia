@@ -6,32 +6,95 @@ import {
   Col,
 } from 'reactstrap';
 import { useLocation, useNavigate } from 'react-router-dom';
+import Barcode from 'react-barcode';
 import ComponentCard1 from '../../../components/ComponentCard1';
 import ComponentCard4 from '../../../components/ComponentCard4';
 import 'react-table-v6/react-table.css';
-import Barcode from "../../../assets/images/bg/barcode.png"
+// import Barcode from "../../../assets/images/bg/barcode.png"
 
 const JumbotronComponent = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [data, setData] = useState([]);
-  const product = location.state;
+  const [factoryProduct, setfactoryProduct] = useState([]);
+  const [embossesData, setEmbossesData] = useState([]);
+
+  const {data1,data2,data3,data4,data5} = location.state;
+  const product = location.state.item;
+
+  function getGrainNameById(grainId) {
+    const Name = data1.find(item => item.id === grainId);
+    // console.log('a1',Name);
+    return Name ? Name.name : 'Unknown grain';
+  }
+
+  function getFabricNameById(fabricId) {
+    const Name = data2.find(item => item.id === fabricId);
+    // console.log('a1',Name);
+    return Name ? Name.name : 'Unknown fabric';
+  }
+  function getFabricColorNameById(fabricId,fabricColorId) {
+    const Name = data2.find(item => item.id === fabricId);
+    let FabricColor = null;
+    if(Name){
+       FabricColor = Name.fabriccolors.find(item => item.id === fabricColorId);
+    }
+    // console.log('a1',Name);
+    return FabricColor ? FabricColor.name : 'Unknown fabricColor';
+  }
+
+  function getQualityNameById(qualityId) {
+    const Name = data3.find(item => item.id === qualityId);
+    // console.log('a1',Name);
+    return Name ? Name.name : 'Unknown quality';
+  }
+
+  function getColorNameById(colorId) {
+    const Name = data4.find(item => item.id === colorId);
+    // console.log('a1',Name);
+    return Name ?  Name.name : 'Unknown color';
+  }
+  function getEmbossesNameById(embossesIds) {
+    const Name = new Set();
+    console.log('embossesData',embossesData,embossesIds);
+    embossesIds.split(',')
+    .map((Embossitem) => {
+      const eV = embossesData.find(item => item.id === Embossitem.trim());
+      if(eV){
+        Name.add(eV.name);
+      }
+     return null
+    });
+    console.log('eV',Name);
+    // console.log('a1',Name);
+        return Array.from(Name);
+}
+  function getHsnNameById(hsnId) {
+    // console.log('dataX',data5)
+    const Name = data5.find(item => item.id === hsnId);
+    // console.log('a1',Name);
+    return Name ?  Name.name : 'Unknown hsn';
+  }
+
+  console.log('product in view',product);
 
   const handleEditAdd = () => {
-    navigate('/order/factory-surplus/edit');
+    navigate('/order/factory-surplus/edit',{state:{item:product,data1,data2,data3,data4,data5}});
   };
 
   const handleSmallRollCreate = () => {
-    navigate('/order/factory-surplus/small-roll-create',{state:product.id});
+    navigate('/order/factory-surplus/small-roll-create',{state:{item:product}});
   };
+
   const handleSmallRollEdit = (rollItem) => {
     navigate('/order/factory-surplus/small-roll-edit', {state: rollItem});
   };
+
   const handleDeleteClick = async (itemId) => {
     try {
       // Call your API endpoint to delete the item
       const token = localStorage.getItem('userToken');
-      const response = await fetch(`https://factory.teamasia.in/api/public/rolls/${itemId}`, {
+      const response = await fetch(`https://factory.teamasia.in/api/public/smallrolls/${itemId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -55,10 +118,10 @@ const JumbotronComponent = () => {
   };
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchFactorySurplusProductData = async () => {
       const token = localStorage.getItem('userToken');
       // console.log('token',token);
-      const response = await fetch(`https://factory.teamasia.in/api/public/rolls/?product_id=${product.id}`, {
+      const response = await fetch(`https://factory.teamasia.in/api/public/products/pair/${product.id}`, {
         method: 'GET', 
         headers: {
           'Authorization': `Bearer ${token}`
@@ -69,14 +132,54 @@ const JumbotronComponent = () => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const result = await response.json();
-      console.log("responsejson1",result.rolls);
+      console.log("responsejson1",result,factoryProduct);
       
-      
-      setData(result.rolls); 
+      const pair = {
+        front: result.front_side,
+        back: result.back_side
+    };
+      setfactoryProduct([pair]); 
     };
 
-    fetchData();
+    const fetchData = async () => {
+      const token = localStorage.getItem('userToken');
+      // console.log('token',token);
+      const response = await fetch(`https://factory.teamasia.in/api/public/smallrolls/?product_id=${product.id}`, {
+        method: 'GET', 
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      // console.log('result',response);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const result = await response.json();
+      console.log("responsejson1",result.smallrolls);
+      setData(result.smallrolls); 
+    };
 
+    const fetchEmbossData = async () => {
+      const token = localStorage.getItem('userToken');
+      console.log('token',token);
+      const response = await fetch(`https://factory.teamasia.in/api/public/embosses/?is_trashed=0`, {
+        method: 'GET', 
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      console.log('result',response);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const result = await response.json();
+      setEmbossesData(result.embosses);
+      console.log(result.embosses);
+    };
+
+    fetchEmbossData();
+    fetchFactorySurplusProductData();
+    fetchData();
   },[]);
 
   return (
@@ -102,12 +205,12 @@ const JumbotronComponent = () => {
                   <Row  style={{background:'#e3e3e3',padding:'2px'}}>
                     <Col md="6">
                       <div style={{margin:'0px 0px'}}>
-                        <div className='fix-wid-1'><i className="bi-menu-button-wide-fill my-eye-color" style={{fontSize:'20px',marginRight:'1px'}}/>Product {product.id}</div> 
+                        <div className='fix-wid-1'><i className="bi-menu-button-wide-fill my-eye-color" style={{fontSize:'20px',marginRight:'1px'}}/><span style={{ fontWeight: '900' }}>Product {product.id}</span></div> 
                       </div>
                     </Col>
                     <Col md="6" style={{padding:'5px 0px 0px 0px'}}>
-                      {/* <button type='button' className="btn mybtncustomer my-btn-color-blue mr-1"> Remaining:19.80 meters</button>
-                      <button type='button' className="btn mybtncustomer my-btn-color mr-1"> Total: 450 meters</button> */}
+                      <button type='button' className="btn mybtncustomer my-btn-color-blue mr-3" style={{marginRight:'10px'}}> Remaining: API-MISSING meters</button>
+                      <button type='button' className="btn mybtncustomer my-btn-color mr-3" style={{marginRight:'10px'}}> Total: {product.quantity} meters</button>
                       <button type='button' className="btn mybtncustomer my-btn-color-red mr-1" onClick={() => handleSmallRollCreate()}> Create Small Roll </button>
                     </Col>
                   </Row>
@@ -115,46 +218,97 @@ const JumbotronComponent = () => {
                 </Table>
                 
                  <div>
-                    <Table className='table-margin-zero ' responsive size="sm">
-                      <thead>
-                        
-                        <tr>
-                          <th scope="col">Grain</th>
-                          <th scope="col">Color</th>
-                          <th scope="col">Quality</th>
-                          <th scope="col">Thickness</th>
-                          <th scope="col">Fabric</th>
-                          <th scope="col">FabricColor</th>
-                          <th scope="col">HSN</th>
-                          <th scope="col">Price($)</th>
-                          <th scope="col">Tax</th>
-                          <th scope="col">Embossing</th>
-                          <th scope="col">Printing</th>
-                          <th scope="col">CIR.</th>
-                          <th scope="col">AT</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td >{product.grainName}</td>
-                                  <td>{product.colorName}</td>
-                                  <td>{product.qualityName}</td>
-                                  <td>{product.thickness}</td>
-                                  <td>{product.fabricName}</td>
-                                  <td>{product.fabricColorName}</td>
-                                  <td>{product.hsnName}</td>
-                                  <td>{product.price}</td>
-                                  <td>{product.tax_rate}</td>
+                 {factoryProduct.map(({ front, back }) => (
+                      <div key={front.id} className='table-margin'>
+                       
+                        <div>
+                          <Table className='table-margin-zero ' responsive size="sm">
+                            <thead>
+                              <tr>
+                                <th colSpan={20}>
+                                  <p style={{ background: '#777', textAlign: 'center', color: 'white', marginBottom: '0px' }}> Front Side </p>
+                                </th>
+                              </tr>
+                              <tr>
+                                <th scope="col">Grain</th>
+                                <th scope="col">Color</th>
+                                <th scope="col">Quality</th>
+                                <th scope="col">Thickness</th>
+                                <th scope="col">Fabric</th>
+                                <th scope="col">FabricColor</th>
+                                <th scope="col">HSN</th>
+                                <th scope="col">Price($)</th>
+                                <th scope="col">Tax</th>
+                                <th scope="col">Embossing</th>
+                                <th scope="col">Printing</th>
+                                <th scope="col">CIR.</th>
+                                <th scope="col">AT</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr>
+                                <td title={getGrainNameById(front.grain_id)}>{getGrainNameById(front.grain_id)}</td>
+                                <td title={getColorNameById(front.color_id)}>{getColorNameById(front.color_id)}</td>
+                                <td title={getQualityNameById(front.quality_id)}>{getQualityNameById(front.quality_id)}</td>
+                                <td title={front.thickness}>{front.thickness}</td>
+                                <td title={getFabricNameById(front.fabric_id)}>{getFabricNameById(front.fabric_id)}</td>
+                                <td title={getFabricColorNameById(front.fabric_id, front.fabric_color_id)}>{getFabricColorNameById(front.fabric_id, front.fabric_color_id)}</td>
+                                <td title={getHsnNameById(front.hsn_id)}>{getHsnNameById(front.hsn_id)}</td>
+                                <td title={front.price}>{front.price}</td>
+                                <td title={front.tax_rate}>{front.tax_rate}%</td>
+                                <td> {getEmbossesNameById(front.emboss_ids).map((item) => <div>{item}</div>)} </td>
+                                <td>N/A</td>
+                                <td>N/A</td>
+                                <td>N/A</td>
+                              </tr>
+                            </tbody>
+                          </Table>
+                          {back && (
+                            <Table className='table-margin-zero ' responsive size="sm">
+                              <thead>
+                                <tr>
+                                  <th colSpan={20}>
+                                    <p style={{ background: '#777', textAlign: 'center', color: 'white', marginBottom: '0px' }}> Back Side </p>
+                                  </th>
+                                </tr>
+                                <tr>
+                                  <th scope="col">Grain</th>
+                                  <th scope="col">Color</th>
+                                  <th scope="col">Quality</th>
+                                  <th scope="col">Thickness</th>
+                                  <th scope="col">Fabric</th>
+                                  <th scope="col">FabricColor</th>
+                                  <th scope="col">HSN</th>
+                                  <th scope="col">Price($)</th>
+                                  <th scope="col">Tax</th>
+                                  <th scope="col">Embossing</th>
+                                  <th scope="col">Printing</th>
+                                  <th scope="col">CIR.</th>
+                                  <th scope="col">AT</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr>
+                                  <td title={getGrainNameById(back.grain_id)}>{getGrainNameById(back.grain_id)}</td>
+                                  <td title={getColorNameById(back.color_id)}>{getColorNameById(back.color_id)}</td>
+                                  <td title={getQualityNameById(back.quality_id)}>{getQualityNameById(back.quality_id)}</td>
+                                  <td title={back.thickness}>{back.thickness}</td>
+                                  <td title={getFabricNameById(back.fabric_id)}>{getFabricNameById(back.fabric_id)}</td>
+                                  <td title={getFabricColorNameById(back.fabric_id, back.fabric_color_id)}>{getFabricColorNameById(back.fabric_id, back.fabric_color_id)}</td>
+                                  <td title={getHsnNameById(back.hsn_id)}>{getHsnNameById(back.hsn_id)}</td>
+                                  <td title={back.price}>{back.price}</td>
+                                  <td title={back.tax_rate}>{back.tax_rate}%</td>
+                                  <td >{getEmbossesNameById(back.emboss_ids).map((item) => <div>{item}</div>)}</td>
                                   <td>N/A</td>
                                   <td>N/A</td>
                                   <td>N/A</td>
-                                  <td>N/A</td>
-
-                        </tr>
-                      
-                      </tbody>
-                      
-                    </Table>
+                                </tr>
+                              </tbody>
+                            </Table>
+                          )}
+                        </div>
+                      </div>
+                    ))}
                  </div>
                </div>
               {/* repeat end */}
@@ -187,8 +341,9 @@ const JumbotronComponent = () => {
                                           <td>{roll.grade_id}</td>
                                           <td>{roll.weight}</td>
                                           <td>{roll.bin}</td>
-                                          <td>{roll.quantity}</td>
-                                          <td><img src={Barcode} alt='barcode'/></td>
+                                          <td>{((roll.weight * 1000) / (roll.quantity * roll.width)).toFixed(2)}</td>
+                                          {/* <td><img src={Barcode} alt='barcode'/></td> */}
+                                          <td><td><Barcode value={`SMALL${roll.id}`} height={20} /></td></td>
                                           <td>
                                             <td ><Button ><i className="bi bi-printer-fill my-pen-color" /></Button></td>
                                             <td ><Button ><i className="bi bi-pencil-fill my-eye-color" onClick={()=>handleSmallRollEdit(roll)} /></Button></td>

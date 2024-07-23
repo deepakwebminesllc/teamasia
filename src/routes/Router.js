@@ -47,26 +47,37 @@ const  OrderTemplatesProductAdd = Loadable(lazy(() => import('../views/order/Ord
 const  OrderTemplatesProductEdit = Loadable(lazy(() => import('../views/order/OrderT/productEdit')));
 
 const  ProductionPlan = Loadable(lazy(() => import('../views/operations/ProductionP/ProductionPlan')));
+const  ProductionPlanEdit = Loadable(lazy(() => import('../views/operations/ProductionP/Edit')));
 const  ProductionPlanView = Loadable(lazy(() => import('../views/operations/ProductionP/View')));
 const  ProductionPlanManagePlan = Loadable(lazy(() => import('../views/operations/ProductionP/ManagePlan')));
+const  ProductionPlanLabReport = Loadable(lazy(() => import('../views/operations/ProductionP/labReport')));
 
 
 const  AdditionalTreat= Loadable(lazy(() => import('../views/operations/AdditionalT/AdditionalTreat')));
+const  AdditionalTreatView= Loadable(lazy(() => import('../views/operations/AdditionalT/View')));
 const  CustomInvoices= Loadable(lazy(() => import('../views/operations/CustomI/CustomInvoices')));
+
 const  Dispatch= Loadable(lazy(() => import('../views/operations/Dispatchh/Dispatch')));
+const  DispatchOrder= Loadable(lazy(() => import('../views/operations/Dispatchh/DispatchOrder')));
+const  DispatchOrderAdd= Loadable(lazy(() => import('../views/operations/Dispatchh/Add')));
+const  DispatchView= Loadable(lazy(() => import('../views/operations/Dispatchh/View')));
+
 const  FindaRoll= Loadable(lazy(() => import('../views/operations/FindR/FindaRoll')));
 
 const  Invoices= Loadable(lazy(() => import('../views/operations/Invoice/Invoices')));
 const  InvoicesAdd= Loadable(lazy(() => import('../views/operations/Invoice/Add')));
+const  InvoicesEdit= Loadable(lazy(() => import('../views/operations/Invoice/Edit')));
 
 
 const  QaPack= Loadable(lazy(() => import('../views/operations/QaP/QaPack')));
 const  QaPackView = Loadable(lazy(() => import('../views/operations/QaP/View')));
+const  QaPackViewOld = Loadable(lazy(() => import('../views/operations/QaP/ViewOld')));
 
 const  StockManagement= Loadable(lazy(() => import('../views/operations/StockM/StockManagement')));
 const  StockManagementOrderView= Loadable(lazy(() => import('../views/operations/StockM/OrderView')));
 const  StockManagementBomReport= Loadable(lazy(() => import('../views/operations/StockM/BomReport')));
 const  StockManagementLabReport= Loadable(lazy(() => import('../views/operations/StockM/LabReport')));
+const  StockManagementLabReportT= Loadable(lazy(() => import('../views/operations/StockM/LabReportStock')));
 const  StockManagementProductionReport= Loadable(lazy(() => import('../views/operations/StockM/ProductionReport')));
 
 const  ByOrder = Loadable(lazy(() => import('../views/executive/ByO/ByOrder')));
@@ -358,25 +369,36 @@ const ThemeRoutes = [
       { path: '/order/order-templates/product-edit', name: 'Modern', exact: true, element: <ProtectedRoute> <OrderTemplatesProductEdit /> </ProtectedRoute>  },
 
       { path: '/operations/production-plans', name: 'Modern', exact: true, element:  <ProtectedRoute><ProductionPlan />  </ProtectedRoute>},
+      { path: '/operations/production-plans/edit', name: 'Modern', exact: true, element:  <ProtectedRoute><ProductionPlanEdit />  </ProtectedRoute>},
       { path: '/operations/production-plans/view', name: 'Modern', exact: true, element: <ProtectedRoute> <ProductionPlanView /> </ProtectedRoute> },
       { path: '/operations/production-plans/manage-plan', name: 'Modern', exact: true, element: <ProtectedRoute> <ProductionPlanManagePlan/> </ProtectedRoute> },
+      { path: '/operations/production-plans/manage-plan/lab-report', name: 'Modern', exact: true, element: <ProtectedRoute> <ProductionPlanLabReport/> </ProtectedRoute> },
       
 
       { path: '/operations/additional-treatment', name: 'Modern', exact: true, element: <ProtectedRoute> <AdditionalTreat /> </ProtectedRoute> },
+      { path: '/operations/additional-treatment/view', name: 'Modern', exact: true, element: <ProtectedRoute> <AdditionalTreatView /> </ProtectedRoute> },
       { path: '/operations/custom-invoices', name: 'Modern', exact: true, element:  <ProtectedRoute><CustomInvoices />  </ProtectedRoute>},
+     
       { path: '/operations/dispatch', name: 'Modern', exact: true, element: <ProtectedRoute> <Dispatch /> </ProtectedRoute> },
+      { path: '/operations/dispatch-order', name: 'Modern', exact: true, element: <ProtectedRoute> <DispatchOrder /> </ProtectedRoute> },
+      { path: '/operations/dispatch-order/add', name: 'Modern', exact: true, element: <ProtectedRoute> <DispatchOrderAdd /> </ProtectedRoute> },
+      { path: '/operations/dispatch/view', name: 'Modern', exact: true, element: <ProtectedRoute> <DispatchView /> </ProtectedRoute> },
+     
       { path: '/operations/find-a-roll', name: 'Modern', exact: true, element:  <ProtectedRoute><FindaRoll /> </ProtectedRoute> },
 
       { path: '/operations/invoices', name: 'Modern', exact: true, element:  <ProtectedRoute><Invoices /> </ProtectedRoute> },
       { path: '/operations/invoices/add', name: 'Modern', exact: true, element:  <ProtectedRoute><InvoicesAdd /> </ProtectedRoute> },
+      { path: '/operations/invoices/edit', name: 'Modern', exact: true, element:  <ProtectedRoute><InvoicesEdit /> </ProtectedRoute> },
       
       { path: '/operations/qa-packaging', name: 'Modern', exact: true, element:  <ProtectedRoute><QaPack /> </ProtectedRoute> },
-      { path: '/operations/qa-packaging/jumboroll', name: 'Modern', exact: true, element:  <ProtectedRoute><QaPackView /></ProtectedRoute>  },
+      { path: '/operations/qa-packaging/view', name: 'Modern', exact: true, element:  <ProtectedRoute><QaPackView /></ProtectedRoute>  },
+      { path: '/operations/qa-packaging/view-old', name: 'Modern', exact: true, element:  <ProtectedRoute><QaPackViewOld /></ProtectedRoute>  },
 
       { path: '/operations/stock-management', name: 'Modern', exact: true, element: <ProtectedRoute> <StockManagement /></ProtectedRoute>  },
       { path: '/operations/stock-management/order-view', name: 'Modern', exact: true, element: <ProtectedRoute> <StockManagementOrderView /></ProtectedRoute> },
       { path: '/operations/Bom-Report', name: 'Modern', exact: true, element: <ProtectedRoute> <StockManagementBomReport /></ProtectedRoute> },
       { path: '/operations/Lab-Report', name: 'Modern', exact: true, element: <ProtectedRoute> <StockManagementLabReport /></ProtectedRoute> },
+      { path: '/operations/Lab-Report-stock', name: 'Modern', exact: true, element: <ProtectedRoute> <StockManagementLabReportT /></ProtectedRoute> },
       { path: '/operations/Production-Report', name: 'Modern', exact: true, element: <ProtectedRoute> <StockManagementProductionReport /></ProtectedRoute> },
 
       { path: '/executive/by-order', name: 'Modern', exact: true, element: <ProtectedRoute> <ByOrder />  </ProtectedRoute>},

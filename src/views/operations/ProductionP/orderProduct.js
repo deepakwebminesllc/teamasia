@@ -6,10 +6,10 @@ import ComponentCard4 from '../../../components/ComponentCard5';
 
 const JumbotronComponent = (props) => {
 
-  const {orderID,formatDate,customerNameFromManagePlan,data1,data2,data3,data4,addItemToLine,removeItemFromLine} = props;
+  const {orderID,formatDate,customerID,customerNameFromManagePlan,data1,data2,data3,data4,addItemToLine} = props;
   const [data, setData] = useState([]);
 
-   console.log('removeItemFromLine',removeItemFromLine,addItemToLine);
+  //  console.log('removeItemFromLine',removeItemFromLine,addItemToLine);
 
   function getGrainNameById(grainId) {
     const Name = data1.find(item => item.id === grainId);
@@ -52,7 +52,9 @@ const JumbotronComponent = (props) => {
     fabricColorName: getFabricColorNameById(product.fabric_id,product.fabric_color_id),
     qualityName: getQualityNameById(product.quality_id),
     colorName: getColorNameById(product.color_id),
-    customerNameFromManagePlan
+    customerNameFromManagePlan,
+    customer_id:customerID,
+    status_id:'0'
   }));
 
   useEffect(() => {
@@ -72,9 +74,10 @@ const JumbotronComponent = (props) => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const result = await response.json();
-      console.log("responsejson",result);
-      const resultFiltered = result.products.filter(product => product.ref_product_id === '0');
-      setData(resultFiltered);
+      // console.log("responsejson",result);
+      // const resultFiltered = result.products.filter(product => product.ref_product_id === '0');
+      // setData(resultFiltered);
+      setData(result.products);
 
     };
     fetchData();  
@@ -86,8 +89,10 @@ const JumbotronComponent = (props) => {
     {productwithNames.map((product) => {
       return  <ComponentCard4 key={product.id}>
                 <div>
-                  <span className='production-plan-page-collape-heading'>PRODUCT</span> { product.id} <button type='button' style={{padding:'1px',background:'#777',borderRadius:'5px',marginLeft:'5px',marginRight:'5px',color:'white'}}>{product.is_factory_surplus_product !== 0?'factory product':''}</button>
-                   <button type='button' style={{padding:'1px',background: '#B33C12',borderRadius:'5px',marginRight:'20px',color:'white'}}>{product.is_online_product !== 0?'online product':''}</button>
+                  <span className='production-plan-page-collape-heading'>PRODUCT</span> { product.id}
+                   {/* <button type='button' style={{padding:'1px',background:'#777',borderRadius:'5px',marginLeft:'5px',marginRight:'5px',color:'white'}}>{product.is_factory_surplus_product !== '0'?'':'factory product'}</button> */}
+                   <button type='button' style={{padding:'1px',background: '#B33C12',borderRadius:'5px',marginLeft:'5px',marginRight:'20px',color:'white'}}>{product.is_online_product !== 0?'online product':''}</button>
+                   <button type='button' style={{padding:'1px',background: '#B33C12',borderRadius:'5px',marginRight:'20px',color:'white'}}>{product.ref_product_id !== '0'?'back side':'front side'}</button>
                     <span style={{paddingTop:'2px'}}><i className="bi bi-arrow-right-square-fill" style={{fontSize:"20px",marginTop:'2px'}} onClick={()=>addItemToLine(product)}></i></span>
                  </div>
        <Table size='sm' className="order-page-table" responsive>
@@ -136,12 +141,13 @@ export default JumbotronComponent;
 
 JumbotronComponent.propTypes = {
   orderID: PropTypes.string.isRequired,
+  customerID: PropTypes.string.isRequired,
   customerNameFromManagePlan: PropTypes.string.isRequired,
   data1: PropTypes.array.isRequired,
   data2: PropTypes.array.isRequired,
   data3: PropTypes.array.isRequired,
   data4: PropTypes.array.isRequired,
   addItemToLine: PropTypes.func.isRequired,
-  removeItemFromLine: PropTypes.func.isRequired,
+  // removeItemFromLine: PropTypes.func.isRequired,
   formatDate: PropTypes.func.isRequired,
 };

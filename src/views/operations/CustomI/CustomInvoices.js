@@ -12,6 +12,7 @@ import {
   Input,
   FormText,
   Button,
+  Table
 
 } from 'reactstrap';
 import { useNavigate } from 'react-router-dom';
@@ -292,45 +293,35 @@ async function apiCall() {
               </Col>
             </Row>
             
-            <table className="table">
-            
-      <thead>
-            <tr>
-              <Row>
-                <Col md="3"><th>Product</th></Col>
-                <Col md="1"><th>Grade</th></Col>
-                <Col md="2"> <th>Discount%</th></Col>
-                <Col md="2"> <th>HSN Code</th></Col>
-                <Col md="1"> <th>Quantity</th></Col>
-                <Col md="1"> <th>Price</th></Col>
-                <Col md="1"> <th>Tax %</th></Col>
-                <Col md="1"> <th>Action</th></Col>
-              </Row>
-              
-            
-            </tr>
-          </thead>
-          <tbody>
-          
-          </tbody>
+            <Table responsive>
+              <thead>
+                    <tr>
+                          <th>Product</th>
+                          <th>Grade</th>
+                        <th>Discount%</th>
+                           <th>HSN Code</th>
+                        <th>Quantity</th>
+                           <th>Price</th>
+                        <th>Tax %</th>
+                           <th>Action</th>
+                    </tr>
+              </thead>
               <tbody>
-              {items.map((item, index) => (
-                  <tr key={item}>
-                    <Row>
-                    <Col md="3"><Input name="product" value={item.product} type="text" onChange={e => handleInputChange(index, e)} placeholder="" /></Col>
-                      <Col md="1"><Input name="grade" value={item.grade} type="text" onChange={e => handleInputChange(index, e)} placeholder="" /></Col>
-                      <Col md="2"><Input name="discount" value={item.discount} type="text" onChange={e => handleInputChange(index, e)} placeholder="" /></Col>
-                      <Col md="2"><Input name="hsnCode" value={item.hsnCode} type="text" onChange={e => handleInputChange(index, e)} placeholder="" /></Col>
-                      <Col md="1"><Input name="quantity" value={item.quantity} type="text" onChange={e => handleInputChange(index, e)} placeholder="" /></Col>
-                      <Col md="1"><Input name="price" value={item.price} type="text" onChange={e => handleInputChange(index, e)} placeholder="" /></Col>
-                      <Col md="1"><Input name="tax" value={item.tax} type="text" onChange={e => handleInputChange(index, e)} placeholder="" /></Col>
-                      <Col md="1"><button type="button"  style={{ backgroundColor:"red",marginTop:"5px"}} onClick={() => removeItem(index)}>X</button></Col>
-                    </Row>
-                    
-                  </tr>
-                ))}
+                {items.map((item, index) => (
+                    <tr key={item}>
+                           <td><Input name="product" value={item.product} type="text" onChange={e => handleInputChange(index, e)} placeholder="" /></td>
+                           <td><Input name="grade" value={item.grade} type="text" onChange={e => handleInputChange(index, e)} placeholder="" /></td>
+                           <td><Input name="discount" value={item.discount} type="text" onChange={e => handleInputChange(index, e)} placeholder="" /></td>
+                           <td><Input name="hsnCode" value={item.hsnCode} type="text" onChange={e => handleInputChange(index, e)} placeholder="" /></td>
+                           <td><Input name="quantity" value={item.quantity} type="text" onChange={e => handleInputChange(index, e)} placeholder="" /></td>
+                           <td><Input name="price" value={item.price} type="text" onChange={e => handleInputChange(index, e)} placeholder="" /></td>
+                           <td><Input name="tax" value={item.tax} type="text" onChange={e => handleInputChange(index, e)} placeholder="" /></td>
+                           <td><button type="button"  style={{ backgroundColor:"red",marginTop:"5px"}} onClick={() => removeItem(index)}>X</button></td>
+                      
+                    </tr>
+                  ))}
               </tbody>
-            </table>
+            </Table>
 
             <CardBody className="border-top gap-2 d-flex align-items-center">
               <FormGroup>

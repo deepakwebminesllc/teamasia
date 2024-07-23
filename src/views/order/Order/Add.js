@@ -34,6 +34,8 @@ const Add = () => {
   const [SaverityData, setSaverityData] = useState([]);
   const [CustomerData, setCustomerData] = useState([]);
   const [AddressData, setAddressData] = useState([]);
+  const [cityData, setCityData] = useState([]);
+  const [stateData, setStateData] = useState([]);
   const [AddressData1, setAddressData1] = useState([]);
   const [firstcheck, setFirstCheck] = useState(false);
   const [secondcheck, setSecondCheck] = useState(false);
@@ -120,6 +122,16 @@ const handleChange = (e) => {
   console.log('hi',formDatas.billingAddressId,formDatas.deliveryAddressId);
 };
 
+function getCityNameById(cityId) {
+  const cityName = cityData.find(city => city.id === cityId);
+  console.log('state',cityName);
+  return cityName ? `${cityName.name},` : '';
+}
+function getStateNameById(stateId) {
+  const stateName = stateData.find(state => state.id === stateId);
+  console.log('state',stateName);
+  return stateName ? `${stateName.name},` : '';
+}
 
 const checkboxclick1 = () => {
   console.log('check',firstcheck);
@@ -313,6 +325,51 @@ useEffect(()=>{
       resultX.push({id:'x',name:'Choose'});
       setSaverityData(resultX); 
     };
+    const fetchCityData = async () => {
+      const token = localStorage.getItem('userToken');
+      // console.log('token',token);
+      const response = await fetch('https://factory.teamasia.in/api/public/cities/?is_trashed=0', {
+        method: 'GET', 
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      // console.log('result',response);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const result = await response.json();
+      console.log("data severities",result.cities);
+      const resultX = result.cities.slice();
+      const sever = resultX.find(item => item.id === formDatas.severityId);
+      if(!sever){
+        setFormDataS(prevState => ({
+          ...prevState,
+          severityId:'x'
+        }));
+      }
+      resultX.push({id:'x',name:'Choose'});
+      setCityData(result.cities); 
+    };
+    const fetchStateData = async () => {
+      const token = localStorage.getItem('userToken');
+      // console.log('token',token);
+      const response = await fetch('https://factory.teamasia.in/api/public/states/?is_trashed=0', {
+        method: 'GET', 
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      // console.log('result',response);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const result = await response.json();
+      console.log("data severities",result.states);
+      
+
+      setStateData(result.states); 
+    };
     const fetchFutureOrderId = async () => {
       const token = localStorage.getItem('userToken');
       // console.log('token',token);
@@ -332,7 +389,8 @@ useEffect(()=>{
         setFutureId(Number(result.currentOrderId));   
       }
     };
-
+    fetchCityData();
+    fetchStateData();
     fetchFutureOrderId();
     fetchData1();
     fetchData();
@@ -402,9 +460,7 @@ useEffect(()=>{
                                 onChange={handleChange}
                                 >
                                   {AddressData.map((item)=>{
-                                  
-          
-                                    return <option key={item.id} value={item.id}>{item.address_line_1}</option>
+                                    return <option key={item.id} value={item.id}>{item.address_line_1} {item.address_line_2} {getCityNameById(item.city_id)} {getStateNameById(item.state_id)} {item.pincode}</option>
                                   })}
                               </Input>
                               
@@ -461,7 +517,7 @@ useEffect(()=>{
                                 onChange={handleChange}
                                 >
                                   {AddressData1.map((item)=>{
-                                    return <option key={item.id} value={item.id}>{item.address_line_1}</option>
+                                    return <option key={item.id} value={item.id}>{item.address_line_1} {item.address_line_2} {getCityNameById(item.city_id)} {getStateNameById(item.state_id)} {item.pincode}</option>
                                   })}
                               </Input>
                               
@@ -518,7 +574,7 @@ useEffect(()=>{
                             <Input type="text" 
                             name="purchaseOrder" 
                             id="name"
-                            placeholder="Enter name" 
+                            placeholder="Enter" 
                             value={formDatas.purchaseOrder}
                             onChange={handleChange} 
                               />

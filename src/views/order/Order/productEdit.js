@@ -67,6 +67,8 @@ const Edit = () => {
   const [submitBlock, setsubmitBlock] = useState(false);
 
   const [formDatas, setFormDataS] = useState({
+    orderId,
+    templateId,
     grain,
     fabricId,
     fabricColorId,
@@ -451,6 +453,8 @@ const handleSubmit = async (event) => {
       const resultX = result.shades.slice();
       resultX.push({id:'x',shade_id:'x',name:'Choose'});
       setData8(resultX);
+      
+
     };
     fetchData8();
     fetchData7();
@@ -746,7 +750,7 @@ const handleSubmit = async (event) => {
                 </Row>
 
                 
-
+      
 
                <Row>
                   <Col md="8">

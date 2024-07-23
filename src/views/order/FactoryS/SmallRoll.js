@@ -21,12 +21,12 @@ import {useLocation,useNavigate} from 'react-router-dom';
 const Add = () => {
   const navigate= useNavigate();
   const location= useLocation();
-const productId = location.state || {}; // Default to an empty object if state is undefined 
+const {id:productId,price:productPerUnitPrice} = location.state.item
 const [data1, setData1] = useState([]);
 const [data2, setData2] = useState([]);
 const [errorMessageFromApi, setErrorMessageFromApi] = useState([]);
 
-
+console.log("productId",productId,productPerUnitPrice)
 const [formDatas, setFormDataS] = useState({
     product_id:productId,
     roll_code:'sp',
@@ -39,13 +39,16 @@ const [formDatas, setFormDataS] = useState({
     t1:'',
     t2:'',
     t3:'',
-    send_to_factory_stock:'0',
+    send_to_factory_stock:'1',
     comment:'',
     qa_id:'x',
     is_trashed:'0'
   });
   
   const [firstcheck, setFirstCheck] = useState(formDatas.send_to_factory_stock !== '0');
+
+  console.log('first check',formDatas.send_to_factory_stock,firstcheck);
+
   const checkboxclick1 = () => {
     console.log('formdatas',formDatas.send_to_factory_stock);
     const send = formDatas.send_to_factory_stock=== '1' ? '0' : '1'
@@ -74,49 +77,34 @@ const closer =()=>{
   async function apiCall() {
     try {
       
-        const formData = new FormData();
-        formData.append('product_id', formDatas.product_id);
-        formData.append('roll_code', formDatas.roll_code);
-        formData.append('cut_piece_length', formDatas.cut_piece_length);
-        formData.append('quantity', formDatas.quantity);
-        formData.append('grade_id', formDatas.grade_id);
-        formData.append('bin', formDatas.bin);
-        formData.append('weight', formDatas.weight);
-        formData.append('width', formDatas.width);
-        formData.append('t1', formDatas.t1);
-        formData.append('t2', formDatas.t2);
-        formData.append('t3', formDatas.t3);
-        formData.append('send_to_factory_stock', formDatas.send_to_factory_stock);
-        formData.append('comment', formDatas.comment);
-        formData.append('qa_id', formDatas.qa_id);
-        formData.append('is_trashed', formDatas.is_trashed);
-       
-        console.log('product_id', formDatas.product_id);
-        console.log('roll_code', formDatas.roll_code);
-        console.log('cut_piece_length', formDatas.cut_piece_length);
-        console.log('quantity', formDatas.quantity);
-        console.log('grade_id', formDatas.grade_id);
-        console.log('bin', formDatas.bin);
-        console.log('weight', formDatas.weight);
-        console.log('width', formDatas.width);
-        console.log('t1', formDatas.t1);
-        console.log('t2', formDatas.t2);
-        console.log('t3', formDatas.t3);
-        console.log('send_to_factory_stock', formDatas.send_to_factory_stock);
-        console.log('comment', formDatas.comment);
-        console.log('qa_id', formDatas.qa_id);
-        console.log('is_trashed', formDatas.is_trashed);
-      
-
+ 
 
         const token = localStorage.getItem('userToken');
-        const response = await fetch(`https://factory.teamasia.in/api/public/rolls`, {
+        const response = await fetch(`https://factory.teamasia.in/api/public/smallrolls`, {
             method: "POST",
             headers: {
-              'Authorization': `Bearer ${token}`
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
             },
-           
-            body: formData
+            body: JSON.stringify({
+              jumbo_roll_id:'0',
+              product_id : formDatas.product_id,
+              roll_code : formDatas.roll_code,
+              cut_piece_length : formDatas.cut_piece_length,
+              quantity : formDatas.quantity,
+              grade_id : formDatas.grade_id,
+              bin : formDatas.bin,
+              weight : formDatas.weight,
+              width : formDatas.width,
+              t1 : formDatas.t1,
+              t2 : formDatas.t2,
+              t3 : formDatas.t3,
+              send_to_factory_stock : '1',
+              comment : formDatas.comment,
+              qa_id : formDatas.qa_id,
+              price:productPerUnitPrice,
+              is_trashed : formDatas.is_trashed,
+            })
         });
 
         const dataZ = await response.json();
@@ -149,8 +137,7 @@ const handleSubmit = async (event) => {
         ...prevState,
         [name]: value
       }));
-   
-    
+      
     // console.log('e',e.target.options[e.target.selectedIndex].text);
     console.log('e',e.target.value);
   };
@@ -242,10 +229,10 @@ const handleSubmit = async (event) => {
                <Col md="10" >
                    <FormGroup>
                      <Label>Quantity (in meters)</Label>
-                     <Input type="text" 
+                     <Input type="number" 
                      name="quantity" 
                      id="name"
-                     placeholder="Enter name" 
+                     placeholder="Enter Value" 
                      value={formDatas.quantity}
                      onChange={handleChange} 
                       />
@@ -276,7 +263,7 @@ const handleSubmit = async (event) => {
                      <Input type="text"
                      name="bin"
                      id="name"
-                     placeholder="Enter name" 
+                     placeholder="Enter" 
                      value={formDatas.bin}
                      onChange={handleChange} 
                       />
@@ -287,10 +274,10 @@ const handleSubmit = async (event) => {
                   <Col md="5" >
                    <FormGroup>
                      <Label>Weight</Label>
-                     <Input type="text" 
-                     name="weight" 
+                     <Input type="number" 
+                     name="weight"
                      id="name"
-                     placeholder="Enter name" 
+                     placeholder="Enter Value" 
                      value={formDatas.weight}
                      onChange={handleChange} 
                       />
@@ -302,10 +289,10 @@ const handleSubmit = async (event) => {
                  <Col md="5" >
                    <FormGroup>
                      <Label>Width</Label>
-                     <Input type="text" 
+                     <Input type="number" 
                      name="width" 
                      id="name"
-                     placeholder="Enter name" 
+                     placeholder="Enter Value" 
                      value={formDatas.width}
                      onChange={handleChange}
                       />
@@ -319,7 +306,7 @@ const handleSubmit = async (event) => {
                      <Input type="text" 
                      name="t1" 
                      id="name"
-                     placeholder="Enter name" 
+                     placeholder="Enter" 
                      value={formDatas.t1}
                      onChange={handleChange} 
                       />      
@@ -333,7 +320,7 @@ const handleSubmit = async (event) => {
                      <Input type="text" 
                      name="t2" 
                      id="name"
-                     placeholder="Enter name" 
+                     placeholder="Enter" 
                      value={formDatas.t2}
                      onChange={handleChange} 
                       />
@@ -348,7 +335,7 @@ const handleSubmit = async (event) => {
                      <Input type="text" 
                      name="t3" 
                      id="name"
-                     placeholder="Enter name" 
+                     placeholder="Enter" 
                      value={formDatas.t3}
                      onChange={handleChange} 
                       />
@@ -362,8 +349,9 @@ const handleSubmit = async (event) => {
                      name="send_to_factory_stock" 
                      id="name"
                      placeholder="Enter name" 
-                     value={firstcheck}
+                     checked={firstcheck}
                      onChange={checkboxclick1} 
+                     disabled
                      />
                      <Label> Send to factory stock</Label>
                      
@@ -377,7 +365,7 @@ const handleSubmit = async (event) => {
                      <Input type="textarea" 
                      name="comment" 
                      id="name"
-                     placeholder="Enter name" 
+                     placeholder="Enter" 
                      value={formDatas.comment}
                      onChange={handleChange} 
                       />

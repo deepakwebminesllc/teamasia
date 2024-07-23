@@ -111,7 +111,7 @@ const Edit = () => {
 
         // console.log('filtered',filtered);
 
-        // console.log('formdata',formData);
+        console.log('formdata',formDatas);
 
         const token = localStorage.getItem('userToken');
         const response = await fetch(`https://factory.teamasia.in/api/public/labtests/${id}`, {
@@ -188,7 +188,7 @@ const validateForm=()=>{
   useEffect(()=>{
     function testDirectionAdd(){
     const testArray = TestDirection.map((test)=>{
-      return {"lab_test_name" : test.name}
+      return {"id":test.id,"lab_test_name" : test.name}
     });
 
     console.log('testArray',testArray);

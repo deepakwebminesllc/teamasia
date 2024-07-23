@@ -96,7 +96,7 @@ const JumbotronComponent = () => {
           }
           
           const datas = await response.json();
-          console.log('result',datas.orders);
+          console.log('result order',datas.orders);
           setOrderData(datas.orders);
         }
 
@@ -115,7 +115,7 @@ const JumbotronComponent = () => {
           }
           
           const datas = await response.json();
-          console.log('result1',datas.customers);
+          console.log('result customer',datas.customers);
           setCustomerData(datas.customers);
         }
         const fetchData1 = async () => {
@@ -132,7 +132,7 @@ const JumbotronComponent = () => {
             throw new Error(`HTTP error! status: ${response.status}`);
           }
           const result = await response.json();
-          console.log("responsejson1",result);
+          console.log("responsejson grain",result);
           const resultX = result.grains.slice();
           resultX.push({id:'x',name:'Choose'});
           setData1(resultX); 
@@ -151,7 +151,7 @@ const JumbotronComponent = () => {
             throw new Error(`HTTP error! status: ${response.status}`);
           }
           const result = await response.json();
-          console.log("responsejson2",result);
+          console.log("responsejson fabric",result);
           const resultX = result.fabrics.slice();
           resultX.push({id:'x',name:'Choose'});
           setData2(resultX);
@@ -170,7 +170,7 @@ const JumbotronComponent = () => {
             throw new Error(`HTTP error! status: ${response.status}`);
           }
           const result = await response.json();
-          console.log("responsejson3",result);
+          console.log("responsejson quality",result);
           const resultX = result.qualities.slice();
           resultX.push({id:'x',name:'Choose'});
           setData3(resultX);
@@ -189,6 +189,7 @@ const JumbotronComponent = () => {
             throw new Error(`HTTP error! status: ${response.status}`);
           }
           const result = await response.json();
+          console.log("responsejson colors",result);
           const resultX = result.colors.slice();
           resultX.push({id:'x',name:'Choose'});
           setData4(resultX);
@@ -207,6 +208,7 @@ const JumbotronComponent = () => {
             throw new Error(`HTTP error! status: ${response.status}`);
           }
           const result = await response.json();
+          console.log("responsejson hsn",result);
           const resultX = result.hsns.slice();
           resultX.push({id:'x',name:'Choose'});
           setData5(resultX);
@@ -231,7 +233,7 @@ const JumbotronComponent = () => {
                   <Button className='my-btn-color' style={{ marginBottom: '1rem',marginRight:'10px' }} onClick={() => handleEditAdd()}>
                     Add Order
                   </Button>
-                  <Button className='my-btn-color' onClick={toggle.bind(null)} style={{ marginBottom: '1rem',marginRight:'10px' }}>
+                  <Button className='my-btn-color' onClick={toggle.bind(null)} style={{ marginBottom: '1rem',marginRight:'10px' }} disabled>
                     Search
                   </Button>
                   {/* <Button className='my-btn-color-green' style={{ marginBottom: '1rem',marginRight:'10px' }} >

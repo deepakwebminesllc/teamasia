@@ -29,7 +29,7 @@ const JumbotronComponent = ({modal,toggle}) => {
      navigate('/operations/Bom-Report');
   }
   const LabReportFunction = ()=>{
-     navigate('/operations/Lab-Report');
+     navigate('/operations/Lab-Report-stock');
   }
   const ProductionFunction = ()=>{
      navigate('/operations/Production-Report');
