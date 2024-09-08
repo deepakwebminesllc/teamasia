@@ -23,7 +23,7 @@ const JumbotronComponent = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [collapse, setCollapse] = useState([]);
-  const {id,item:planItem,data1,data2,data3,data4,data5}    = location.state
+  const {id,item:planItem}    = location.state
   const [data,setData] = useState([]);
   const [CustomerData,setCustomerData] = useState([]);
   const [line1, setLine1] = useState([]);
@@ -63,7 +63,7 @@ const JumbotronComponent = () => {
        newItems = line4.slice();
     }
 
-    newItems.push({...product,id:'x',product_id:product.id,plan_date:planItem.date ,quantity:'',pre_skin:'',skin:'',top_coat:'',filler_in_top_coat:'',foam:'',filler_in_foam:'',adhesive:'',filler_in_adhesive:'',final_gsm:'',line_id:activeTab});
+    newItems.push({...product ,product_details:{...product},id:'x',product_id:product.id,plan_date:planItem.date ,quantity:'',pre_skin:'',skin:'',top_coat:'',filler_in_top_coat:'',foam:'',filler_in_foam:'',adhesive:'',filler_in_adhesive:'',final_gsm:'',line_id:activeTab});
 
     console.log('mega',newItems);
     if(activeTab === '1'){
@@ -172,10 +172,10 @@ else if(activeTab === '4'){
 }
   };
 
-  const handleEditcustomer = () => {
-    navigate('/order/customers/edit',{state:location.state});
-  };
-  
+// const handleEditcustomer = () => {
+//   navigate('/order/customers/edit',{state:location.state});
+// };
+
 const CustomerName =(customerId)=>{
     // console.log('customerData',CustomerData);
     const result =  CustomerData.find((item)=> item.id === customerId);
@@ -217,10 +217,8 @@ async function apiPostCall() {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
           },
-         
           body: JSON.stringify([...filteredL1,...filteredL2,...filteredL3,...filteredL4]),
       });
-
       const datas = await response.json();
       // console.log("dataapi",datas,response);
       if (response.status === 201) {
@@ -567,7 +565,7 @@ useEffect(()=>{
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     const result = await response.json();
-    console.log("responsejson1 producton",result);
+    console.log("responsejson1 producton.....11111",result);
     const plans = result.production_plan;
 
     const line1Data = plans.filter(plan => plan.line_id === '1');
@@ -580,7 +578,6 @@ useEffect(()=>{
     setLine2(line2Data);
     setLine3(line3Data);
     setLine4(line4Data);
-
   };
 
     fetchCustomerData();
@@ -598,10 +595,10 @@ useEffect(()=>{
                     <ComponentCard4>
                         <div className="order-view-page-flex">
                           <div style={{fontSize:'17px',fontWeight:'500',textTransform:'uppercase'}}> Manage Production Plan @ <span style={{fontWeight:'800'}}>{formatDate(planItem.date)} </span>
-                            <span style={{marginLeft:'17px'}}><Button className='my-btn-color' onClick={() => handleEditcustomer()}>
+                            {/* <span style={{marginLeft:'17px'}}><Button className='my-btn-color' disabled onClick={() => handleEditcustomer()}>
                                         Change Date
                                     </Button>
-                            </span>
+                            </span> */}
                           </div>
                         </div>
                     </ComponentCard4>
@@ -618,9 +615,8 @@ useEffect(()=>{
                             <div className="my-btn-color" onClick={()=>toggle(index)} style={{textAlign:'center',color:'white',marginBottom:'2px',padding:'5px'}}> #{AddressItem.id} {CustomerName(AddressItem.customer_id)} (Grains : ALINEA,3001 A) <br></br>
                                  Order Date: {formatDate(AddressItem.created_at)} | Nearest Expected Date: {formatDate(AddressItem.expected_delivery_date)}</div>
                             <Collapse isOpen={collapse[index]}>
-                            
-                                <OrderProduct orderID ={AddressItem.id} customerID={AddressItem.customer_id} formatDate = {formatDate} data1={data1} data2={data2} data3={data3} data4={data4} data5={data5} addItemToLine={addItemToLine} removeItemFromLine = {removeItemFromLine} customerNameFromManagePlan={CustomerName(AddressItem.customer_id)}/>
-                        </Collapse>
+                                <OrderProduct orderID ={AddressItem.id} customerID={AddressItem.customer_id} formatDate = {formatDate} addItemToLine={addItemToLine} removeItemFromLine = {removeItemFromLine} customerNameFromManagePlan={CustomerName(AddressItem.customer_id)}/>
+                            </Collapse>
                         </div>
                           ))
                         
@@ -694,37 +690,39 @@ useEffect(()=>{
                       <TabContent className="p-2" activeTab={activeTab}>
 
                         <TabPane tabId="1">
-                          {
+                        {
                             line1.map((product,index)=>
                               {
                                 return <div key={product.id}>
                                 <div>
-                                  <span className='production-plan-page-collape-heading'>PRODUCT</span> { product.id} 
-                                  <button type='button' style={{padding:'1px',background:'aliceblue',borderRadius:'5px',marginLeft:'5px',marginRight:'5px'}}>{CustomerName(product.customer_id)}</button>
-                                  <button type='button' style={{padding:'1px',background:'#777',borderRadius:'5px',marginLeft:'5px',marginRight:'5px',color:'white'}}>{product.is_factory_surplus_product !== 0?'factory product':''}</button>
-                                  <button type='button' style={{padding:'1px',background: '#B33C12',borderRadius:'5px',marginRight:'20px',color:'white'}}>{product.is_online_product !== 0?'online product':''}</button>
-                                    <span style={{paddingTop:'2px'}}><i className="bi bi-x-square" style={{fontSize:"20px",marginTop:'2px'}} onClick={()=>removeItemFromLine(index)}></i></span>
+                                  <span className='production-plan-page-collape-heading'>PRODUCT</span> { product.product_id} 
+                                  <button type='button' style={{padding:'1px',background:'aliceblue',borderRadius:'5px',marginLeft:'5px',marginRight:'5px'}}>{product.customerNameFromManagePlan}</button>
+                                  {/* {product.is_factory_surplus_product !== '0' && <button type='button' style={{padding:'1px',background:'#777',borderRadius:'5px',marginLeft:'5px',marginRight:'5px',color:'white'}}>factory product</button>} */}
+                                  {(product?.product_details.is_online_product !== '0' || product?.product_details.ref_product_id !== '0') && <button type='button' style={{padding:'1px',background: '#B33C12',borderRadius:'5px',marginLeft:'5px',marginRight:'20px',color:'white'}}>online product</button>}
+                                  {product?.product_details.is_online_product !== '0' && product?.product_details.ref_product_id === '0' && <button type='button' style={{padding:'1px',background: '#B33C12',borderRadius:'5px',marginLeft:'5px',marginRight:'20px',color:'white'}}>front side</button>}
+                                  {product?.product_details.is_online_product === '0' && product?.product_details.ref_product_id !== '0' && <button type='button' style={{padding:'1px',background: '#B33C12',borderRadius:'5px',marginLeft:'5px',marginRight:'20px',color:'white'}}>back side</button>}
+                                    <span style={{paddingTop:'2px',cursor:'pointer'}}><i className="bi bi-x-square" style={{fontSize:"20px",marginTop:'2px'}} onClick={()=>removeItemFromLine(index)}></i></span>
                                 </div>
                                 <Table size='sm' className="order-page-table" responsive>     
                                       <tbody> 
                                             <tr>
-                                              <td title={product.grainName}>{product.grainName}</td>
-                                              <td title={product.colorName}>{product.colorName}</td>
-                                              <td title={product.qualityName}>{product.qualityName}</td>
-                                              <td title={product.fabricName}>{product.fabricName}</td>
-                                              <td title={product.fabricColorName}>{product.fabricColorName}</td>
+                                                <td title={product.product_details.grain_name}>{product.product_details.grain_name}</td>
+                                                <td title={product.product_details.color_name}>{product.product_details.color_name}</td>
+                                                <td title={product.product_details.quality_name}>{product.product_details.quality_name}</td>
+                                                <td title={product.product_details.fabric_name}>{product.product_details.fabric_name}</td>
+                                                <td title={product.product_details.fabric_color_name}>{product.product_details.fabric_color_name}</td>
                                             </tr>
                                             <tr>
                                               <td title="">{}</td>
                                               <td title="">{}</td>
                                               <td title="">{}</td>
                                               <td title="">{}</td>
-                                              <td title={product.thickness}>{product.thickness}mm</td>
+                                              <td title={product.product_details.thickness}>{product.product_details.thickness}mm</td>
                                             </tr>
                                             
                                             <tr>
-                                              <td title="" colSpan={3}><span className='production-plan-page-collape-heading'>Cust. Item Ref:</span>  {product.customer_item_reference}</td>
-                                              <td title="" colSpan={2}><span className='production-plan-page-collape-heading'>Price Per Unit:</span> ₹{product.price}</td>
+                                              <td title="" colSpan={3}><span className='production-plan-page-collape-heading'>Cust. Item Ref:</span>  {product.product_details.customer_item_reference}</td>
+                                              <td title="" colSpan={2}><span className='production-plan-page-collape-heading'>Price Per Unit:</span> ₹{product.product_details.price}</td>
                                             </tr>
                                             <tr>
                                               <td title="" colSpan={3}>Additional Treatment :</td>
@@ -758,7 +756,7 @@ useEffect(()=>{
                                                 <Input 
                                                   name="skin" 
                                                   value={product.skin} 
-                                                  type="text" 
+                                                  type="text"
                                                   
                                                   placeholder="skin"
                                                   onChange={e => handleInputChangeOfPlan(index, e)}
@@ -869,32 +867,34 @@ useEffect(()=>{
                               {
                                 return <div key={product.id}>
                                 <div>
-                                  <span className='production-plan-page-collape-heading'>PRODUCT</span> { product.id} 
-                                  <button type='button' style={{padding:'1px',background:'aliceblue',borderRadius:'5px',marginLeft:'5px',marginRight:'5px'}}>{CustomerName(product.customer_id)}</button>
-                                  <button type='button' style={{padding:'1px',background:'#777',borderRadius:'5px',marginLeft:'5px',marginRight:'5px',color:'white'}}>{product.is_factory_surplus_product !== 0?'factory product':''}</button>
-                                  <button type='button' style={{padding:'1px',background: '#B33C12',borderRadius:'5px',marginRight:'20px',color:'white'}}>{product.is_online_product !== 0?'online product':''}</button>
-                                    <span style={{paddingTop:'2px'}}><i className="bi bi-x-square" style={{fontSize:"20px",marginTop:'2px'}} onClick={()=>removeItemFromLine(index)}></i></span>
+                                  <span className='production-plan-page-collape-heading'>PRODUCT</span> { product.product_id} 
+                                  <button type='button' style={{padding:'1px',background:'aliceblue',borderRadius:'5px',marginLeft:'5px',marginRight:'5px'}}>{product.customerNameFromManagePlan}</button>
+                                  {/* {product.is_factory_surplus_product !== '0' && <button type='button' style={{padding:'1px',background:'#777',borderRadius:'5px',marginLeft:'5px',marginRight:'5px',color:'white'}}>factory product</button>} */}
+                                  {(product?.product_details.is_online_product !== '0' || product?.product_details.ref_product_id !== '0') && <button type='button' style={{padding:'1px',background: '#B33C12',borderRadius:'5px',marginLeft:'5px',marginRight:'20px',color:'white'}}>online product</button>}
+                                  {product?.product_details.is_online_product !== '0' && product?.product_details.ref_product_id === '0' && <button type='button' style={{padding:'1px',background: '#B33C12',borderRadius:'5px',marginLeft:'5px',marginRight:'20px',color:'white'}}>front side</button>}
+                                  {product?.product_details.is_online_product === '0' && product?.product_details.ref_product_id !== '0' && <button type='button' style={{padding:'1px',background: '#B33C12',borderRadius:'5px',marginLeft:'5px',marginRight:'20px',color:'white'}}>back side</button>}
+                                    <span style={{paddingTop:'2px',cursor:'pointer'}}><i className="bi bi-x-square" style={{fontSize:"20px",marginTop:'2px'}} onClick={()=>removeItemFromLine(index)}></i></span>
                                 </div>
                                 <Table size='sm' className="order-page-table" responsive>     
                                       <tbody> 
-                                            <tr>
-                                              <td title={product.grainName}>{product.grainName}</td>
-                                              <td title={product.colorName}>{product.colorName}</td>
-                                              <td title={product.qualityName}>{product.qualityName}</td>
-                                              <td title={product.fabricName}>{product.fabricName}</td>
-                                              <td title={product.fabricColorName}>{product.fabricColorName}</td>
+                                           <tr>
+                                              <td title={product.product_details.grain_name}>{product.product_details.grain_name}</td>
+                                              <td title={product.product_details.color_name}>{product.product_details.color_name}</td>
+                                              <td title={product.product_details.quality_name}>{product.product_details.quality_name}</td>
+                                              <td title={product.product_details.fabric_name}>{product.product_details.fabric_name}</td>
+                                              <td title={product.product_details.fabric_color_name}>{product.product_details.fabric_color_name}</td>
                                             </tr>
                                             <tr>
                                               <td title="">{}</td>
                                               <td title="">{}</td>
                                               <td title="">{}</td>
                                               <td title="">{}</td>
-                                              <td title={product.thickness}>{product.thickness}mm</td>
+                                              <td title={product.product_details.thickness}>{product.product_details.thickness}mm</td>
                                             </tr>
                                             
                                             <tr>
-                                              <td title="" colSpan={3}><span className='production-plan-page-collape-heading'>Cust. Item Ref:</span>  {product.customer_item_reference}</td>
-                                              <td title="" colSpan={2}><span className='production-plan-page-collape-heading'>Price Per Unit:</span> ₹{product.price}</td>
+                                              <td title="" colSpan={3}><span className='production-plan-page-collape-heading'>Cust. Item Ref:</span>  {product.product_details.customer_item_reference}</td>
+                                              <td title="" colSpan={2}><span className='production-plan-page-collape-heading'>Price Per Unit:</span> ₹{product.product_details.price}</td>
                                             </tr>
                                             <tr>
                                               <td title="" colSpan={3}>Additional Treatment :</td>
@@ -1038,32 +1038,34 @@ useEffect(()=>{
                               {
                                 return <div key={product.id}>
                                 <div>
-                                  <span className='production-plan-page-collape-heading'>PRODUCT</span> { product.id} 
-                                  <button type='button' style={{padding:'1px',background:'aliceblue',borderRadius:'5px',marginLeft:'5px',marginRight:'5px'}}>{CustomerName(product.customer_id)}</button>
-                                  <button type='button' style={{padding:'1px',background:'#777',borderRadius:'5px',marginLeft:'5px',marginRight:'5px',color:'white'}}>{product.is_factory_surplus_product !== 0?'factory product':''}</button>
-                                  <button type='button' style={{padding:'1px',background: '#B33C12',borderRadius:'5px',marginRight:'20px',color:'white'}}>{product.is_online_product !== 0?'online product':''}</button>
-                                    <span style={{paddingTop:'2px'}}><i className="bi bi-x-square" style={{fontSize:"20px",marginTop:'2px'}} onClick={()=>removeItemFromLine(index)}></i></span>
+                                  <span className='production-plan-page-collape-heading'>PRODUCT</span> { product.product_id} 
+                                  <button type='button' style={{padding:'1px',background:'aliceblue',borderRadius:'5px',marginLeft:'5px',marginRight:'5px'}}>{product.customerNameFromManagePlan}</button>
+                                  {/* {product.is_factory_surplus_product !== '0' && <button type='button' style={{padding:'1px',background:'#777',borderRadius:'5px',marginLeft:'5px',marginRight:'5px',color:'white'}}>factory product</button>} */}
+                                  {(product?.product_details.is_online_product !== '0' || product?.product_details.ref_product_id !== '0') && <button type='button' style={{padding:'1px',background: '#B33C12',borderRadius:'5px',marginLeft:'5px',marginRight:'20px',color:'white'}}>online product</button>}
+                                  {product?.product_details.is_online_product !== '0' && product?.product_details.ref_product_id === '0' && <button type='button' style={{padding:'1px',background: '#B33C12',borderRadius:'5px',marginLeft:'5px',marginRight:'20px',color:'white'}}>front side</button>}
+                                  {product?.product_details.is_online_product === '0' && product?.product_details.ref_product_id !== '0' && <button type='button' style={{padding:'1px',background: '#B33C12',borderRadius:'5px',marginLeft:'5px',marginRight:'20px',color:'white'}}>back side</button>}
+                                    <span style={{paddingTop:'2px',cursor:'pointer'}}><i className="bi bi-x-square" style={{fontSize:"20px",marginTop:'2px'}} onClick={()=>removeItemFromLine(index)}></i></span>
                                 </div>
                                 <Table size='sm' className="order-page-table" responsive>     
                                       <tbody> 
-                                            <tr>
-                                              <td title={product.grainName}>{product.grainName}</td>
-                                              <td title={product.colorName}>{product.colorName}</td>
-                                              <td title={product.qualityName}>{product.qualityName}</td>
-                                              <td title={product.fabricName}>{product.fabricName}</td>
-                                              <td title={product.fabricColorName}>{product.fabricColorName}</td>
+                                          <tr>
+                                               <td title={product.product_details.grain_name}>{product.product_details.grain_name}</td>
+                                               <td title={product.product_details.color_name}>{product.product_details.color_name}</td>
+                                               <td title={product.product_details.quality_name}>{product.product_details.quality_name}</td>
+                                               <td title={product.product_details.fabric_name}>{product.product_details.fabric_name}</td>
+                                               <td title={product.product_details.fabric_color_name}>{product.product_details.fabric_color_name}</td>
                                             </tr>
                                             <tr>
                                               <td title="">{}</td>
                                               <td title="">{}</td>
                                               <td title="">{}</td>
                                               <td title="">{}</td>
-                                              <td title={product.thickness}>{product.thickness}mm</td>
+                                              <td title={product.product_details.thickness}>{product.product_details.thickness}mm</td>
                                             </tr>
                                             
                                             <tr>
-                                              <td title="" colSpan={3}><span className='production-plan-page-collape-heading'>Cust. Item Ref:</span>  {product.customer_item_reference}</td>
-                                              <td title="" colSpan={2}><span className='production-plan-page-collape-heading'>Price Per Unit:</span> ₹{product.price}</td>
+                                              <td title="" colSpan={3}><span className='production-plan-page-collape-heading'>Cust. Item Ref:</span>  {product.product_details.customer_item_reference}</td>
+                                              <td title="" colSpan={2}><span className='production-plan-page-collape-heading'>Price Per Unit:</span> ₹{product.product_details.price}</td>
                                             </tr>
                                             <tr>
                                               <td title="" colSpan={3}>Additional Treatment :</td>
@@ -1207,32 +1209,34 @@ useEffect(()=>{
                               {
                                 return <div key={product.id}>
                                 <div>
-                                  <span className='production-plan-page-collape-heading'>PRODUCT</span> { product.id} 
-                                  <button type='button' style={{padding:'1px',background:'aliceblue',borderRadius:'5px',marginLeft:'5px',marginRight:'5px'}}>{CustomerName(product.customer_id)}</button>
-                                  <button type='button' style={{padding:'1px',background:'#777',borderRadius:'5px',marginLeft:'5px',marginRight:'5px',color:'white'}}>{product.is_factory_surplus_product !== 0?'factory product':''}</button>
-                                  <button type='button' style={{padding:'1px',background: '#B33C12',borderRadius:'5px',marginRight:'20px',color:'white'}}>{product.is_online_product !== 0?'online product':''}</button>
-                                    <span style={{paddingTop:'2px'}}><i className="bi bi-x-square" style={{fontSize:"20px",marginTop:'2px'}} onClick={()=>removeItemFromLine(index)}></i></span>
+                                  <span className='production-plan-page-collape-heading'>PRODUCT</span> { product.product_id} 
+                                  <button type='button' style={{padding:'1px',background:'aliceblue',borderRadius:'5px',marginLeft:'5px',marginRight:'5px'}}>{product.customerNameFromManagePlan}</button>
+                                  {/* {product.is_factory_surplus_product !== '0' && <button type='button' style={{padding:'1px',background:'#777',borderRadius:'5px',marginLeft:'5px',marginRight:'5px',color:'white'}}>factory product</button>} */}
+                                  {(product?.product_details.is_online_product !== '0' || product?.product_details.ref_product_id !== '0') && <button type='button' style={{padding:'1px',background: '#B33C12',borderRadius:'5px',marginLeft:'5px',marginRight:'20px',color:'white'}}>online product</button>}
+                                  {product?.product_details.is_online_product !== '0' && product?.product_details.ref_product_id === '0' && <button type='button' style={{padding:'1px',background: '#B33C12',borderRadius:'5px',marginLeft:'5px',marginRight:'20px',color:'white'}}>front side</button>}
+                                  {product?.product_details.is_online_product === '0' && product?.product_details.ref_product_id !== '0' && <button type='button' style={{padding:'1px',background: '#B33C12',borderRadius:'5px',marginLeft:'5px',marginRight:'20px',color:'white'}}>back side</button>}
+                                    <span style={{paddingTop:'2px',cursor:'pointer'}}><i className="bi bi-x-square" style={{fontSize:"20px",marginTop:'2px'}} onClick={()=>removeItemFromLine(index)}></i></span>
                                 </div>
                                 <Table size='sm' className="order-page-table" responsive>     
                                       <tbody> 
                                             <tr>
-                                              <td title={product.grainName}>{product.grainName}</td>
-                                              <td title={product.colorName}>{product.colorName}</td>
-                                              <td title={product.qualityName}>{product.qualityName}</td>
-                                              <td title={product.fabricName}>{product.fabricName}</td>
-                                              <td title={product.fabricColorName}>{product.fabricColorName}</td>
+                                              <td title={product.product_details.grain_name}>{product.product_details.grain_name}</td>
+                                              <td title={product.product_details.color_name}>{product.product_details.color_name}</td>
+                                              <td title={product.product_details.quality_name}>{product.product_details.quality_name}</td>
+                                              <td title={product.product_details.fabric_name}>{product.product_details.fabric_name}</td>
+                                              <td title={product.product_details.fabric_color_name}>{product.product_details.fabric_color_name}</td>
                                             </tr>
                                             <tr>
                                               <td title="">{}</td>
                                               <td title="">{}</td>
                                               <td title="">{}</td>
                                               <td title="">{}</td>
-                                              <td title={product.thickness}>{product.thickness}mm</td>
+                                              <td title={product.product_details.thickness}>{product.product_details.thickness}mm</td>
                                             </tr>
                                             
                                             <tr>
-                                              <td title="" colSpan={3}><span className='production-plan-page-collape-heading'>Cust. Item Ref:</span>  {product.customer_item_reference}</td>
-                                              <td title="" colSpan={2}><span className='production-plan-page-collape-heading'>Price Per Unit:</span> ₹{product.price}</td>
+                                              <td title="" colSpan={3}><span className='production-plan-page-collape-heading'>Cust. Item Ref:</span>  {product.product_details.customer_item_reference}</td>
+                                              <td title="" colSpan={2}><span className='production-plan-page-collape-heading'>Price Per Unit:</span> ₹{product.product_details.price}</td>
                                             </tr>
                                             <tr>
                                               <td title="" colSpan={3}>Additional Treatment :</td>

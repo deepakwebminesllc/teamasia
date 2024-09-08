@@ -63,10 +63,16 @@ const  DispatchOrderAdd= Loadable(lazy(() => import('../views/operations/Dispatc
 const  DispatchView= Loadable(lazy(() => import('../views/operations/Dispatchh/View')));
 
 const  FindaRoll= Loadable(lazy(() => import('../views/operations/FindR/FindaRoll')));
+const  FindaJumboRoll= Loadable(lazy(() => import('../views/operations/FindR/FindaJumboRoll')));
+const  FindaJumboRollA= Loadable(lazy(() => import('../views/operations/FindR/FindaJumboRollA')));
 
 const  Invoices= Loadable(lazy(() => import('../views/operations/Invoice/Invoices')));
 const  InvoicesAdd= Loadable(lazy(() => import('../views/operations/Invoice/Add')));
 const  InvoicesEdit= Loadable(lazy(() => import('../views/operations/Invoice/Edit')));
+
+const  InvoicesPrint= Loadable(lazy(() => import('../views/InvoivePrint/invoice')));
+const  SmallPrint= Loadable(lazy(() => import('../views/InvoivePrint/smallRoll')));
+const  JumboPrint= Loadable(lazy(() => import('../views/InvoivePrint/jumboRoll')));
 
 
 const  QaPack= Loadable(lazy(() => import('../views/operations/QaP/QaPack')));
@@ -129,6 +135,8 @@ const  Factory = Loadable(lazy(() => import('../views/factories/Factory')));
 const  FactoryEdit = Loadable(lazy(() => import('../views/factories/Edit')));
 const  FactoryAdd = Loadable(lazy(() => import('../views/factories/Add')));
 const  FactoryView = Loadable(lazy(() => import('../views/factories/View')));
+const  FactoryViewAddress = Loadable(lazy(() => import('../views/addresses/Address')));
+const  FactoryAddAddress = Loadable(lazy(() => import('../views/addresses/AddressAdd')));
 const  FactoryEditAddress = Loadable(lazy(() => import('../views/addresses/AddressEdit')));
 
 const  User = Loadable(lazy(() => import('../views/users/User')));
@@ -385,10 +393,15 @@ const ThemeRoutes = [
       { path: '/operations/dispatch/view', name: 'Modern', exact: true, element: <ProtectedRoute> <DispatchView /> </ProtectedRoute> },
      
       { path: '/operations/find-a-roll', name: 'Modern', exact: true, element:  <ProtectedRoute><FindaRoll /> </ProtectedRoute> },
+      { path: '/operations/find-a-jumbo-roll', name: 'Modern', exact: true, element:  <ProtectedRoute><FindaJumboRoll /> </ProtectedRoute> },
+      { path: '/operations/find-additional-jumbo-roll', name: 'Modern', exact: true, element:  <ProtectedRoute><FindaJumboRollA /> </ProtectedRoute> },
 
       { path: '/operations/invoices', name: 'Modern', exact: true, element:  <ProtectedRoute><Invoices /> </ProtectedRoute> },
       { path: '/operations/invoices/add', name: 'Modern', exact: true, element:  <ProtectedRoute><InvoicesAdd /> </ProtectedRoute> },
       { path: '/operations/invoices/edit', name: 'Modern', exact: true, element:  <ProtectedRoute><InvoicesEdit /> </ProtectedRoute> },
+      { path: '/operations/invoices/print', name: 'Modern', exact: true, element:  <ProtectedRoute><InvoicesPrint /> </ProtectedRoute> },
+      { path: '/operations/small/print', name: 'Modern', exact: true, element:  <ProtectedRoute><SmallPrint /> </ProtectedRoute> },
+      { path: '/operations/jumbo/print', name: 'Modern', exact: true, element:  <ProtectedRoute><JumboPrint /> </ProtectedRoute> },
       
       { path: '/operations/qa-packaging', name: 'Modern', exact: true, element:  <ProtectedRoute><QaPack /> </ProtectedRoute> },
       { path: '/operations/qa-packaging/view', name: 'Modern', exact: true, element:  <ProtectedRoute><QaPackView /></ProtectedRoute>  },
@@ -448,6 +461,8 @@ const ThemeRoutes = [
       { path: '/factories/edit', name: 'Modern', exact: true, element: <ProtectedRoute> <FactoryEdit />  </ProtectedRoute>},
       { path: '/factories/add', name: 'Modern', exact: true, element: <ProtectedRoute> <FactoryAdd />  </ProtectedRoute>},
       { path: '/factories/view', name: 'Modern', exact: true, element: <ProtectedRoute> <FactoryView />  </ProtectedRoute>},
+      { path: '/addresses', name: 'Modern', exact: true, element: <ProtectedRoute> <FactoryViewAddress />  </ProtectedRoute>},
+      { path: '/addresses/add', name: 'Modern', exact: true, element: <ProtectedRoute> <FactoryAddAddress />  </ProtectedRoute>},
       { path: '/addresses/edit', name: 'Modern', exact: true, element: <ProtectedRoute> <FactoryEditAddress />  </ProtectedRoute>},
 
       { path: '/users/user', name: 'Modern', exact: true, element: <ProtectedRoute> <User />  </ProtectedRoute>},

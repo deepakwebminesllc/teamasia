@@ -1,4 +1,6 @@
-import React,{useState,useEffect} from 'react';
+import React,{useState,useEffect,useCallback} from 'react';
+import AsyncSelect from 'react-select/async';
+import debounce from 'lodash.debounce';
 
 import {
   Card,
@@ -20,16 +22,48 @@ import { useLocation,useNavigate  } from 'react-router-dom';
 
 // import ComponentCard from '../../components/ComponentCard';
 
+
+// Custom hook for fetching options
+const useDebouncedFetchOptions = (endpoint,queryParams='') => {
+  const fetchOptions = async (inputValue) => {
+    const token = localStorage.getItem('userToken');
+    console.log('endpoint',endpoint);
+    let endpoint1 = 'countries?'
+    if(endpoint === 'states'){
+      endpoint1 = `states?country_id=${queryParams} &`
+
+    }else if(endpoint === 'cities'){
+      endpoint1 = `cities?state_id=${queryParams} &`
+    }
+    const response = await fetch(`https://factory.teamasia.in/api/public/${endpoint1}search=${inputValue}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const result = await response.json();
+    console.log('result',`https://factory.teamasia.in/api/public/${endpoint1}search=${inputValue}`);
+    return result[endpoint].map(item => ({ value: item.id, label: item.name || item.code }));
+  };
+
+  const debouncedFetch = useCallback(debounce((inputValue, callback) => {
+    fetchOptions(inputValue).then(callback).catch(error => {
+      console.error(error);
+      callback([]);
+    });
+  }, 300), [endpoint,queryParams]);
+
+  return debouncedFetch;
+}; 
+
 const Edit = () => {
   const location = useLocation();
   const navigate= useNavigate();
   const id = location.state || {}; // Default to an empty object if state is undefined
-  // const [data, setData] = useState([]);
-  const [data1, setData1] = useState([]);
-  const [data1x, setData1x] = useState([]);
-  const [data2, setData2] = useState([]);
-  const [data3, setData3] = useState([]);
-  const [data3x, setData3x] = useState([]);
+
   const [data4, setData4] = useState([]);
   const [errorMessageFromApi, setErrorMessageFromApi] = useState('');
   const [errors, setErrors] = useState({});
@@ -48,37 +82,35 @@ const handleChange = (e) => {
   }));
 };
 
-const handleTypeChange = (e) => {
-  const { name, value } = e.target;
+const handleSelectChange = (selectedOption, actionMeta) => {
 
-  // console.log('name',name,value);
-  // console.log('data3',data3);
-  
-  if(name === 'countryId'){
-    
-    const stateElement = data3.filter(item => item.country_id === value);
-    console.log('element',stateElement);
-    const resultX = stateElement.slice();
-    resultX.push({id:'x',name:'Choose'});
-    setData3x(resultX);
+  console.log('formdata',formDatas.countryId);
+
+  if(actionMeta.name === 'countryId'){
     setFormDataS(prevState => ({
       ...prevState,
+      [actionMeta.name]: selectedOption,
       stateId:'x',
       cityId:'x'
     }));
-  }
-  else if(name === 'stateId'){
-    
-    const stateElement = data1.filter(item => item.state_id === value);
-    console.log('element',stateElement);
-    const resultX = stateElement.slice();
-    resultX.push({id:'x',name:'Choose'});
-    setData1x(resultX);
+  }else if(actionMeta.name === 'stateId'){
     setFormDataS(prevState => ({
       ...prevState,
+      [actionMeta.name]: selectedOption,
       cityId:'x'
     }));
+  }else{
+  
+    setFormDataS(prevState => ({
+      ...prevState,
+      [actionMeta.name]: selectedOption
+    }));
   }
+  
+};
+
+const handleTypeChange = (e) => {
+  const { name, value } = e.target;
 
   // console.log('e',e.target.options[e.target.selectedIndex].text);
   console.log('e',e.target.value);
@@ -88,7 +120,12 @@ const handleTypeChange = (e) => {
   }));
 };
 
-  const addItem = () => {
+const countryOptions = useDebouncedFetchOptions('countries');
+const stateOptions = useDebouncedFetchOptions('states',formDatas.countryId?.value);
+
+const cityOptions = useDebouncedFetchOptions('cities',formDatas.stateId?.value);
+
+const addItem = () => {
     const newItems = formDatas.items.slice();
     newItems.push({
       id:"",
@@ -178,9 +215,9 @@ const handleTypeChange = (e) => {
               address_line_2:formDatas.addressLine2,
               landmark:formDatas.landMark,
               pincode:formDatas.pinCode,
-              country_id:formDatas.countryId,
-              state_id:formDatas.stateId,
-              city_id:formDatas.cityId,
+              country_id:formDatas.countryId.value,
+              state_id:formDatas.stateId.value,
+              city_id:formDatas.cityId.value,
               gst:formDatas.gst,
               tin:formDatas.tin,
               address_representative:formDatas.items
@@ -269,77 +306,13 @@ const handleSubmit = async (event) => {
 };
 
 
-useEffect(()=>{
-    const stateElement1 = data3.filter(item => item.country_id === formDatas.countryId);
-    console.log('element1',data3,stateElement1,formDatas.countryId);
-    const resultX = stateElement1.slice();
-    resultX.push({id:'x',name:'Choose'});
-    setData3x(resultX);
-    
 
-    const stateElement2 = data1.filter(item => item.state_id === formDatas.stateId);
-    console.log('element2',data1,stateElement2,formDatas.stateId);
-    const resultY = stateElement2.slice();
-    resultY.push({id:'x',name:'Choose'});
-    setData1x(resultY);
-
-},[data1,data3,data2])
 
 useEffect(() => {
-  const fetchData1 = async () => {
-    const token = localStorage.getItem('userToken');
-    const response = await fetch('https://factory.teamasia.in/api/public/cities', {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    });
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const result = await response.json();
-    console.log("data1(cities)", result.cities);
-    const resultX = result.cities.slice();
-    resultX.push({ id: 'x', name: 'Choose' });
-    setData1x(resultX);
-    setData1(result.cities);
-  };
 
-  const fetchData2 = async () => {
-    const token = localStorage.getItem('userToken');
-    const response = await fetch('https://factory.teamasia.in/api/public/countries', {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    });
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const result = await response.json();
-    console.log("data2(countries)", result.countries);
-    setData2(result.countries);
-  };
 
-  const fetchData3 = async () => {
-    const token = localStorage.getItem('userToken');
-    const response = await fetch('https://factory.teamasia.in/api/public/states', {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    });
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const result = await response.json();
-    console.log("data3(states)", result.states);
-    const resultX = result.states.slice();
-    resultX.push({ id: 'x', name: 'Choose' });
-    console.log('resultX(states)',resultX);
-    setData3x(resultX);
-    setData3(result.states);
-  };
+
+
 
   const fetchData4 = async () => {
     const token = localStorage.getItem('userToken');
@@ -384,18 +357,15 @@ useEffect(() => {
       addressLine2: resultX.address_line_2,
       landMark: resultX.landmark,
       pinCode: resultX.pincode,
-      countryId: resultX.country_id,
-      stateId: resultX.state_id,
-      cityId: resultX.city_id,
+      countryId: { value: resultX.country_id, label:resultX.country_name} ,
+      stateId: { value: resultX.state_id, label:resultX.state_name} ,
+      cityId: { value: resultX.city_id, label:resultX.city_name} ,
       gst: resultX.gst,
       tin: resultX.tin,
       items: resultX.addressrepresentatives
     }));
 
     // Fetch the other data once data0 is fetched
-    fetchData1();
-    fetchData2();
-    fetchData3();
     fetchData4();
   };
 
@@ -522,63 +492,63 @@ useEffect(() => {
                      <FormText className="muted"></FormText>
                    </FormGroup>
                  </Col>
-                 <Col md="6" className=''>
-                   <FormGroup>
-                     <Label>Country</Label>
-                     <Input type="select" 
-                         name="countryId" 
-                         value={formDatas.countryId}
-                        onChange={handleTypeChange}
+                
+                 <Col md="6">
+                    <FormGroup>
+                      <Label>Country</Label>
+                      <AsyncSelect
+                        name="countryId"
+                        onChange={handleSelectChange}
+                        loadOptions={countryOptions}
+                        value={formDatas.countryId}
                         className={errors.countryId ? "is-invalid" : ""}
-                        >
-                           {data2.map((item)=>{
-   
-                             return <option key={item.id} value={item.id}>{item.name}</option>
-                           })}
-                      </Input>
+                        isClearable
+                        isSearchable
+                      />
                       {errors.countryId && (
                         <FormText className="text-danger">{errors.countryId}</FormText>
                       )}
-                   </FormGroup>
-                 </Col>
-                 <Col md="6" className=''>
-                   <FormGroup>
-                     <Label>State</Label>
-                     <Input type="select" 
-                         name="stateId" 
-                         value={formDatas.stateId}
-                        onChange={handleTypeChange}
+                    </FormGroup>
+                  </Col>
+
+                  <Col md="6">
+                    <FormGroup>
+                      <Label>State</Label>
+                      <AsyncSelect
+                        name="stateId"
+                        onChange={handleSelectChange}
+                        loadOptions={stateOptions}
+                        value={formDatas.stateId}
                         className={errors.stateId ? "is-invalid" : ""}
-                        >
-                           {data3x.map((item)=>{
-   
-                             return <option key={item.id} value={item.id}>{item.name}</option>
-                           })}
-                      </Input>
+                        isClearable
+                        isSearchable
+                      />
                       {errors.stateId && (
                         <FormText className="text-danger">{errors.stateId}</FormText>
                       )}
-                   </FormGroup>
-                 </Col>
-                 <Col md="6" className=''>
-                   <FormGroup>
-                     <Label>City</Label>
-                     <Input type="select" 
-                         name="cityId" 
-                         value={formDatas.cityId}
-                        onChange={handleTypeChange}
+                    </FormGroup>
+                  </Col>
+
+                  <Col md="6">
+                    <FormGroup>
+                      <Label>City</Label>
+                      <AsyncSelect
+                        name="cityId"
+                        onChange={handleSelectChange}
+                        loadOptions={cityOptions}
+                        value={formDatas.cityId}
                         className={errors.cityId ? "is-invalid" : ""}
-                        >
-                           {data1x.map((item)=>{
-   
-                             return <option key={item.id} value={item.id}>{item.name}</option>
-                           })}
-                      </Input>
+                        isClearable
+                        isSearchable
+                      />
                       {errors.cityId && (
                         <FormText className="text-danger">{errors.cityId}</FormText>
                       )}
-                   </FormGroup>
-                 </Col>
+                    </FormGroup>
+                  </Col>
+
+                 
+                
                  <Col md="6" className=''>
                    <FormGroup>
                      <Label>GST No</Label>

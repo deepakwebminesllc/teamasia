@@ -49,6 +49,10 @@ const Dispatch = () => {
     navigate('/operations/dispatch/view',{state: {dispatchItem,data1,data2,data3,data4,data5}});
   }
 
+  const InvoiceView = (dispatchItem)=>{
+    navigate('/operations/invoices/print',{state: dispatchItem});
+  }
+
   const addressStyle = {
     width: '250px',
     maxWidth: '250px',
@@ -57,22 +61,19 @@ const Dispatch = () => {
     whiteSpace: 'nowrap'
   };
 
-  const addressNames = (orderId) => {
-    const orderValue = OrderWithCompleteData.find(order => order.id === orderId);
-    console.log('ordervalue 0',orderValue);
-    if (orderValue) {
-      const addressValue = dispatchAddresses.find(address => address.id === orderValue.delivery_address_id);
+  const addressNames = (orderAdressId) => {
+    
+  
+      const addressValue = dispatchAddresses.find(address => address.id === orderAdressId);
       return addressValue ? addressValue.address_line_1 : 'Address not found';
-    }
-    return 'Order not found';
   };
 
   const customerNames = (orderId) => {
     const orderValue = OrderWithCompleteData.find(order => order.id === orderId);
-    console.log('ordervalue',orderValue);
+    // console.log('ordervalue',orderValue);
     if (orderValue) {
       const customerValue = Customerdata.find(customer => customer.id === orderValue.customer_id);
-    console.log('ordervalue 2',customerValue);
+    // console.log('ordervalue 2',customerValue);
       return customerValue ? customerValue.company_name : 'customer not found';
     }
     return 'customer not found';
@@ -80,21 +81,30 @@ const Dispatch = () => {
 
   const deliveryDate = (orderId) => {
     const orderValue = OrderWithCompleteData.find(order => order.id === orderId);
-    console.log('ordervalue',orderValue);
+    // console.log('ordervalue',orderValue);
     if (orderValue) {
      
       return orderValue.expected_delivery_date
     }
     return 'customer not found';
   };
+
+  function formatDate(inputDate) {
+    const date = new Date(inputDate);
+  
+    // Use Intl.DateTimeFormat to format the date
+    const options = { day: 'numeric', month: 'short', year: 'numeric' };
+    return new Intl.DateTimeFormat('en-GB', options).format(date);
+
+  }
+
   
 const DispatchData = dispatch.map((dis)=>({
   ...dis,
-  address: addressNames(dis.order_id),
+  address: addressNames(dis.delivery_address_id),
   customerName:customerNames(dis.order_id),
   delivery:deliveryDate(dis.order_id),
-  
-}))
+}));
 
   useEffect(()=>{
     const fetchDispatch = async () => {
@@ -130,12 +140,13 @@ const DispatchData = dispatch.map((dis)=>({
       }
       const result = await response.json();
       // console.log("responsejson1",result.dispatch);
-      setDispatchAddresses(result.addresses);
+      setDispatchAddresses(result.addresses ? result.addresses:[]);
     };
+
     const fetchOrderWithCompleteData = async () => {
       const token = localStorage.getItem('userToken');
       // console.log('token',token);
-      const response = await fetch(`https://factory.teamasia.in/api/public/orders/?status_id=3`, {
+      const response = await fetch(`https://factory.teamasia.in/api/public/orders/?status_id=1`, {
         method: 'GET', 
         headers: {
           'Authorization': `Bearer ${token}`
@@ -149,6 +160,7 @@ const DispatchData = dispatch.map((dis)=>({
       // console.log("responsejson1",result.orders);
       setOrderWithCompleteData(result.orders);
     };
+
     const fetchCustomerData = async ()=>{
 
       const token = localStorage.getItem('userToken');
@@ -347,18 +359,18 @@ const DispatchData = dispatch.map((dis)=>({
               </tr>
               </thead>
               <tbody>
-                {DispatchData.map((dispatchItem,index) => (
+                {DispatchData.map((dispatchItem) => (
                     <tr key={dispatchItem.order_id}>
                       <td style={{fontWeight:900,paddingLeft:"40px"}}># {dispatchItem.order_id}</td>
                       <td style={addressStyle} title={dispatchItem.address}>{dispatchItem.address}</td>
-                      <td>TCINV/22-23/078{index}{dispatchItem.invoice}</td>
-                      <td>2{index} Jun, 2024{dispatchItem.invoiceDate}</td>
+                      <td>{dispatchItem.bill_no}</td>
+                      <td>{formatDate(dispatchItem.invoice_date)}</td>
                       <td>
                         {/* Replace with actual action components or icons */}
                         <button type="button" className="btn mybtncustomer btn-secondary btn-sm mr-2"><i className="bi bi-eye-fill my-eye-color" onClick={()=>dispatchView(dispatchItem)}/></button>
-                        {/* <button type="button" className="btn mybtncustomer btn-secondary btn-sm mr-2"> <i className="bi bi-bell-fill my-bell-color" /> </button>
-                        <button type="button" className="btn mybtncustomer btn-secondary btn-sm mr-2"><i className="bi bi-printer-fill my-printer-color" /></button>
-                        <button type="button" className="btn mybtncustomer btn-secondary btn-sm mr-2"><i className="bi bi-list my-list-color" /></button> */}
+                        {/* <button type="button" className="btn mybtncustomer btn-secondary btn-sm mr-2"> <i className="bi bi-bell-fill my-bell-color" /> </button> */}
+                        <button type="button" className="btn mybtncustomer btn-secondary btn-sm mr-2"><i className="bi bi-printer-fill my-printer-color" onClick={()=>InvoiceView(dispatchItem.invoice_id)} /></button>
+                        {/* <button type="button" className="btn mybtncustomer btn-secondary btn-sm mr-2"><i className="bi bi-list my-list-color" /></button> */}
                       </td>
                     </tr>
                   ))}

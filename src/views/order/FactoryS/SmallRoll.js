@@ -303,7 +303,7 @@ const handleSubmit = async (event) => {
                  <Col md="3" >
                    <FormGroup>
                      <Label>T1</Label>
-                     <Input type="text" 
+                     <Input type="number" 
                      name="t1" 
                      id="name"
                      placeholder="Enter" 
@@ -317,7 +317,7 @@ const handleSubmit = async (event) => {
                  <Col md="3" >
                    <FormGroup>
                      <Label>T2</Label>
-                     <Input type="text" 
+                     <Input type="number" 
                      name="t2" 
                      id="name"
                      placeholder="Enter" 
@@ -332,7 +332,7 @@ const handleSubmit = async (event) => {
                  <Col md="3" >
                    <FormGroup>
                      <Label>T3</Label>
-                     <Input type="text" 
+                     <Input type="number" 
                      name="t3" 
                      id="name"
                      placeholder="Enter" 

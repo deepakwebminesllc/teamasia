@@ -16,70 +16,54 @@ const JumbotronComponent = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [data, setData] = useState([]);
-  const [factoryProduct, setfactoryProduct] = useState([]);
-  const [embossesData, setEmbossesData] = useState([]);
+  const [data7, setData7] = useState([]);
+  const [data8, setData8] = useState([]);
+  const [data9, setData9] = useState([]);
 
-  const {data1,data2,data3,data4,data5} = location.state;
   const product = location.state.item;
 
-  function getGrainNameById(grainId) {
-    const Name = data1.find(item => item.id === grainId);
-    // console.log('a1',Name);
-    return Name ? Name.name : 'Unknown grain';
-  }
+  const {backSideProduct} = location.state;
 
-  function getFabricNameById(fabricId) {
-    const Name = data2.find(item => item.id === fabricId);
-    // console.log('a1',Name);
-    return Name ? Name.name : 'Unknown fabric';
-  }
-  function getFabricColorNameById(fabricId,fabricColorId) {
-    const Name = data2.find(item => item.id === fabricId);
-    let FabricColor = null;
-    if(Name){
-       FabricColor = Name.fabriccolors.find(item => item.id === fabricColorId);
-    }
-    // console.log('a1',Name);
-    return FabricColor ? FabricColor.name : 'Unknown fabricColor';
-  }
 
-  function getQualityNameById(qualityId) {
-    const Name = data3.find(item => item.id === qualityId);
-    // console.log('a1',Name);
-    return Name ? Name.name : 'Unknown quality';
-  }
-
-  function getColorNameById(colorId) {
-    const Name = data4.find(item => item.id === colorId);
-    // console.log('a1',Name);
-    return Name ?  Name.name : 'Unknown color';
-  }
-  function getEmbossesNameById(embossesIds) {
-    const Name = new Set();
-    console.log('embossesData',embossesData,embossesIds);
-    embossesIds.split(',')
-    .map((Embossitem) => {
-      const eV = embossesData.find(item => item.id === Embossitem.trim());
-      if(eV){
-        Name.add(eV.name);
+  const printing  = (productprints)=>{
+    console.log('productprints',productprints);
+    
+   const printArray =  productprints.map((item)=> {
+      let str = ''
+      const design = data7.find((d)=> d.id === item.design_id);
+      const shade = data8.find((s)=> s.id === item.shade_id);
+      
+      console.log('design,shade',design,shade)
+      if(design){
+        str += `${design.code}/${design.code}/`
       }
-     return null
-    });
-    console.log('eV',Name);
-    // console.log('a1',Name);
-        return Array.from(Name);
-}
-  function getHsnNameById(hsnId) {
-    // console.log('dataX',data5)
-    const Name = data5.find(item => item.id === hsnId);
-    // console.log('a1',Name);
-    return Name ?  Name.name : 'Unknown hsn';
+      if(shade){
+        str += shade.name
+      }
+      return str
+    }  
+)
+
+    return printArray.length > 0? printArray:[];
   }
+
+  const gradeName  = (gradeId)=>{
+
+    console.log('productprints',gradeId);
+
+      const grade = data9.find((d)=> d.id === gradeId);
+      
+      console.log('grade',grade)
+   
+      return grade?.name
+
+}
+
 
   console.log('product in view',product);
 
   const handleEditAdd = () => {
-    navigate('/order/factory-surplus/edit',{state:{item:product,data1,data2,data3,data4,data5}});
+    navigate('/order/factory-surplus/edit',{state:{product, backSideProduct}});
   };
 
   const handleSmallRollCreate = () => {
@@ -118,29 +102,6 @@ const JumbotronComponent = () => {
   };
 
   useEffect(() => {
-    const fetchFactorySurplusProductData = async () => {
-      const token = localStorage.getItem('userToken');
-      // console.log('token',token);
-      const response = await fetch(`https://factory.teamasia.in/api/public/products/pair/${product.id}`, {
-        method: 'GET', 
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      // console.log('result',response);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const result = await response.json();
-      console.log("responsejson1",result,factoryProduct);
-      
-      const pair = {
-        front: result.front_side,
-        back: result.back_side
-    };
-      setfactoryProduct([pair]); 
-    };
-
     const fetchData = async () => {
       const token = localStorage.getItem('userToken');
       // console.log('token',token);
@@ -159,26 +120,65 @@ const JumbotronComponent = () => {
       setData(result.smallrolls); 
     };
 
-    const fetchEmbossData = async () => {
+    const fetchData7 = async () => {
       const token = localStorage.getItem('userToken');
-      console.log('token',token);
-      const response = await fetch(`https://factory.teamasia.in/api/public/embosses/?is_trashed=0`, {
+      // console.log('token',token);
+      const response = await fetch('https://factory.teamasia.in/api/public/designs', {
         method: 'GET', 
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
-      console.log('result',response);
+      // console.log('result',response);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const result = await response.json();
-      setEmbossesData(result.embosses);
-      console.log(result.embosses);
+      const resultX = result.designs.slice();
+      // resultX.push({id:'x',design_id:'x',code:'Choose'});
+      setData7(resultX);
     };
 
-    fetchEmbossData();
-    fetchFactorySurplusProductData();
+    const fetchData8 = async () => {
+      const token = localStorage.getItem('userToken');
+      // console.log('token',token);
+      const response = await fetch('https://factory.teamasia.in/api/public/shades', {
+        method: 'GET', 
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      // console.log('result',response);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const result = await response.json();
+      const resultX = result.shades.slice();
+      // resultX.push({id:'x',shade_id:'x',name:'Choose'});
+      setData8(resultX);
+    };
+    const fetchData9 = async () => {
+      const token = localStorage.getItem('userToken');
+      // console.log('token',token);
+      const response = await fetch('https://factory.teamasia.in/api/public/grades', {
+        method: 'GET', 
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      // console.log('result',response);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const result = await response.json();
+      const resultX = result.grades.slice();
+      resultX.push({ id: 'x', name: 'Choose' });
+      setData9(resultX);
+    };
+
+    fetchData9();
+    fetchData8();
+    fetchData7();
     fetchData();
   },[]);
 
@@ -218,8 +218,7 @@ const JumbotronComponent = () => {
                 </Table>
                 
                  <div>
-                 {factoryProduct.map(({ front, back }) => (
-                      <div key={front.id} className='table-margin'>
+                      <div key={product.id} className='table-margin'>
                        
                         <div>
                           <Table className='table-margin-zero ' responsive size="sm">
@@ -246,24 +245,24 @@ const JumbotronComponent = () => {
                               </tr>
                             </thead>
                             <tbody>
-                              <tr>
-                                <td title={getGrainNameById(front.grain_id)}>{getGrainNameById(front.grain_id)}</td>
-                                <td title={getColorNameById(front.color_id)}>{getColorNameById(front.color_id)}</td>
-                                <td title={getQualityNameById(front.quality_id)}>{getQualityNameById(front.quality_id)}</td>
-                                <td title={front.thickness}>{front.thickness}</td>
-                                <td title={getFabricNameById(front.fabric_id)}>{getFabricNameById(front.fabric_id)}</td>
-                                <td title={getFabricColorNameById(front.fabric_id, front.fabric_color_id)}>{getFabricColorNameById(front.fabric_id, front.fabric_color_id)}</td>
-                                <td title={getHsnNameById(front.hsn_id)}>{getHsnNameById(front.hsn_id)}</td>
-                                <td title={front.price}>{front.price}</td>
-                                <td title={front.tax_rate}>{front.tax_rate}%</td>
-                                <td> {getEmbossesNameById(front.emboss_ids).map((item) => <div>{item}</div>)} </td>
-                                <td>N/A</td>
-                                <td>N/A</td>
-                                <td>N/A</td>
-                              </tr>
+                            <tr>
+                              <td title={product.grain_name}>{product.grain_name}</td>
+                              <td title={product.color_name}>{product.color_name}</td>
+                              <td title={product.quality_name}>{product.quality_name}</td>
+                              <td title={product.thickness}>{product.thickness}</td>
+                              <td title={product.fabric_name}>{product.fabric_name}</td>
+                              <td title={product.fabric_color_name}>{product.fabric_color_name}</td>
+                              <td title={product.hsn_name}>{product.hsn_name}</td>
+                              <td title={product.price}>{product.price}</td>
+                              <td title={product.tax_rate}>{product.tax_rate}%</td>
+                              <td title={product.emboss_name}>{product.emboss_name}</td>
+                              <td>{printing(product.productprints).map(item=> <div>{item}</div>)}</td>
+                              <td>N/A</td>
+                              <td>N/A</td>
+                            </tr>
                             </tbody>
                           </Table>
-                          {back && (
+                          {backSideProduct && (
                             <Table className='table-margin-zero ' responsive size="sm">
                               <thead>
                                 <tr>
@@ -289,17 +288,17 @@ const JumbotronComponent = () => {
                               </thead>
                               <tbody>
                                 <tr>
-                                  <td title={getGrainNameById(back.grain_id)}>{getGrainNameById(back.grain_id)}</td>
-                                  <td title={getColorNameById(back.color_id)}>{getColorNameById(back.color_id)}</td>
-                                  <td title={getQualityNameById(back.quality_id)}>{getQualityNameById(back.quality_id)}</td>
-                                  <td title={back.thickness}>{back.thickness}</td>
-                                  <td title={getFabricNameById(back.fabric_id)}>{getFabricNameById(back.fabric_id)}</td>
-                                  <td title={getFabricColorNameById(back.fabric_id, back.fabric_color_id)}>{getFabricColorNameById(back.fabric_id, back.fabric_color_id)}</td>
-                                  <td title={getHsnNameById(back.hsn_id)}>{getHsnNameById(back.hsn_id)}</td>
-                                  <td title={back.price}>{back.price}</td>
-                                  <td title={back.tax_rate}>{back.tax_rate}%</td>
-                                  <td >{getEmbossesNameById(back.emboss_ids).map((item) => <div>{item}</div>)}</td>
-                                  <td>N/A</td>
+                                  <td title={backSideProduct.grain_name}>{backSideProduct.grain_name}</td>
+                                  <td title={backSideProduct.color_name}>{backSideProduct.color_name}</td>
+                                  <td title={backSideProduct.quality_name}>{backSideProduct.quality_name}</td>
+                                  <td title={backSideProduct.thickness}>{backSideProduct.thickness}</td>
+                                  <td title={backSideProduct.fabric_name}>{backSideProduct.fabric_name}</td>
+                                  <td title={backSideProduct.fabric_color_name}>{backSideProduct.fabric_color_name}</td>
+                                  <td title={backSideProduct.hsn_name}>{backSideProduct.hsn_name}</td>
+                                  <td title={backSideProduct.price}>{backSideProduct.price}</td>
+                                  <td title={backSideProduct.tax_rate}>{backSideProduct.tax_rate}%</td>
+                                  <td title={backSideProduct.emboss_name}>{backSideProduct.emboss_name}</td>
+                                  <td>{printing(backSideProduct.productprints).map(item=> <div>{item}</div>)}</td>
                                   <td>N/A</td>
                                   <td>N/A</td>
                                 </tr>
@@ -308,16 +307,16 @@ const JumbotronComponent = () => {
                           )}
                         </div>
                       </div>
-                    ))}
+
                  </div>
                </div>
               {/* repeat end */}
              </ComponentCard4>
          
-            
-              <ComponentCard4 title="">  
+            {data?.length !== 0 ? <ComponentCard4 title="">  
                       <Table responsive size="sm">
                         <thead>
+                          
                           <tr>
                             <th scope="col">S. No.</th>
                             <th scope="col">Quantity</th>
@@ -338,7 +337,7 @@ const JumbotronComponent = () => {
                                       <tr key={roll.id}>
                                           <td>{index}</td>
                                           <td>{roll.quantity}</td>
-                                          <td>{roll.grade_id}</td>
+                                          <td>{gradeName(roll.grade_id)}</td>
                                           <td>{roll.weight}</td>
                                           <td>{roll.bin}</td>
                                           <td>{((roll.weight * 1000) / (roll.quantity * roll.width)).toFixed(2)}</td>
@@ -356,7 +355,8 @@ const JumbotronComponent = () => {
                             }
                         </tbody>
                       </Table>
-              </ComponentCard4>
+              </ComponentCard4>: ''}
+              
            
         
       </ComponentCard1>

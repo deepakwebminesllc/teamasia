@@ -9,11 +9,8 @@ import ComponentCard from '../../../components/ComponentCard';
 const FactorySurplus = () => {
   const navigate = useNavigate();
   const [data, setData] = useState([]);
-  const [data1, setData1] = useState([]);
-  const [data2, setData2] = useState([]);
-  const [data3, setData3] = useState([]);
-  const [data4, setData4] = useState([]);
-  const [data5, setData5] = useState([]);
+  const [ProductsAll, setAllProducts] = useState([]);
+
   const tableStyle = {
     // margin: 'auto', 
     // width: '60%',  
@@ -21,17 +18,28 @@ const FactorySurplus = () => {
   };
 
   const handleEditClick = (item) => {
+    console.log('item',item,ProductsAll);
 
-    navigate('/order/factory-surplus/edit', { state: { item,data1,data2,data3,data4,data5} });
+    const backSideProduct = ProductsAll.find((prod)=> prod.ref_product_id === item.id);
+
+    console.log('backSideProduct',backSideProduct);
+
+    navigate('/order/factory-surplus/edit', { state: { product : item, backSideProduct }});
   };
+
   const handleView = (item) => {
 
-    navigate('/order/factory-surplus/view',{state: { item,data1,data2,data3,data4,data5}});
+    console.log('item',item,ProductsAll);
+
+    const backSideProduct = ProductsAll.find((prod)=> prod.ref_product_id === item.id);
+
+    console.log('backSideProduct',backSideProduct);
+    navigate('/order/factory-surplus/view',{state: { item, backSideProduct }});
   };
   
   const handleEditAdd = () => {
 
-    navigate('/order/factory-surplus/add',{state: { data1,data2,data3,data4,data5}});
+    navigate('/order/factory-surplus/add');
   };
   
   const handleDeleteClick = async (itemId) => {
@@ -61,57 +69,11 @@ const FactorySurplus = () => {
     }
   };
 
-  function getGrainNameById(grainId) {
-    const Name = data1.find(item => item.id === grainId);
-    // console.log('a1',Name);
-    return Name ? Name.name : 'Unknown grain';
-  }
 
-  function getFabricNameById(fabricId) {
-    const Name = data2.find(item => item.id === fabricId);
-    // console.log('a1',Name);
-    return Name ? Name.name : 'Unknown fabric';
-  }
 
-  function getFabricColorNameById(fabricId,fabricColorId) {
-    const Name = data2.find(item => item.id === fabricId);
-    let FabricColor = null;
-    if(Name){
-       FabricColor = Name.fabriccolors.find(item => item.id === fabricColorId);
-    }
-    // console.log('a1',Name);
-    return FabricColor ? FabricColor.name : 'Unknown fabricColor';
-  }
-
-  function getQualityNameById(qualityId) {
-    const Name = data3.find(item => item.id === qualityId);
-    // console.log('a1',Name);
-    return Name ? Name.name : 'Unknown quality';
-  }
-
-  function getColorNameById(colorId) {
-    const Name = data4.find(item => item.id === colorId);
-    // console.log('a1',Name);
-    return Name ?  Name.name : 'Unknown color';
-  }
-
-  function getHsnNameById(hsnId) {
-    // console.log('hi',data5)
-    const Name = data5.find(item => item.id === hsnId);
-    // console.log('a14',Name);
-    return Name ?  Name.name : 'Unknown hsn';
-  }
 
   
-  const productwithNames = data.map(product => ({
-    ...product,
-    grainName: getGrainNameById(product.grain_id),
-    fabricName: getFabricNameById(product.fabric_id),
-    fabricColorName: getFabricColorNameById(product.fabric_id,product.fabric_color_id),
-    qualityName: getQualityNameById(product.quality_id),
-    colorName: getColorNameById(product.color_id),
-    hsnName: getHsnNameById(product.hsn_id)
-  }));
+
 
 
   useEffect(() => {
@@ -133,107 +95,11 @@ const FactorySurplus = () => {
       const result = await response.json();
       console.log("responsejson",result);
       const resultFiltered = result.products.filter(product => product.ref_product_id === '0');
+      setAllProducts(result.products);
       setData(resultFiltered);
     };
 
-    const fetchData1 = async () => {
-      const token = localStorage.getItem('userToken');
-      // console.log('token',token);
-      const response = await fetch('https://factory.teamasia.in/api/public/grains', {
-        method: 'GET', 
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      // console.log('result',response);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const result = await response.json();
-      // console.log("responsejson1",result);
-      const resultX = result.grains.slice();
-      resultX.push({id:'x',name:'Choose'});
-      setData1(resultX); 
-    };
-    const fetchData2 = async () => {
-      const token = localStorage.getItem('userToken');
-      // console.log('token',token);
-      const response = await fetch('https://factory.teamasia.in/api/public/fabrics', {
-        method: 'GET', 
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      // console.log('result',response);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const result = await response.json();
-      // console.log("responsejson2",result);
-      const resultX = result.fabrics.slice();
-      resultX.push({id:'x',name:'Choose'});
-      setData2(resultX);
-    };
-    const fetchData3 = async () => {
-      const token = localStorage.getItem('userToken');
-      // console.log('token',token);
-      const response = await fetch('https://factory.teamasia.in/api/public/qualities', {
-        method: 'GET', 
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      // console.log('result',response);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const result = await response.json();
-      // console.log("responsejson3",result);
-      const resultX = result.qualities.slice();
-      resultX.push({id:'x',name:'Choose'});
-      setData3(resultX);
-    };
-    const fetchData4 = async () => {
-      const token = localStorage.getItem('userToken');
-      // console.log('token',token);
-      const response = await fetch('https://factory.teamasia.in/api/public/colors', {
-        method: 'GET', 
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      // console.log('result',response);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const result = await response.json();
-      const resultX = result.colors.slice();
-      resultX.push({id:'x',name:'Choose'});
-      setData4(resultX);
-    };
-    const fetchData5 = async () => {
-      const token = localStorage.getItem('userToken');
-      // console.log('token',token);
-      const response = await fetch('https://factory.teamasia.in/api/public/hsns', {
-        method: 'GET', 
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      // console.log('result',response);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const result = await response.json();
-      const resultX = result.hsns.slice();
-      resultX.push({id:'x',name:'Choose'});
-      setData5(resultX);
-    };
-    fetchData5();
-    fetchData4();
-    fetchData3();
-    fetchData2();
-    fetchData1();
+
     fetchData();
 
   
@@ -263,12 +129,12 @@ const FactorySurplus = () => {
           </tr>
               </thead>
               <tbody>
-                {productwithNames.map((product) => (
+                {data.map((product) => (
                   <tr key={product.id}>
-                  <td>{product.grainName}</td>
-                  <td>{product.fabricName}</td>
-                  <td>{product.qualityName}</td>
-                  <td>{product.colorName}</td>
+                   <td>{product.grain_name}</td>
+                  <td>{product.fabric_name}</td>
+                  <td>{product.quality_name}</td>
+                  <td>{product.color_name}</td>
                   <td>{product.quantity}</td>
                   <td>
                     {/* Action buttons or icons */}

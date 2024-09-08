@@ -85,8 +85,12 @@ const Countries = () => {
       }
       const result = await response.json();
       console.log("responsejson in country",result);
+      if(result.countries){
+        result.countries.sort((a, b) => {
+           return a.name.localeCompare(b.name, undefined, { sensitivity: 'base' });
+        });
+      }
       setData(result.countries);
-      
     };
   
     fetchData();

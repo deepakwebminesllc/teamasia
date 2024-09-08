@@ -28,6 +28,7 @@ const JumbotronComponent = () => {
     setCollapse(newArray);
   }
   const handleEditcustomer = () => {
+    console.log('customer edit in customer view',location.state);
     navigate('/order/customers/edit',{state:location.state});
   };
 

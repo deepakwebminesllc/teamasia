@@ -22,7 +22,7 @@ const JumbotronComponent = () => {
   const [activeTab, setActiveTab] = useState('1');
   const navigate = useNavigate();
   const location = useLocation();
-  const {Customerdata,data1,data2,data3,data4,data5,data6} = location.state
+  const {Customerdata,data6} = location.state
   const { date: planDate } = location.state.item
   const [modal, setModal] = useState(false);
   const [modal1, setModal1] = useState(false);
@@ -41,7 +41,7 @@ const JumbotronComponent = () => {
   };
 
 
- console.log('data.....',location.state.item,location,data1,data2,data3,data4,data5);
+ console.log('data.....',location.state.item,location);
 
  function formatDate(inputDate) {
   const date = new Date(inputDate);
@@ -64,7 +64,7 @@ const JumbotronComponent = () => {
   setModal1(!modal1);
 }
  const setterJumboDataFromPlan = (product)=>{
-  console.log('productxxxxxxxxxxxxxx',product)
+  // console.log('productxxxxxxxxxxxxxx',product)
   setJumboDataFromPlan(product);
   addRollTogglefunction();
 }
@@ -81,7 +81,7 @@ const handleCreateJumboRoll = () => {
 };
 
 const setterJumboUpdateDataFromPlan = (product)=>{
-  console.log('product',product);
+  // console.log('product',product);
   setJumboUpdateDataFromPlan(product);
   updateRollTogglefunction();
 }
@@ -119,7 +119,7 @@ useEffect(()=>{
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     const result = await response.json();
-    console.log("responsejson1",result);
+    // console.log("responsejson1",result);
     const resultX = result.qapateams.slice();
     resultX.push({id:'x',name:'Choose'});
     setQaData(resultX); 
@@ -138,7 +138,7 @@ useEffect(()=>{
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     const result = await response.json();
-    console.log("responsejson1 producton",result);
+    // console.log("responsejson1 producton",result);
     const plans = result.production_plan;
 
     const line1Data = plans.filter(plan => plan.line_id === '1');
@@ -158,23 +158,6 @@ useEffect(()=>{
   fetchQaData();
 },[]);
   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 console.log(line1,line2,line3,line4);
   return (
     <>
@@ -184,7 +167,7 @@ console.log(line1,line2,line3,line4);
 
        {modal1 && <CreateJumboRoll handleCreateJumboRoll ={handleCreateJumboRoll} modal={modal1} JumboDataFromPlan={JumboDataFromPlan} setModal1={setModal1} toggle={addRollTogglefunction} data2={QaData} data6={data6} />}
       {modal2 && <UpdateJumboRoll modal={modal2} JumboUpdateDataFromPlan={JumboUpdateDataFromPlan} setModal1={setModal2} toggle={updateRollTogglefunction} data2={QaData} data6={data6} />}
-      {modal && <PasteConsumption modal={modal} toggle={addPasteConsumption} JumboDataFromPlan={JumboUpdateDataFromPlan} data2={QaData} data3={data3} data4={data4} data6={data6} />}
+      {modal && <PasteConsumption modal={modal} toggle={addPasteConsumption} JumboDataFromPlan={JumboUpdateDataFromPlan} data2={QaData} data3={[]} data4={[]} data6={data6} />}
       
       <ComponentCard title="">
         <Nav tabs>
@@ -241,7 +224,12 @@ console.log(line1,line2,line3,line4);
                   </tr>
                 </thead>
             </Table>
-            {line1.map((product)=>{
+            {line1?.length <1 ? <div className="my-btn-color-temp"  style={{background: 'aliceblue',textAlign:'center',border: '2px solid black',color:'black',marginBottom:'2px',padding:'40px'}}>
+                    <div>
+                      <i className="bi bi-emoji-frown" style={{fontSize:'25px',color:'black'}}/>
+                    </div>
+                    No item on this production line.
+               </div>:line1.map((product)=>{
                 return <React.Fragment key={product.id}>
                 
             
@@ -252,8 +240,13 @@ console.log(line1,line2,line3,line4);
                   <thead>
                     <tr>
                       <th scope="col">
-                        <div>{CustomerName(product.customer_id)}  Product({product.product_id})</div>
-                        <div>Delivery Date :{ formatDate(product.created_at)} Total : 200 m | Remaining : 30.00 m</div>
+                        <div>{CustomerName(product.customer_id)}  
+                          <button type="button" style={{background:'rgb(28 81 28)',color:'white',borderRadius:'7px'}}>Product({product.product_id})</button>
+                            {(product?.product_details.is_online_product !== '0' || product?.product_details.ref_product_id !== '0') && <button type='button' style={{padding:'1px',background: '#B33C12',borderRadius:'5px',marginLeft:'5px',marginRight:'20px',color:'white'}}>online product</button>}
+                            {product?.product_details.is_online_product !== '0' && product?.product_details.ref_product_id === '0' && <button type='button' style={{padding:'1px',background: '#B33C12',borderRadius:'5px',marginLeft:'5px',marginRight:'20px',color:'white'}}>front side</button>}
+                            {product?.product_details.is_online_product === '0' && product?.product_details.ref_product_id !== '0' && <button type='button' style={{padding:'1px',background: '#B33C12',borderRadius:'5px',marginLeft:'5px',marginRight:'20px',color:'white'}}>back side</button>}
+                        </div>
+                        <div>Delivery Date :{ formatDate(product.created_at)}, Total : {product.quantity} | Total : API missing | Remaining : API missing </div>
                         </th>
                       <th scope="col"><Button className='my-btn-color' onClick={()=>setterJumboDataFromPlan(product)}>Create Jumbo Roll</Button></th>
                       <th scope="col"><Button className='my-btn-color-red' onClick={()=>setterPasteDataFromPlan(product)}>Paste Consumption</Button></th>
@@ -266,7 +259,7 @@ console.log(line1,line2,line3,line4);
                   
                 </Table>
 
-                <PlanViewProduct productID ={product.product_id} data1={data1} data2={data2} data3={data3} data4={data4} data5={data5}/>
+                <PlanViewProduct productID ={product.product_id}/>
               
                 
                 <Table responsive size="sm">
@@ -286,7 +279,7 @@ console.log(line1,line2,line3,line4);
                   <tbody>
                     <tr>
                       <td>{product.pre_skin}</td>
-                      <td>{product.skin}gsm</td>
+                      <td>{product.skin} gsm</td>
                       <td>{product.top_coat}</td>
                       <td>{product.filler_in_top_coat}</td>
                       <td>{product.foam} gsm</td>
@@ -300,9 +293,7 @@ console.log(line1,line2,line3,line4);
                 </Table>
                   {activeTab === '1' &&  <PlanViewJumbo Refreshkey={refreshKey} product={product} updateRollTogglefunction={setterJumboUpdateDataFromPlan}/>}
                </div>
-                
                
-
              </ComponentCard4>
              </React.Fragment>
               })
@@ -318,9 +309,15 @@ console.log(line1,line2,line3,line4);
                   </thead>
                   
                 </Table>
-          {
-              line2.map((product)=>{
+                {line2?.length <1 ? <div className="my-btn-color-temp"  style={{background: 'aliceblue',textAlign:'center',border: '2px solid black',color:'black',marginBottom:'2px',padding:'40px'}}>
+                    <div>
+                      <i className="bi bi-emoji-frown" style={{fontSize:'25px',color:'black'}}/>
+                    </div>
+                    No item on this production line.
+               </div>:line2.map((product)=>{
                 return <React.Fragment key={product.id}>
+                
+            
             <ComponentCard4>
 
               <div className='table-margin'>
@@ -328,8 +325,13 @@ console.log(line1,line2,line3,line4);
                   <thead>
                     <tr>
                       <th scope="col">
-                        <div>{CustomerName(product.customer_id)}  Product({product.product_id})</div>
-                        <div>Delivery Date :{ formatDate(product.created_at)} Total : 200 m | Remaining : 30.00 m</div>
+                        <div>{CustomerName(product.customer_id)}  
+                          <button type="button" style={{background:'rgb(28 81 28)',color:'white',borderRadius:'7px'}}>Product({product.product_id})</button>
+                            {(product?.product_details.is_online_product !== '0' || product?.product_details.ref_product_id !== '0') && <button type='button' style={{padding:'1px',background: '#B33C12',borderRadius:'5px',marginLeft:'5px',marginRight:'20px',color:'white'}}>online product</button>}
+                            {product?.product_details.is_online_product !== '0' && product?.product_details.ref_product_id === '0' && <button type='button' style={{padding:'1px',background: '#B33C12',borderRadius:'5px',marginLeft:'5px',marginRight:'20px',color:'white'}}>front side</button>}
+                            {product?.product_details.is_online_product === '0' && product?.product_details.ref_product_id !== '0' && <button type='button' style={{padding:'1px',background: '#B33C12',borderRadius:'5px',marginLeft:'5px',marginRight:'20px',color:'white'}}>back side</button>}
+                        </div>
+                        <div>Delivery Date :{ formatDate(product.created_at)}, Total : {product.quantity} | Total : API missing | Remaining : API missing </div>
                         </th>
                       <th scope="col"><Button className='my-btn-color' onClick={()=>setterJumboDataFromPlan(product)}>Create Jumbo Roll</Button></th>
                       <th scope="col"><Button className='my-btn-color-red' onClick={()=>setterPasteDataFromPlan(product)}>Paste Consumption</Button></th>
@@ -342,7 +344,7 @@ console.log(line1,line2,line3,line4);
                   
                 </Table>
 
-                <PlanViewProduct productID ={product.product_id} data1={data1} data2={data2} data3={data3} data4={data4} data5={data5}/>
+                <PlanViewProduct productID ={product.product_id}/>
               
                 
                 <Table responsive size="sm">
@@ -362,7 +364,7 @@ console.log(line1,line2,line3,line4);
                   <tbody>
                     <tr>
                       <td>{product.pre_skin}</td>
-                      <td>{product.skin}gsm</td>
+                      <td>{product.skin} gsm</td>
                       <td>{product.top_coat}</td>
                       <td>{product.filler_in_top_coat}</td>
                       <td>{product.foam} gsm</td>
@@ -376,9 +378,7 @@ console.log(line1,line2,line3,line4);
                 </Table>
                   {activeTab === '2' &&  <PlanViewJumbo Refreshkey={refreshKey} product={product} updateRollTogglefunction={setterJumboUpdateDataFromPlan}/>}
                </div>
-                
                
-
              </ComponentCard4>
              </React.Fragment>
               })
@@ -394,9 +394,15 @@ console.log(line1,line2,line3,line4);
                   </thead>
                   
                 </Table>
-          {
-              line3.map((product)=>{
+                {line3?.length <1 ? <div className="my-btn-color-temp"  style={{background: 'aliceblue',textAlign:'center',border: '2px solid black',color:'black',marginBottom:'2px',padding:'40px'}}>
+                    <div>
+                      <i className="bi bi-emoji-frown" style={{fontSize:'25px',color:'black'}}/>
+                    </div>
+                    No item on this production line.
+               </div>:line3.map((product)=>{
                 return <React.Fragment key={product.id}>
+                
+            
             <ComponentCard4>
 
               <div className='table-margin'>
@@ -404,8 +410,13 @@ console.log(line1,line2,line3,line4);
                   <thead>
                     <tr>
                       <th scope="col">
-                        <div>{CustomerName(product.customer_id)}  Product({product.product_id})</div>
-                        <div>Delivery Date :{ formatDate(product.created_at)} Total : 200 m | Remaining : 30.00 m</div>
+                        <div>{CustomerName(product.customer_id)}  
+                          <button type="button" style={{background:'rgb(28 81 28)',color:'white',borderRadius:'7px'}}>Product({product.product_id})</button>
+                            {(product?.product_details.is_online_product !== '0' || product?.product_details.ref_product_id !== '0') && <button type='button' style={{padding:'1px',background: '#B33C12',borderRadius:'5px',marginLeft:'5px',marginRight:'20px',color:'white'}}>online product</button>}
+                            {product?.product_details.is_online_product !== '0' && product?.product_details.ref_product_id === '0' && <button type='button' style={{padding:'1px',background: '#B33C12',borderRadius:'5px',marginLeft:'5px',marginRight:'20px',color:'white'}}>front side</button>}
+                            {product?.product_details.is_online_product === '0' && product?.product_details.ref_product_id !== '0' && <button type='button' style={{padding:'1px',background: '#B33C12',borderRadius:'5px',marginLeft:'5px',marginRight:'20px',color:'white'}}>back side</button>}
+                        </div>
+                        <div>Delivery Date :{ formatDate(product.created_at)}, Total : {product.quantity} | Total : API missing | Remaining : API missing </div>
                         </th>
                       <th scope="col"><Button className='my-btn-color' onClick={()=>setterJumboDataFromPlan(product)}>Create Jumbo Roll</Button></th>
                       <th scope="col"><Button className='my-btn-color-red' onClick={()=>setterPasteDataFromPlan(product)}>Paste Consumption</Button></th>
@@ -418,7 +429,7 @@ console.log(line1,line2,line3,line4);
                   
                 </Table>
 
-                <PlanViewProduct productID ={product.product_id} data1={data1} data2={data2} data3={data3} data4={data4} data5={data5}/>
+                <PlanViewProduct productID ={product.product_id}/>
               
                 
                 <Table responsive size="sm">
@@ -438,7 +449,7 @@ console.log(line1,line2,line3,line4);
                   <tbody>
                     <tr>
                       <td>{product.pre_skin}</td>
-                      <td>{product.skin}gsm</td>
+                      <td>{product.skin} gsm</td>
                       <td>{product.top_coat}</td>
                       <td>{product.filler_in_top_coat}</td>
                       <td>{product.foam} gsm</td>
@@ -452,9 +463,7 @@ console.log(line1,line2,line3,line4);
                 </Table>
                   {activeTab === '3' &&  <PlanViewJumbo Refreshkey={refreshKey} product={product} updateRollTogglefunction={setterJumboUpdateDataFromPlan}/>}
                </div>
-                
                
-
              </ComponentCard4>
              </React.Fragment>
               })
@@ -470,9 +479,15 @@ console.log(line1,line2,line3,line4);
                   </thead>
                   
                 </Table>
-          {
-              line4.map((product)=>{
+                {line4?.length <1 ? <div className="my-btn-color-temp"  style={{background: 'aliceblue',textAlign:'center',border: '2px solid black',color:'black',marginBottom:'2px',padding:'40px'}}>
+                    <div>
+                      <i className="bi bi-emoji-frown" style={{fontSize:'25px',color:'black'}}/>
+                    </div>
+                    No item on this production line.
+               </div>:line4.map((product)=>{
                 return <React.Fragment key={product.id}>
+                
+            
             <ComponentCard4>
 
               <div className='table-margin'>
@@ -480,8 +495,13 @@ console.log(line1,line2,line3,line4);
                   <thead>
                     <tr>
                       <th scope="col">
-                        <div>{CustomerName(product.customer_id)}  Product({product.product_id})</div>
-                        <div>Delivery Date :{ formatDate(product.created_at)} Total : 200 m | Remaining : 30.00 m</div>
+                        <div>{CustomerName(product.customer_id)}  
+                          <button type="button" style={{background:'rgb(28 81 28)',color:'white',borderRadius:'7px'}}>Product({product.product_id})</button>
+                            {(product?.product_details.is_online_product !== '0' || product?.product_details.ref_product_id !== '0') && <button type='button' style={{padding:'1px',background: '#B33C12',borderRadius:'5px',marginLeft:'5px',marginRight:'20px',color:'white'}}>online product</button>}
+                            {product?.product_details.is_online_product !== '0' && product?.product_details.ref_product_id === '0' && <button type='button' style={{padding:'1px',background: '#B33C12',borderRadius:'5px',marginLeft:'5px',marginRight:'20px',color:'white'}}>front side</button>}
+                            {product?.product_details.is_online_product === '0' && product?.product_details.ref_product_id !== '0' && <button type='button' style={{padding:'1px',background: '#B33C12',borderRadius:'5px',marginLeft:'5px',marginRight:'20px',color:'white'}}>back side</button>}
+                        </div>
+                        <div>Delivery Date :{ formatDate(product.created_at)}, Total : {product.quantity} | Total : API missing | Remaining : API missing </div>
                         </th>
                       <th scope="col"><Button className='my-btn-color' onClick={()=>setterJumboDataFromPlan(product)}>Create Jumbo Roll</Button></th>
                       <th scope="col"><Button className='my-btn-color-red' onClick={()=>setterPasteDataFromPlan(product)}>Paste Consumption</Button></th>
@@ -494,7 +514,7 @@ console.log(line1,line2,line3,line4);
                   
                 </Table>
 
-                <PlanViewProduct productID ={product.product_id} data1={data1} data2={data2} data3={data3} data4={data4} data5={data5}/>
+                <PlanViewProduct productID ={product.product_id}/>
               
                 
                 <Table responsive size="sm">
@@ -514,7 +534,7 @@ console.log(line1,line2,line3,line4);
                   <tbody>
                     <tr>
                       <td>{product.pre_skin}</td>
-                      <td>{product.skin}gsm</td>
+                      <td>{product.skin} gsm</td>
                       <td>{product.top_coat}</td>
                       <td>{product.filler_in_top_coat}</td>
                       <td>{product.foam} gsm</td>
@@ -526,11 +546,9 @@ console.log(line1,line2,line3,line4);
                   
                   </tbody>
                 </Table>
-                  {activeTab === '4' &&  <PlanViewJumbo Refreshkey={refreshKey} product={product} updateRollTogglefunction={setterJumboUpdateDataFromPlan}/>}
+                  {activeTab === '1' &&  <PlanViewJumbo Refreshkey={refreshKey} product={product} updateRollTogglefunction={setterJumboUpdateDataFromPlan}/>}
                </div>
-                
                
-
              </ComponentCard4>
              </React.Fragment>
               })

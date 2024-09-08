@@ -5,7 +5,7 @@ import {
   Table,
   Col,
 } from 'reactstrap';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate} from 'react-router-dom';
 import Barcode from 'react-barcode';
 import ComponentCard1 from '../../../components/ComponentCard1';
 import ComponentCard4 from '../../../components/ComponentCard4';
@@ -15,18 +15,23 @@ import 'react-table-v6/react-table.css';
 import  AddressBlock from "./AddressBlock";
 
 const JumbotronComponent = () => {
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
   const location = useLocation();
   const [data, setData] = useState([]);
   const product = location.state;
   const dispatchData = product.dispatchItem;
-  const deliveryAddressId = 1;
 
   console.log('dispatchData',dispatchData);
 
   // const handleSmallRollEdit = (rollItem) => {
   //   navigate('/order/factory-surplus/small-roll-edit', {state: rollItem});
   // };
+
+
+  const InvoiceView = (dispatchItem)=>{
+    console.log('hi',dispatchItem);
+    navigate('/operations/invoices/print',{state: dispatchItem});
+  }
 
   function formatDate(inputDate) {
     const date = new Date(inputDate);
@@ -66,11 +71,10 @@ const JumbotronComponent = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-
       try{
         const token = localStorage.getItem('userToken');
         // console.log('token',token);
-        const response = await fetch(`https://factory.teamasia.in/api/public/smallrolls/?order_id=${dispatchData.order_id}`, {
+        const response = await fetch(`https://factory.teamasia.in/api/public/smallrolls/?small_roll_ids=${dispatchData.small_roll_ids}`, {
           method: 'GET', 
           headers: {
             'Authorization': `Bearer ${token}`
@@ -84,11 +88,11 @@ const JumbotronComponent = () => {
         console.log("responsejson1 small rolls",result.smallrolls);
         
         if(result && result.smallrolls.length !== 0){
-          const SmallRollIDs = dispatchData.small_roll_ids.split(',');
-              const smallRolls = result.smallrolls.filter((smallRoll) => {
-                return SmallRollIDs.includes(smallRoll.id.toString())
-              })
-              setData(smallRolls); 
+          // const SmallRollIDs = dispatchData.small_roll_ids.split(',');
+          //     const smallRolls = result.smallrolls.filter((smallRoll) => {
+          //       return SmallRollIDs.includes(smallRoll.id.toString())
+          //     })
+              setData(result.smallrolls); 
       };
       }catch(error){
        console.log('error',error);
@@ -108,7 +112,7 @@ const JumbotronComponent = () => {
                     </Col>
                     <Col md="7" style={{padding:'5px 0px'}}>
                       <Button  className="btn mybtncustomer btn-secondary" outline color="danger"><i className="bi bi-printer-fill" style={{fontSize:'20px',marginRight:'1px'}}/>Package List </Button>
-                      <Button  className="btn mybtncustomer btn-secondary" outline color="success"><i className="bi bi-printer-fill" style={{fontSize:'20px',marginRight:'1px'}}/>Invoice </Button>
+                      <Button  className="btn mybtncustomer btn-secondary" outline onClick={()=>InvoiceView(dispatchData.invoice_id)}  color="success"><i className="bi bi-printer-fill" style={{fontSize:'20px',marginRight:'1px'}}/>Invoice </Button>
                       <Button  className="btn mybtncustomer btn-secondary" outline color="danger">Send On <i className="bi bi-envelope" style={{fontSize:'20px',marginRight:'1px'}}/></Button>
                       <Button  className="btn mybtncustomer btn-secondary" outline color="success">Send On <i className="bi bi-whatsapp" style={{fontSize:'20px',marginRight:'1px'}}/></Button>
                       <button type='button' className="btn mybtncustomer my-btn-color mr-1"> Show History</button>
@@ -117,7 +121,7 @@ const JumbotronComponent = () => {
             <Row>
               <Col md="6">
                 <div style={{padding:'10px'}}><i className="bi-geo-alt my-list-color" style={{fontSize:'19px',marginRight:'5px'}}/><span style={{fontWeight:'500'}}>Dispatched To</span></div>
-                <AddressBlock addressId={deliveryAddressId}/>
+                <AddressBlock addressId={dispatchData.delivery_address_id}/>
               </Col>
               <Col md="6">
                 <div style={{padding:'10px'}}><i className="bi bi-truck my-list-color" style={{fontSize:'19px',marginRight:'5px'}}/><span style={{fontWeight:'500'}}>Transportation Details</span></div>
@@ -147,7 +151,6 @@ const JumbotronComponent = () => {
                             <th>Code</th>
                             {/* <th scope="col">Action</th> */}
                             <th>Comment</th>
-                          
                           </tr>
                         </thead>
                         <tbody>
@@ -160,8 +163,8 @@ const JumbotronComponent = () => {
                                           <td>{roll.grade_id}</td>
                                           <td>{roll.weight}</td>
                                           <td>{roll.bin}</td>
-                                          <td>{roll.quantity}</td>
-                                          <td><Barcode value={`JUMBO${roll.id}`} height={20} /></td>
+                                          <td>{((roll.weight * 1000) / (roll.quantity * roll.width)).toFixed(2)}</td>
+                                          <td><Barcode value={`SMALL${roll.id}`} height={20} /></td>
                                           {/* <td>
                                             <td ><Button ><i className="bi bi-printer-fill my-pen-color" /></Button></td>
                                             <td ><Button ><i className="bi bi-pencil-fill my-eye-color" onClick={()=>handleSmallRollEdit(roll)} /></Button></td>

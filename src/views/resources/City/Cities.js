@@ -106,6 +106,11 @@ const Cities = () => {
       }
       const result = await response.json();
       console.log("responsejson",result);
+      if(result.cities){
+        result.cities.sort((a, b) => {
+           return a.name.localeCompare(b.name, undefined, { sensitivity: 'base' });
+        });
+      }
       setData(result.cities); 
     };
 
@@ -124,7 +129,12 @@ const Cities = () => {
       }
       const result = await response.json();
       console.log("responsejson2",result);
-      setData2(result.countries); 
+
+      const resultX = result.countries.slice();
+      console.log('resultX',resultX);
+      resultX.push({id:'',name:'choose'})
+      console.log('resultX',resultX);
+      setData2(resultX);
     };
     const fetchData3 = async () => {
       const token = localStorage.getItem('userToken');

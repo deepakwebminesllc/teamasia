@@ -4,6 +4,7 @@ import {
   Card,
   CardBody,
   CardTitle,
+  Table,
   Row,
   Col,
   Form,
@@ -19,31 +20,55 @@ import { useLocation,useNavigate  } from 'react-router-dom';
 
 // import ComponentCard from '../../components/ComponentCard';
 
-const Add = () => {
+const Edit = () => {
   const location = useLocation();
   const navigate= useNavigate();
-  const customerId = location.state || {}; // Default to an empty object if state is undefined
+  const id = location.state || {}; // Default to an empty object if state is undefined
   // const [data, setData] = useState([]);
   const [data1, setData1] = useState([]);
   const [data1x, setData1x] = useState([]);
   const [data2, setData2] = useState([]);
+  const [data2x, setData2x] = useState([]);
   const [data3, setData3] = useState([]);
   const [data3x, setData3x] = useState([]);
   const [data4, setData4] = useState([]);
-  const [items, setItems] = useState([]);
+  const [errorMessageFromApi, setErrorMessageFromApi] = useState('');
   const [errors, setErrors] = useState({});
 
- console.log("items",items,location.state);
+ console.log("location.state in factory",id,location.state);
  const [formDatas, setFormDataS] = useState({
-       customerId,
-       vendorId:'',
-       addressTypeId:'x',
-       countryId:'x',
-       stateId:'x',
-       cityId:'x',
-      items:[]
- });
+  customerId:'0',
+  factoryId:id,
+  vendorId:'0',
+  addressTypeId:'x',
+  addressAlias:'',
+  addressLine1:'',
+  addressLine2:'',
+  landMark:'',
+  pinCode:'',
+  countryId:'x',
+  stateId:'x',
+  cityId:'x',
+  gst:'',
+  tin:'temp',
+  items:[{
+    name: "",
+          designation: "",
+          email: "",
+          country_code: "",
+          mobile: "",
+          email_proforma_invoice: "0",
+          email_invoice_dispatch: "0",
+          email_ledger: "0",
+          email_pending_payment: "0",
+          whatsapp_proforma_invoice: "0",
+          whatsapp_invoice_dispatch: "0",
+          whatsapp_ledger: "0",
+          whatsapp_pending_payment: "0"
+  }]
+});
 
+console.log('itemsX',formDatas.items)
 const handleChange = (e) => {
   const { name, value } = e.target;
   setFormDataS(prevState => ({
@@ -93,9 +118,8 @@ const handleTypeChange = (e) => {
 };
 
   const addItem = () => {
-    const newItems = items.slice();
+    const newItems = formDatas.items.slice();
     newItems.push({
-      id:"",
       name: "",
             designation: "",
             email: "",
@@ -109,15 +133,17 @@ const handleTypeChange = (e) => {
             whatsapp_invoice_dispatch: "0",
             whatsapp_ledger: "0",
             whatsapp_pending_payment: "0"
-    })
-    setItems(newItems);
+    });
+    setFormDataS(prevState=>({
+      ...prevState,
+      items:newItems
+  }))
   };
 
   const removeItem = (index) => {
-    const newItems = items.slice();
+    const newItems = formDatas.items.slice();
     newItems.splice(index, 1);
-    console.log('newItems',newItems);
-    setItems(newItems);
+    // console.log('newItems',newItems);
     setFormDataS(prevState=>({
       ...prevState,
       items:newItems
@@ -126,8 +152,8 @@ const handleTypeChange = (e) => {
 
   const handleInputChange = (index, event) => {
     const {name ,value,type} = event.target;
-    const newItems = items.slice();
-    console.log("data",index,newItems[index]);
+    const newItems = formDatas.items.slice();
+    // console.log("data",index,newItems[index]);
     if(type === 'checkbox'){
       console.log('check value',value,event.target.checked);
       if(newItems[index][name] === '0')
@@ -142,26 +168,25 @@ const handleTypeChange = (e) => {
         newItems[index][name] =  value;
         console.log('check not',newItems[index][name]);
     }
-    setItems(newItems);
     setFormDataS(prevState=>({
           ...prevState,
           items:newItems
-      }))
-    
+      }))    
   };
+
+  const closer =()=>{
+    setErrorMessageFromApi('');
+  }
 
   async function apiCall() {
     try {
-        // const formData = new FormData();
-        // formData.append('name', formDatas.name);
-        // formData.append('iso_code', formDatas.isoCode);
-        // formData.append('isd_code', formDatas.isdCode);
-        console.log('dataX',formDatas.items);
-        const filtered = formDatas.items.filter((temp)=>{
-          return temp.name !== '';
-        })
+        
+        // console.log('dataX',formDatas);
+        // const filtered = formDatas.items.filter((temp)=>{
+        //   return temp.name !== '';
+        // })
 
-        console.log('filtered',filtered);
+        // console.log('filtered',filtered);
 
         const token = localStorage.getItem('userToken');
         const response = await fetch(`https://factory.teamasia.in/api/public/addresses`, {
@@ -186,37 +211,37 @@ const handleTypeChange = (e) => {
               city_id:formDatas.cityId,
               gst:formDatas.gst,
               tin:formDatas.tin,
-              address_representative:filtered
+              address_representative:formDatas.items
             }),
         });
-
         const datas = await response.json();
-        console.log("dataapi",datas)
-        if (response.ok) {
-
-          console.log('formdata2',formDatas)
-          navigate('/inventory/vendors');
-            
-        } 
-            // Handle any errors, such as showing an error message to the user
-            console.error("Authentication failed:", datas.message);
-            return null;
-      
-    } catch (error) {
-        console.error("Network error:", error);
+        if (response.status === 201) {
+          navigate(-1);
+        } else {
+          console.error("Authentication failed:", Object.values(datas.messages.errors));
+          if (datas.error) {
+            setErrorMessageFromApi(Object.values(datas.messages.errors));
+          }
+        }  
         return null;
-    }
+      } catch (error) {
+        console.log('error',error);
+         setErrorMessageFromApi(["Network error"]);
+        return null;
+      }
 }
 
 const validateForm = () => {
   let formIsValid = true;
   const errors1 = {};
 
+
   if(formDatas.addressTypeId === 'x') {
     formIsValid = false;
     // eslint-disable-next-line dot-notation
-    errors1["addressTypeId"] = "Please select a addressType";
+    errors1["addressTypeId"] = "Please select a address Type Id.";
   }
+
   if(formDatas.countryId === 'x') {
     formIsValid = false;
     // eslint-disable-next-line dot-notation
@@ -232,12 +257,35 @@ const validateForm = () => {
     // eslint-disable-next-line dot-notation
     errors1["cityId"] = "Please select a city.";
   }
-
- 
   
-
-
-  // ... repeat for other fields ...
+  // formDatas.items.forEach((element) => {
+  //   console.log('element',element);
+  //         if(element.name === ''){
+  //            formIsValid = false;
+  //     // eslint-disable-next-line dot-notation
+  //           errors1["representName"] ="Required"
+  //         }
+  //         if(element.designation === ''){
+  //            formIsValid = false;
+  //     // eslint-disable-next-line dot-notation
+  //           errors1["representDesignation"] ="Required"
+  //         }
+  //         if(element.email === ''){
+  //            formIsValid = false;
+  //     // eslint-disable-next-line dot-notation
+  //           errors1["representEmail"] ="Required"
+  //         }
+  //         if(element.country_code === ''){
+  //            formIsValid = false;
+  //     // eslint-disable-next-line dot-notation
+  //           errors1["representCountryCode"] ="Required"
+  //         }
+  //         if(element.mobile === ''){
+  //            formIsValid = false;
+  //     // eslint-disable-next-line dot-notation
+  //           errors1["representMobile"] ="Required"
+  //         }
+  //     });
 
   setErrors(errors1);
   return formIsValid;
@@ -255,154 +303,109 @@ const handleSubmit = async (event) => {
 
 };
 
-// const checkboxclick = ()=>{
-//   let value;
-//   console.log('hi',check);
-//   setCheck(!check);
-//   if(check){
-//     value=0
-//   }else{
-//     value=1
-//   }
-//   setFormDataS(prevState => ({
-//    ...prevState,
-//    DefaultToFactoryStock:value
-//  }));
-// }
 
-  useEffect(() => {
+useEffect(()=>{
+    const stateElement1 = data3.filter(item => item.country_id === formDatas.countryId);
+    // console.log('element1',data3,stateElement1,formDatas.countryId);
+    const resultX = stateElement1.slice();
+    resultX.push({id:'x',name:'Choose'});
+    setData3x(resultX);
     
-    // Fetch the data from the API
-    // const fetchData = async () => {
-    //   const token = localStorage.getItem('userToken');
-    //   console.log('token',token);
-    //   const response = await fetch('https://factory.teamasia.in/api/public/addresses/1', {
-    //     method: 'GET', 
-    //     headers: {
-    //       'Authorization': `Bearer ${token}`
-    //     }
-    //   });
-    //   console.log('result',response);
-    //   if (!response.ok) {
-    //     throw new Error(`HTTP error! status: ${response.status}`);
-    //   }
-    //   const result = await response.json();
-    //   console.log("responsejson",id,result);
-    //   setData(result); 
-    //   setFormDataS(prevState => ({
-    //     ...prevState,
-    //     customer_id:result.customer_id,
-    //     factory_id:result.factory_id,
-    //     vendor_id:result.vendor_id,
-    //     address_type_id:result.address_type_id,
-    //     address_alias:result.address_alias,
-    //     address_line_1:result.address_line_1,
-    //     address_line_2:result.address_line_2,
-    //     landmark:result.landmark,
-    //     pincode:result.pincode,
-    //     country_id:result.country_id,
-    //     state_id:result.state_id,
-    //     city_id:result.city_id,
-    //     gst:result.gst,
-    //     tin:result.tin,
-    //     address_representative:result.addressrepresentatives
-    //   }));
-    //   setItems(result.addressrepresentatives);
-    // };
- 
-    console.log('id',customerId,location.state);
-    const fetchData1 = async () => {
-      const token = localStorage.getItem('userToken');
-      // console.log('token',token);
-      const response = await fetch('https://factory.teamasia.in/api/public/cities', {
-        method: 'GET', 
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      // console.log('result',response);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const result = await response.json();
-      console.log("cities",result);
-      const resultX = result.cities.slice();
-      resultX.push({id:'x',name:'Choose'});
-      setData1x(resultX)
-      setData1(result.cities); 
-    };
 
-    const fetchData2 = async () => {
-      const token = localStorage.getItem('userToken');
-      // console.log('token',token);
-      const response = await fetch('https://factory.teamasia.in/api/public/countries', {
-        method: 'GET', 
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      // console.log('result',response);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const result = await response.json();
-      console.log("countries",result);
-      const resultX = result.countries.slice();
-      resultX.push({id:'x',name:'Choose'});
-      setData2(resultX); 
-    };
-    const fetchData3 = async () => {
-      const token = localStorage.getItem('userToken');
-      // console.log('token',token);
-      const response = await fetch('https://factory.teamasia.in/api/public/states', {
-        method: 'GET', 
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      // console.log('result',response);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const result = await response.json();
-      console.log("states",result);
-      const resultX = result.states.slice();
-      resultX.push({id:'x',name:'Choose'});
-      setData3x(resultX); 
-      setData3(result.states); 
-    };
+    const stateElement2 = data1.filter(item => item.state_id === formDatas.stateId);
+    // console.log('element2',data1,stateElement2,formDatas.stateId);
+    const resultY = stateElement2.slice();
+    resultY.push({id:'x',name:'Choose'});
+    setData1x(resultY);
+},[data1,data3,data2])
 
-    const fetchData4 = async () => {
-      const token = localStorage.getItem('userToken');
-      // console.log('token',token);
-      const response = await fetch('https://factory.teamasia.in/api/public/addresstypes', {
-        method: 'GET', 
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      // console.log('result',response);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+useEffect(() => {
+  const fetchData1 = async () => {
+    const token = localStorage.getItem('userToken');
+    const response = await fetch('https://factory.teamasia.in/api/public/cities', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`
       }
-      const result = await response.json();
-      console.log("states",result);
-      const resultX = result.addresstypes.slice();
-      resultX.push({id:'x',name:'Choose'});
-      setData4(resultX); 
-    };
+    });
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const result = await response.json();
+    // console.log("data1(cities)", result.cities);
+    const resultX = result.cities.slice();
+    resultX.push({ id: 'x', name: 'Choose' });
+    setData1x(resultX);
+    setData1(result.cities);
+  };
 
-    fetchData4();
-    fetchData3();
-    fetchData2();
-    fetchData1();
-    // fetchData();
-    // console.log("data",data);
-    console.log("data1",data1);
-    console.log("data2",data2);
-    console.log("data3",data3);
-    console.log("data4",data4);
-  }, []);
+  const fetchData2 = async () => {
+    const token = localStorage.getItem('userToken');
+    const response = await fetch('https://factory.teamasia.in/api/public/countries', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const result = await response.json();
+    console.log("data2(countries)", result.countries);
+    const resultX = result.countries.slice();
+    resultX.push({ id: 'x', name: 'Choose' });
+    console.log('resultX(countries)',resultX);
+    setData2x(resultX);
+    setData2(result.countries);
+  };
+
+  const fetchData3 = async () => {
+    const token = localStorage.getItem('userToken');
+    const response = await fetch('https://factory.teamasia.in/api/public/states', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const result = await response.json();
+    console.log("data3(states)", result.states);
+    const resultX = result.states.slice();
+    resultX.push({ id: 'x', name: 'Choose' });
+    console.log('resultX(states)',resultX);
+    setData3x(resultX);
+    setData3(result.states);
+  };
+
+  const fetchData4 = async () => {
+    const token = localStorage.getItem('userToken');
+    const response = await fetch('https://factory.teamasia.in/api/public/addresstypes', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const result = await response.json();
+    console.log("data4(addresstypes)", result.addresstypes);
+    const resultX = result.addresstypes.slice();
+    resultX.push({ id: 'x', name: 'Choose' });
+    setData4(resultX);
+  };
+
+  
+
+  fetchData1();
+  fetchData2();
+  fetchData3();
+  fetchData4();
+
+}, []);
+
   return (
 <div>
      
@@ -418,14 +421,31 @@ const handleSubmit = async (event) => {
            <CardBody>
              <Form onSubmit={handleSubmit}>
                <Row>
+               <Col md="9">{errorMessageFromApi.length !== 0 && (
+                      <div style={{ background:'#ff9c7a',color: 'black', marginBottom: '10px', padding:"5px 10px"}}>
+                        <div style={{display:'flex',justifyContent:'space-between'}}>
+                          Following errors were found:
+                          <span onClick={closer} style={{cursor:'pointer'}}>X</span>
+                        </div>
+                        <ul>
+                          {errorMessageFromApi.map((item)=>
+                          <li>
+                              {item}
+                          </li>
+                          )}
+                        </ul>
+                      </div>
+                    )}
+                  </Col>
+                  
                  <Col md="6" className=''>
                    <FormGroup>
                      <Label>Address Type</Label>
                      <Input type="select" 
                          name="addressTypeId" 
                          value={formDatas.addressTypeId}
+                         className={errors.addressTypeId ? "is-invalid" : ""}
                         onChange={handleTypeChange}
-                        className={errors.addressTypeId ? "is-invalid" : ""}
                         >
                            {data4.map((item)=>{
    
@@ -516,7 +536,7 @@ const handleSubmit = async (event) => {
                         onChange={handleTypeChange}
                         className={errors.countryId ? "is-invalid" : ""}
                         >
-                           {data2.map((item)=>{
+                           {data2x.map((item)=>{
    
                              return <option key={item.id} value={item.id}>{item.name}</option>
                            })}
@@ -587,43 +607,101 @@ const handleSubmit = async (event) => {
                   
                 </Row>
 
-                 <table className="table">        
-                  <thead className='nobordertop'>
-                        <tr className='nobordertop'>
-                          <Row>
-                            <Col md="2"><th className='noborder'>Name</th></Col>
-                            <Col md="3"><th className='noborder'>Designation</th></Col>
-                            <Col md="3"><th className='noborder'>Email</th></Col>
-                            <Col md="1"><th className='noborder'>Country code</th></Col>
-                            <Col md="2"><th className='noborder'>Mobile</th></Col>
-                            <Col md="1"><th className='noborder'><Button type="button" className='btn-success' onClick={addItem}>+</Button></th></Col>
-                          </Row>
+                 <Table responsive size="sm">        
+                     <thead>
+                        <tr>
+                              <th >Name</th>
+                              <th >Designation</th>
+                              <th >Email</th>
+                              <th >Country code</th>
+                              <th >Mobile</th>
+                              <th ><Button type="button" className='btn-success' onClick={addItem}>+</Button></th>
+                             
                         </tr>
+                        
+                      
                       </thead>
           
               <tbody>
-              {items.map((item, index) => (
-                  <tr key={item.id}>
-                    <Row>
-                      <Col md="2"><Input name="name" value={item.name} type="text" onChange={e => handleInputChange(index, e)} placeholder="" /></Col>
-                      <Col md="3"><Input name="designation" value={item.designation} type="text" onChange={e => handleInputChange(index, e)} placeholder="" /></Col>
-                      <Col md="3"><Input name="email" value={item.email} type="text" onChange={e => handleInputChange(index, e)} placeholder="" /></Col>
-                      <Col md="1"><Input name="country_code" value={item.country_code} type="text" onChange={e => handleInputChange(index, e)} placeholder="" /></Col>
-                      <Col md="2"><Input name="mobile" value={item.mobile} type="text" onChange={e => handleInputChange(index, e)} placeholder="" /></Col>
-                      <Col md="1"><button type="button"  style={{ backgroundColor:"red",marginTop:"5px"}} onClick={() => removeItem(index)}>X</button></Col>
-                    </Row>
-                    <Row>
-                    <Col md="2">
-                      <FormGroup>
+              {formDatas.items.map((item, index) => (
+                <>
+                  <tr key={item.id} style={{borderBottomColor:'aliceblue'}}>
+                       <td>
+                           <Input 
+                               name="name" 
+                               value={item.name} 
+                               type="text" 
+                               onChange={e => handleInputChange(index, e)} 
+                               placeholder="" 
+                               className={errors.representName && item.name === '' ? "is-invalid":""}
+                               />
+                                {errors.representName && item.name === ''  &&  <FormText className="text-danger">Required</FormText>}
+                        </td> 
+                        <td>
+                            <Input 
+                              name="designation" 
+                              value={item.designation} 
+                              type="text" 
+                              onChange={e => handleInputChange(index, e)} 
+                              placeholder="" 
+                              className={errors.representDesignation && item.designation === '' ? "is-invalid":""}
+                               />
+                                {errors.representDesignation && item.designation === ''  &&  <FormText className="text-danger">Required</FormText>}
+                        </td>
+                        
+                        <td>
+                          <Input 
+                              name="email" 
+                              value={item.email} 
+                              type="text" 
+                              onChange={e => handleInputChange(index, e)} 
+                              placeholder="" 
+                              className={errors.representEmail && item.email === '' ? "is-invalid":""}
+                               />
+                                {errors.representEmail && item.email === ''  &&  <FormText className="text-danger">Required</FormText>}
+                        </td> 
+                        
+                        <td>
+                          <Input 
+                             name="country_code" 
+                             value={item.country_code} 
+                             type="text" 
+                             onChange={e => handleInputChange(index, e)} 
+                             placeholder="" 
+                             className={errors.representCountryCode && item.country_code === '' ? "is-invalid":""}
+                               />
+                                {errors.representCountryCode && item.country_code === ''  &&  <FormText className="text-danger">Required</FormText>}
+                        </td>    
+
+                        <td>
+                          <Input 
+                            name="mobile" 
+                            value={item.mobile} 
+                            type="text" 
+                            onChange={e => handleInputChange(index, e)} 
+                            placeholder="" 
+                            className={errors.representMobile && item.mobile === '' ? "is-invalid":""}
+                               />
+                                {errors.representMobile && item.mobile === ''  &&  <FormText className="text-danger">Required</FormText>}
+                        </td>   
+                            
+                        <td>
+                          <button type="button"  style={{ backgroundColor:"red",marginTop:"5px"}} onClick={() => removeItem(index)} disabled={index === 0}>X</button>
+                        </td> 
+                  </tr>
+                  <tr><td></td></tr>
+                   <tr key={item.id} style={{borderBottomColor:'snow'}}>
+                    <td>
+                    <FormGroup>
                         {/* <Input type="checkbox" checked={ DefaultToFactoryStock === '1'} onChange={checkboxclick()}  /> */}
-                        <br></br>
+                        <Label style={{display:'block',color:'snow'}}>Proforma Invoice</Label>
                         <Label className='mx-1'>Email</Label>
                         <FormText className="muted"></FormText>
                       </FormGroup>
-                    </Col>
-
-                     <Col md="2">
-                      <FormGroup>
+                    </td>
+                     
+                     <td>
+                     <FormGroup>
                         {/* <Input type="checkbox" checked={ DefaultToFactoryStock === '1'} onChange={checkboxclick()}  /> */}
                         <Label className=''>Proforma Invoice</Label>
                         <br></br>
@@ -632,9 +710,10 @@ const handleSubmit = async (event) => {
                         />
                         <FormText className="muted"></FormText>
                       </FormGroup>
-                    </Col>
-                     <Col md="2">
-                      <FormGroup>
+                     </td>
+                      
+                   <td>
+                     <FormGroup>
                         {/* <Input type="checkbox" checked={ DefaultToFactoryStock === '1'} onChange={checkboxclick()}  /> */}
                         <Label className=''>Invoice/dispatch</Label>
                         <br></br>
@@ -643,81 +722,86 @@ const handleSubmit = async (event) => {
                         />
                         <FormText className="muted"></FormText>
                       </FormGroup>
-                    </Col>
-                     <Col md="2">
+                   </td>
+                     
+                    <td>
                       <FormGroup>
-                        {/* <Input type="checkbox" checked={ DefaultToFactoryStock === '1'} onChange={checkboxclick()}  /> */}
-                        <Label className=''>Ledgers</Label>
-                        <br></br>
-                        <Input 
-                        type="checkbox" checked={ item.email_ledger !== '0' } name="email_ledger" onChange={e => handleInputChange(index, e)}  
-                        />
-                        <FormText className="muted"></FormText>
-                      </FormGroup>
-                    </Col>
-                     <Col md="2">
+                          {/* <Input type="checkbox" checked={ DefaultToFactoryStock === '1'} onChange={checkboxclick()}  /> */}
+                          <Label className=''>Ledgers</Label>
+                          <br></br>
+                          <Input 
+                          type="checkbox" checked={ item.email_ledger !== '0' } name="email_ledger" onChange={e => handleInputChange(index, e)}  
+                          />
+                          <FormText className="muted"></FormText>
+                        </FormGroup>
+                    </td>
+                      
+                    <td>
                       <FormGroup>
-                        {/* <Input type="checkbox" checked={ DefaultToFactoryStock === '1'} onChange={checkboxclick()}  /> */}
-                        <Label className=''>Pending Payments</Label>
-                        <br></br>
-                        <Input 
-                        type="checkbox" checked={ item.email_pending_payment !== '0' } name="email_pending_payment" onChange={e => handleInputChange(index, e)}  
-                        />
-                        <FormText className="muted"></FormText>
-                      </FormGroup>
-                    </Col>
-                    </Row>
-
-                    <Row>
-                    <Col md="2">
-                      <FormGroup>
-                        {/* <Input type="checkbox" checked={ DefaultToFactoryStock === '1'} onChange={checkboxclick()}  /> */}
-                        <Label className='mx-1'>Whatsapp</Label>
-                        <FormText className="muted"></FormText>
-                      </FormGroup>
-                    </Col>
-                     <Col md="2">
-                      <FormGroup>
-                        {/* <Input type="checkbox" checked={ DefaultToFactoryStock === '1'} onChange={checkboxclick()}  /> */}
-                        <Input 
-                        type="checkbox" checked={ item.whatsapp_proforma_invoice !== '0' } name="whatsapp_proforma_invoice" onChange={e => handleInputChange(index, e)}  
-                        />
-                        <FormText className="muted"></FormText>
-                      </FormGroup>
-                    </Col>
-                     <Col md="2">
-                      <FormGroup>
-                        {/* <Input type="checkbox" checked={ DefaultToFactoryStock === '1'} onChange={checkboxclick()}  /> */}
-                        <Input 
-                        type="checkbox" checked={item.whatsapp_invoice_dispatch !== '0' } name="whatsapp_invoice_dispatch" onChange={e => handleInputChange(index, e)} 
-                        />
-                        <FormText className="muted"></FormText>
-                      </FormGroup>
-                    </Col>
-                     <Col md="2">
-                      <FormGroup>
-                        {/* <Input type="checkbox" checked={ DefaultToFactoryStock === '1'} onChange={checkboxclick()}  /> */}
-                        <Input 
-                        type="checkbox" checked={ item.whatsapp_ledger !== '0' } name="whatsapp_ledger" onChange={e => handleInputChange(index, e)}  
-                        />
-                        <FormText className="muted"></FormText>
-                      </FormGroup>
-                    </Col>
-                     <Col md="2">
-                      <FormGroup>
-                        {/* <Input type="checkbox" checked={ DefaultToFactoryStock === '1'} onChange={checkboxclick()}  /> */}
-                        <Input 
-                        type="checkbox" checked={ item.whatsapp_pending_payment !== '0' } name="whatsapp_pending_payment" onChange={e => handleInputChange(index, e)}  
-                        />
-                        <FormText className="muted"></FormText>
-                      </FormGroup>
-                    </Col>
-                    </Row>
+                          {/* <Input type="checkbox" checked={ DefaultToFactoryStock === '1'} onChange={checkboxclick()}  /> */}
+                          <Label className=''>Pending Payments</Label>
+                          <br></br>
+                          <Input 
+                          type="checkbox" checked={ item.email_pending_payment !== '0' } name="email_pending_payment" onChange={e => handleInputChange(index, e)}  
+                          />
+                          <FormText className="muted"></FormText>
+                        </FormGroup>
+                    </td>
+                     </tr>
                     
+                    <tr style={{borderTop:'none'}}>
+                      <td>
+                        <FormGroup>
+                            {/* <Input type="checkbox" checked={ DefaultToFactoryStock === '1'} onChange={checkboxclick()}  /> */}
+                            <Label className='mx-1'>Whatsapp</Label>
+                            <FormText className="muted"></FormText>
+                          </FormGroup>
+                      </td>
+                        
+                      <td>
+                      <FormGroup>
+                            {/* <Input type="checkbox" checked={ DefaultToFactoryStock === '1'} onChange={checkboxclick()}  /> */}
+                            <Input 
+                            type="checkbox" checked={ item.whatsapp_proforma_invoice !== '0' } name="whatsapp_proforma_invoice" onChange={e => handleInputChange(index, e)}  
+                            />
+                            <FormText className="muted"></FormText>
+                          </FormGroup>
+                      </td>
+                        
+                      <td>
+                      <FormGroup>
+                          {/* <Input type="checkbox" checked={ DefaultToFactoryStock === '1'} onChange={checkboxclick()}  /> */}
+                          <Input 
+                          type="checkbox" checked={item.whatsapp_invoice_dispatch !== '0' } name="whatsapp_invoice_dispatch" onChange={e => handleInputChange(index, e)} 
+                          />
+                          <FormText className="muted"></FormText>
+                        </FormGroup>
+                      </td>
+                      
+                      <td>
+                        <FormGroup>
+                          {/* <Input type="checkbox" checked={ DefaultToFactoryStock === '1'} onChange={checkboxclick()}  /> */}
+                          <Input 
+                          type="checkbox" checked={ item.whatsapp_ledger !== '0' } name="whatsapp_ledger" onChange={e => handleInputChange(index, e)}  
+                          />
+                          <FormText className="muted"></FormText>
+                        </FormGroup>
+                      </td>
+                        
+                      <td>
+                        <FormGroup>
+                          {/* <Input type="checkbox" checked={ DefaultToFactoryStock === '1'} onChange={checkboxclick()}  /> */}
+                          <Input 
+                          type="checkbox" checked={ item.whatsapp_pending_payment !== '0' } name="whatsapp_pending_payment" onChange={e => handleInputChange(index, e)}  
+                          />
+                          <FormText className="muted"></FormText>
+                        </FormGroup>
+                      </td>
                   </tr>
+                  </>
                 ))}
               </tbody>
-            </table>
+            </Table>
 
                  <Col md="4">
                    <FormGroup>
@@ -746,4 +830,4 @@ const handleSubmit = async (event) => {
   );
 };
 
-export default Add;
+export default Edit;

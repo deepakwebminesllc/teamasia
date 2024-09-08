@@ -22,7 +22,7 @@ const JumbotronComponent = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [collapse, setCollapse] = useState([]);
-  const {id,managePlanDate,data1,data2,data3,data4,data5}    = location.state || {}; 
+  const {id,managePlanDate}    = location.state || {}; 
   const [data,setData] = useState([]);
   const [CustomerData,setCustomerData] = useState([]);
   const [line1, setLine1] = useState([]);
@@ -143,9 +143,9 @@ else if(activeTab === '4'){
 }
   };
 
-  const handleEditcustomer = () => {
-    navigate('/order/customers/edit',{state:location.state});
-  };
+  // const handleEditcustomer = () => {
+  //   navigate('/order/customers/edit',{state:location.state});
+  // };
   
 const CustomerName =(customerId)=>{
     // console.log('customerData',CustomerData);
@@ -281,16 +281,20 @@ useEffect(()=>{
                           data.map((AddressItem,index)=>(
                             <div key={AddressItem.id}>
                             
-                            {/* <div className="my-btn-color" onClick={()=>toggle(index)} style={{textAlign:'center',color:'white',marginBottom:'2px',padding:'5px'}}> Address {index+1}  <span className=""  style={{textAlign:'center',background:"white",color:'blue',marginBottom:'0px',borderRadius:'4px',padding:'1px'}}> </span></div> */}
-                            <div className="my-btn-color" onClick={()=>toggle(index)} style={{textAlign:'center',color:'white',marginBottom:'2px',padding:'5px'}}> #{AddressItem.id} {CustomerName(AddressItem.customer_id)} (Grains : ALINEA,3001 A) <br></br>
+                            
+                            {/* <div className="my-btn-color" onClick={()=>toggle(index)} style={{textAlign:'center',color:'white',marginBottom:'2px',padding:'5px'}}> #{AddressItem.id} {CustomerName(AddressItem.customer_id)} (Grains : ALINEA,3001 A) <br></br> */}
+                            
+                            <div className="my-btn-color" onClick={()=>toggle(index)} style={{textAlign:'center',color:'white',marginBottom:'2px',padding:'5px'}}> #{AddressItem.id} {CustomerName(AddressItem.customer_id)}<br></br>
                                  Order Date: {formatDate(AddressItem.created_at)} | Nearest Expected Date: {formatDate(AddressItem.expected_delivery_date)}</div>
                             <Collapse isOpen={collapse[index]}>
                             
-                                <OrderProduct orderID ={AddressItem.id} formatDate = {formatDate} data1={data1} data2={data2} data3={data3} data4={data4} data5={data5} addItemToLine={addItemToLine} removeItemFromLine = {removeItemFromLine} customerNameFromManagePlan={CustomerName(AddressItem.customer_id)} customerID={AddressItem.customer_id}/>
+                                <OrderProduct orderID ={AddressItem.id} formatDate = {formatDate} addItemToLine={addItemToLine} removeItemFromLine = {removeItemFromLine} customerNameFromManagePlan={CustomerName(AddressItem.customer_id)} customerID={AddressItem.customer_id}/>
                         </Collapse>
                         </div>
                           ))
-                          :""}
+                          :<div className="my-btn-color"  style={{textAlign:'center',color:'white',marginBottom:'2px',padding:'20px'}}> 
+                               NO CONFIRMED ORDER
+                          </div>}
                  </Col>
                 <Col md="7">
                     <ComponentCard4 title="">
@@ -351,7 +355,7 @@ useEffect(()=>{
                             Line 2 (night)
                           </NavLink>
                         </NavItem>
-                        <Button ><i className='bi bi-arrow-down-square'></i></Button>
+                        {/* <Button ><i className='bi bi-arrow-down-square'></i></Button> */}
                         <Button className='my-btn-color' onClick={()=>handleSubmit()}>Save Plan</Button>
                       </Nav>
                       <TabContent className="p-2" activeTab={activeTab}>
@@ -364,18 +368,20 @@ useEffect(()=>{
                                 <div>
                                   <span className='production-plan-page-collape-heading'>PRODUCT</span> { product.id} 
                                   <button type='button' style={{padding:'1px',background:'aliceblue',borderRadius:'5px',marginLeft:'5px',marginRight:'5px'}}>{product.customerNameFromManagePlan}</button>
-                                  <button type='button' style={{padding:'1px',background:'#777',borderRadius:'5px',marginLeft:'5px',marginRight:'5px',color:'white'}}>{product.is_factory_surplus_product !== 0?'factory product':''}</button>
-                                  <button type='button' style={{padding:'1px',background: '#B33C12',borderRadius:'5px',marginRight:'20px',color:'white'}}>{product.is_online_product !== 0?'online product':''}</button>
-                                    <span style={{paddingTop:'2px'}}><i className="bi bi-x-square" style={{fontSize:"20px",marginTop:'2px'}} onClick={()=>removeItemFromLine(index)}></i></span>
+                                  {/* {product.is_factory_surplus_product !== '0' && <button type='button' style={{padding:'1px',background:'#777',borderRadius:'5px',marginLeft:'5px',marginRight:'5px',color:'white'}}>factory product</button>} */}
+                                  {(product.is_online_product !== '0' || product.ref_product_id !== '0') && <button type='button' style={{padding:'1px',background: '#B33C12',borderRadius:'5px',marginLeft:'5px',marginRight:'20px',color:'white'}}>online product</button>}
+                                  {product.is_online_product !== '0' && product.ref_product_id === '0' && <button type='button' style={{padding:'1px',background: '#B33C12',borderRadius:'5px',marginLeft:'5px',marginRight:'20px',color:'white'}}>front side</button>}
+                                  {product.is_online_product === '0' && product.ref_product_id !== '0' && <button type='button' style={{padding:'1px',background: '#B33C12',borderRadius:'5px',marginLeft:'5px',marginRight:'20px',color:'white'}}>back side</button>}
+                                    <span style={{paddingTop:'2px',cursor:'pointer'}}><i className="bi bi-x-square" style={{fontSize:"20px",marginTop:'2px'}} onClick={()=>removeItemFromLine(index)}></i></span>
                                 </div>
                                 <Table size='sm' className="order-page-table" responsive>     
                                       <tbody> 
                                             <tr>
-                                              <td title={product.grainName}>{product.grainName}</td>
-                                              <td title={product.colorName}>{product.colorName}</td>
-                                              <td title={product.qualityName}>{product.qualityName}</td>
-                                              <td title={product.fabricName}>{product.fabricName}</td>
-                                              <td title={product.fabricColorName}>{product.fabricColorName}</td>
+                                                <td title={product.grain_name}>{product.grain_name}</td>
+                                                <td title={product.color_name}>{product.color_name}</td>
+                                                <td title={product.quality_name}>{product.quality_name}</td>
+                                                <td title={product.fabric_name}>{product.fabric_name}</td>
+                                                <td title={product.fabric_color_name}>{product.fabric_color_name}</td>
                                             </tr>
                                             <tr>
                                               <td title="">{}</td>
@@ -515,18 +521,20 @@ useEffect(()=>{
                                 <div>
                                   <span className='production-plan-page-collape-heading'>PRODUCT</span> { product.id} 
                                   <button type='button' style={{padding:'1px',background:'aliceblue',borderRadius:'5px',marginLeft:'5px',marginRight:'5px'}}>{product.customerNameFromManagePlan}</button>
-                                  <button type='button' style={{padding:'1px',background:'#777',borderRadius:'5px',marginLeft:'5px',marginRight:'5px',color:'white'}}>{product.is_factory_surplus_product !== 0?'factory product':''}</button>
-                                  <button type='button' style={{padding:'1px',background: '#B33C12',borderRadius:'5px',marginRight:'20px',color:'white'}}>{product.is_online_product !== 0?'online product':''}</button>
-                                    <span style={{paddingTop:'2px'}}><i className="bi bi-x-square" style={{fontSize:"20px",marginTop:'2px'}} onClick={()=>removeItemFromLine(index)}></i></span>
+                                  {/* {product.is_factory_surplus_product !== '0' && <button type='button' style={{padding:'1px',background:'#777',borderRadius:'5px',marginLeft:'5px',marginRight:'5px',color:'white'}}>factory product</button>} */}
+                                  {(product.is_online_product !== '0' || product.ref_product_id !== '0') && <button type='button' style={{padding:'1px',background: '#B33C12',borderRadius:'5px',marginLeft:'5px',marginRight:'20px',color:'white'}}>online product</button>}
+                                  {product.is_online_product !== '0' && product.ref_product_id === '0' && <button type='button' style={{padding:'1px',background: '#B33C12',borderRadius:'5px',marginLeft:'5px',marginRight:'20px',color:'white'}}>front side</button>}
+                                  {product.is_online_product === '0' && product.ref_product_id !== '0' && <button type='button' style={{padding:'1px',background: '#B33C12',borderRadius:'5px',marginLeft:'5px',marginRight:'20px',color:'white'}}>back side</button>}
+                                    <span style={{paddingTop:'2px',cursor:'pointer'}}><i className="bi bi-x-square" style={{fontSize:"20px",marginTop:'2px'}} onClick={()=>removeItemFromLine(index)}></i></span>
                                 </div>
                                 <Table size='sm' className="order-page-table" responsive>     
                                       <tbody> 
                                             <tr>
-                                              <td title={product.grainName}>{product.grainName}</td>
-                                              <td title={product.colorName}>{product.colorName}</td>
-                                              <td title={product.qualityName}>{product.qualityName}</td>
-                                              <td title={product.fabricName}>{product.fabricName}</td>
-                                              <td title={product.fabricColorName}>{product.fabricColorName}</td>
+                                                <td title={product.grain_name}>{product.grain_name}</td>
+                                                <td title={product.color_name}>{product.color_name}</td>
+                                                <td title={product.quality_name}>{product.quality_name}</td>
+                                                <td title={product.fabric_name}>{product.fabric_name}</td>
+                                                <td title={product.fabric_color_name}>{product.fabric_color_name}</td>
                                             </tr>
                                             <tr>
                                               <td title="">{}</td>
@@ -665,18 +673,20 @@ useEffect(()=>{
                                 <div>
                                   <span className='production-plan-page-collape-heading'>PRODUCT</span> { product.id} 
                                   <button type='button' style={{padding:'1px',background:'aliceblue',borderRadius:'5px',marginLeft:'5px',marginRight:'5px'}}>{product.customerNameFromManagePlan}</button>
-                                  <button type='button' style={{padding:'1px',background:'#777',borderRadius:'5px',marginLeft:'5px',marginRight:'5px',color:'white'}}>{product.is_factory_surplus_product !== 0?'factory product':''}</button>
-                                  <button type='button' style={{padding:'1px',background: '#B33C12',borderRadius:'5px',marginRight:'20px',color:'white'}}>{product.is_online_product !== 0?'online product':''}</button>
-                                    <span style={{paddingTop:'2px'}}><i className="bi bi-x-square" style={{fontSize:"20px",marginTop:'2px'}} onClick={()=>removeItemFromLine(index)}></i></span>
+                                  {/* {product.is_factory_surplus_product !== '0' && <button type='button' style={{padding:'1px',background:'#777',borderRadius:'5px',marginLeft:'5px',marginRight:'5px',color:'white'}}>factory product</button>} */}
+                                  {(product.is_online_product !== '0' || product.ref_product_id !== '0') && <button type='button' style={{padding:'1px',background: '#B33C12',borderRadius:'5px',marginLeft:'5px',marginRight:'20px',color:'white'}}>online product</button>}
+                                  {product.is_online_product !== '0' && product.ref_product_id === '0' && <button type='button' style={{padding:'1px',background: '#B33C12',borderRadius:'5px',marginLeft:'5px',marginRight:'20px',color:'white'}}>front side</button>}
+                                  {product.is_online_product === '0' && product.ref_product_id !== '0' && <button type='button' style={{padding:'1px',background: '#B33C12',borderRadius:'5px',marginLeft:'5px',marginRight:'20px',color:'white'}}>back side</button>}
+                                    <span style={{paddingTop:'2px',cursor:'pointer'}}><i className="bi bi-x-square" style={{fontSize:"20px",marginTop:'2px'}} onClick={()=>removeItemFromLine(index)}></i></span>
                                 </div>
                                 <Table size='sm' className="order-page-table" responsive>     
                                       <tbody> 
                                             <tr>
-                                              <td title={product.grainName}>{product.grainName}</td>
-                                              <td title={product.colorName}>{product.colorName}</td>
-                                              <td title={product.qualityName}>{product.qualityName}</td>
-                                              <td title={product.fabricName}>{product.fabricName}</td>
-                                              <td title={product.fabricColorName}>{product.fabricColorName}</td>
+                                                <td title={product.grain_name}>{product.grain_name}</td>
+                                                <td title={product.color_name}>{product.color_name}</td>
+                                                <td title={product.quality_name}>{product.quality_name}</td>
+                                                <td title={product.fabric_name}>{product.fabric_name}</td>
+                                                <td title={product.fabric_color_name}>{product.fabric_color_name}</td>
                                             </tr>
                                             <tr>
                                               <td title="">{}</td>
@@ -815,18 +825,20 @@ useEffect(()=>{
                                 <div>
                                   <span className='production-plan-page-collape-heading'>PRODUCT</span> { product.id} 
                                   <button type='button' style={{padding:'1px',background:'aliceblue',borderRadius:'5px',marginLeft:'5px',marginRight:'5px'}}>{product.customerNameFromManagePlan}</button>
-                                  <button type='button' style={{padding:'1px',background:'#777',borderRadius:'5px',marginLeft:'5px',marginRight:'5px',color:'white'}}>{product.is_factory_surplus_product !== 0?'factory product':''}</button>
-                                  <button type='button' style={{padding:'1px',background: '#B33C12',borderRadius:'5px',marginRight:'20px',color:'white'}}>{product.is_online_product !== 0?'online product':''}</button>
-                                    <span style={{paddingTop:'2px'}}><i className="bi bi-x-square" style={{fontSize:"20px",marginTop:'2px'}} onClick={()=>removeItemFromLine(index)}></i></span>
+                                  {/* {product.is_factory_surplus_product !== '0' && <button type='button' style={{padding:'1px',background:'#777',borderRadius:'5px',marginLeft:'5px',marginRight:'5px',color:'white'}}>factory product</button>} */}
+                                  {(product.is_online_product !== '0' || product.ref_product_id !== '0') && <button type='button' style={{padding:'1px',background: '#B33C12',borderRadius:'5px',marginLeft:'5px',marginRight:'20px',color:'white'}}>online product</button>}
+                                  {product.is_online_product !== '0' && product.ref_product_id === '0' && <button type='button' style={{padding:'1px',background: '#B33C12',borderRadius:'5px',marginLeft:'5px',marginRight:'20px',color:'white'}}>front side</button>}
+                                  {product.is_online_product === '0' && product.ref_product_id !== '0' && <button type='button' style={{padding:'1px',background: '#B33C12',borderRadius:'5px',marginLeft:'5px',marginRight:'20px',color:'white'}}>back side</button>}
+                                    <span style={{paddingTop:'2px',cursor:'pointer'}}><i className="bi bi-x-square" style={{fontSize:"20px",marginTop:'2px'}} onClick={()=>removeItemFromLine(index)}></i></span>
                                 </div>
                                 <Table size='sm' className="order-page-table" responsive>     
                                       <tbody> 
                                             <tr>
-                                              <td title={product.grainName}>{product.grainName}</td>
-                                              <td title={product.colorName}>{product.colorName}</td>
-                                              <td title={product.qualityName}>{product.qualityName}</td>
-                                              <td title={product.fabricName}>{product.fabricName}</td>
-                                              <td title={product.fabricColorName}>{product.fabricColorName}</td>
+                                                <td title={product.grain_name}>{product.grain_name}</td>
+                                                <td title={product.color_name}>{product.color_name}</td>
+                                                <td title={product.quality_name}>{product.quality_name}</td>
+                                                <td title={product.fabric_name}>{product.fabric_name}</td>
+                                                <td title={product.fabric_color_name}>{product.fabric_color_name}</td>
                                             </tr>
                                             <tr>
                                               <td title="">{}</td>

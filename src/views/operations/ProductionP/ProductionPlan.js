@@ -24,11 +24,6 @@ const ProductionPlan = () => {
   const [Customerdata, setCustomerData] = useState([]);
   const [managePlanDate, setManagePlanDate] = useState('');
   const [errors, setErrors] = useState({});
-  const [data1, setData1] = useState([]);
-  const [data2, setData2] = useState([]);
-  const [data3, setData3] = useState([]);
-  const [data4, setData4] = useState([]);
-  const [data5, setData5] = useState([]);
   const [data6, setData6] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -40,11 +35,11 @@ const ProductionPlan = () => {
   };
 
   const handleEditClick = (item) => {
-    navigate('/operations/production-plans/edit', { state: { item, data1, data2, data3, data4, data5 } });
+    navigate('/operations/production-plans/edit', { state: { item } });
   };
 
   const handleViewClick = (item) => {
-    navigate('/operations/production-plans/view', { state: { item, Customerdata, data1, data2, data3, data4, data5, data6 } });
+    navigate('/operations/production-plans/view', { state: { item, Customerdata, data6 } });
   };
 
   const validateForm = () => {
@@ -63,7 +58,7 @@ const ProductionPlan = () => {
   const handleManagePlan = () => {
     if (validateForm()) {
       console.log('Form is valid, proceed with API call');
-      navigate('/operations/production-plans/manage-plan', { state: { managePlanDate, data1, data2, data3, data4, data5 } });
+      navigate('/operations/production-plans/manage-plan', { state: { managePlanDate } });
     } else {
       console.log('Form is invalid, do not submit');
     }
@@ -119,86 +114,6 @@ const ProductionPlan = () => {
       setCustomerData(datas.customers);
     }
 
-    const fetchData1 = async () => {
-      const token = localStorage.getItem('userToken');
-      const response = await fetch('https://factory.teamasia.in/api/public/grains', {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const result = await response.json();
-      const resultX = result.grains.slice();
-      resultX.push({ id: 'x', name: 'Choose' });
-      setData1(resultX);
-    };
-    const fetchData2 = async () => {
-      const token = localStorage.getItem('userToken');
-      const response = await fetch('https://factory.teamasia.in/api/public/fabrics', {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const result = await response.json();
-      const resultX = result.fabrics.slice();
-      resultX.push({ id: 'x', name: 'Choose' });
-      setData2(resultX);
-    };
-    const fetchData3 = async () => {
-      const token = localStorage.getItem('userToken');
-      const response = await fetch('https://factory.teamasia.in/api/public/qualities', {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const result = await response.json();
-      const resultX = result.qualities.slice();
-      resultX.push({ id: 'x', name: 'Choose' });
-      setData3(resultX);
-    };
-    const fetchData4 = async () => {
-      const token = localStorage.getItem('userToken');
-      const response = await fetch('https://factory.teamasia.in/api/public/colors', {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const result = await response.json();
-      const resultX = result.colors.slice();
-      resultX.push({ id: 'x', name: 'Choose' });
-      setData4(resultX);
-    };
-    const fetchData5 = async () => {
-      const token = localStorage.getItem('userToken');
-      const response = await fetch('https://factory.teamasia.in/api/public/hsns', {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const result = await response.json();
-      const resultX = result.hsns.slice();
-      resultX.push({ id: 'x', name: 'Choose' });
-      setData5(resultX);
-    };
     const fetchData6 = async () => {
       const token = localStorage.getItem('userToken');
       const response = await fetch('https://factory.teamasia.in/api/public/faults/??is_trashed=0', {
@@ -217,11 +132,6 @@ const ProductionPlan = () => {
     };
 
     fetchData6();
-    fetchData5();
-    fetchData4();
-    fetchData3();
-    fetchData2();
-    fetchData1();
     fetchDataPlan();
     fetchCustomerData();
   }, [])

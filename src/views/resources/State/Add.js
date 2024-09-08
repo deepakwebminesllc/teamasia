@@ -1,4 +1,6 @@
-import React,{useState,useEffect} from 'react';
+import React,{useState,useCallback} from 'react';
+import AsyncSelect from 'react-select/async';
+import debounce from 'lodash.debounce';
 
 import {
   Card,
@@ -19,16 +21,54 @@ import { useNavigate } from 'react-router-dom';
 
 // import ComponentCard from '../../components/ComponentCard';
 
+// Custom hook for fetching options
+const useDebouncedFetchOptions = (endpoint) => {
+  const fetchOptions = async (inputValue) => {
+    const token = localStorage.getItem('userToken');
+    const response = await fetch(`https://factory.teamasia.in/api/public/${endpoint}?search=${inputValue}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const result = await response.json();
+    return result[endpoint].map(item => ({ value: item.id, label: item.name || item.code || item.company_name }));
+  };
+
+  const debouncedFetch = useCallback(debounce((inputValue, callback) => {
+    fetchOptions(inputValue).then(callback).catch(error => {
+      console.error(error);
+      callback([]);
+    });
+  }, 300), [endpoint]);
+
+  return debouncedFetch;
+};
+
+
+
+
+
 const Edit = () => {
   const navigate = useNavigate();
   const [errorMessageFromApi, setErrorMessageFromApi] = useState([]);
   const [errors,setErrors] = useState({});
-  const [selectedType, setSelectedType] = useState('');
-  const [data2, setData2] = useState([]);
   const [formDatas, setFormDataS] = useState({
     name:'',
     countryId:''
   });
+
+  const countryOptions = useDebouncedFetchOptions('countries');
+
+  const handleSelectChange = (selectedOption, actionMeta) => {
+    setFormDataS(prevState => ({
+      ...prevState,
+      [actionMeta.name]: selectedOption
+    }));
+  };
 
     const handleChange = (e) => {
       const { name, value } = e.target;
@@ -51,15 +91,7 @@ const Edit = () => {
           }
     };
 
-    const handleTypeChange = (e) => {
-      setSelectedType(e.target.value);
-      // console.log('e',e.target.options[e.target.selectedIndex].text);
-      // console.log('e',e.target.value);
-      setFormDataS(prevState => ({
-        ...prevState,
-        countryId: e.target.value
-      }));
-    };
+
     
   const closer =()=>{
     setErrorMessageFromApi([]);
@@ -70,7 +102,7 @@ const Edit = () => {
       try {
           const formData = new FormData();
           formData.append('name', formDatas.name);
-          formData.append('country_id', formDatas.countryId);
+          formData.append('country_id', formDatas.countryId.value);
           formData.append('is_trashed','0');
           console.log('formdataX',formDatas.countryId)
           const token = localStorage.getItem('userToken');
@@ -122,45 +154,6 @@ const validateForm=()=>{
     }
   };
 
-
-  useEffect(() => {
-
-    const fetchData2 = async () => {
-      const token = localStorage.getItem('userToken');
-      // console.log('token',token);
-      const response = await fetch(`https://factory.teamasia.in/api/public/countries`, {
-        method: 'GET', 
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      // console.log('result',response);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const result = await response.json();
-      console.log("responsejson2",result);
-      
-      setData2(result.countries);
-      
-      if(result.countries.length > 0)
-      {
-        setFormDataS(prevState => ({
-          ...prevState,
-          countryId: result.countries[0].id
-        }));
-      }
-      
-
-
-    };
-
-  
-    fetchData2();
-   
-  
-  },[]);
-
   return (
 <div>
      
@@ -209,23 +202,18 @@ const validateForm=()=>{
                  </Col>
                  <Col md="4">
                    <FormGroup>
-                     <Label>Country</Label>
-                     <Input type="select"
-                      name="countryId" 
-                      //  value={selectedType} 
-                      value={selectedType}
-                    //  value={countryName}
-                      
-                     onChange={handleTypeChange}>
-                        {data2.map((item)=>{
-
-                          return <option key={item.id} value={item.id}>{item.name}</option>
-                        })}
-                        
-                      </Input>
-                     <FormText className="muted"></FormText>
-                   </FormGroup>
-                  
+                      <Label>*Country</Label>
+                        <AsyncSelect
+                          name="countryId"
+                          onChange={handleSelectChange}
+                          loadOptions={countryOptions}
+                          value={formDatas.countryId}
+                          isClearable
+                          isSearchable
+                        />
+                    
+                        <FormText className="text-danger"></FormText>
+                    </FormGroup>
                  </Col>
                  <Col md="4">
                    <FormGroup>

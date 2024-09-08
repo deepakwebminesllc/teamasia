@@ -8,16 +8,34 @@ import {
 
 import PropTypes from 'prop-types';
 // import ComponentCard4 from '../../../components/ComponentCard5';
-import ProgressBar from 'react-bootstrap/ProgressBar';
+import { useNavigate } from 'react-router-dom';
+// import ProgressBar from 'react-bootstrap/ProgressBar';
 import Barcode from 'react-barcode';
+
+import MyProgressBar from './MyProgressBar';
+
 
 
 const JumbotronComponent = (props) => {
-
+  const navigate = useNavigate();
   const {Refreshkey,product,updateRollTogglefunction} = props;
   const [data, setData] = useState([]);
 
   // console.log('productID',product,data)
+
+  const JumboQaView = (dispatchItem)=>{
+    console.log('hi',dispatchItem);
+    navigate('/operations/find-a-jumbo-roll',{state: {jumboId:dispatchItem}});
+  }
+
+
+
+
+
+  const JumboPrint = (dispatchItem)=>{
+    console.log('hi',dispatchItem);
+    navigate('/operations/jumbo/print',{state: dispatchItem});
+  }
 
   const handleDeleteClick = async (pro,index) => {
     try {
@@ -61,7 +79,7 @@ const JumbotronComponent = (props) => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const result = await response.json();
-      console.log("responsejson in s..",result);
+      // console.log("responsejson in s..",result);
       setData(result.jumborolls);
     };
     fetchData();  
@@ -90,15 +108,26 @@ const JumbotronComponent = (props) => {
                 <tr>
                   <td>{index+1}</td>
                   <td>{pro.quantity}</td>
-                  <td><td> <td><Barcode value={`JUMBO${pro.id}`} height={20} /></td></td></td>
-                  <td><ProgressBar now={220} label={`${220}`} style={{width:"300px",height:"25px"}}/></td>
+                  <td><button type="button" onClick={()=>JumboQaView(pro.id)} style={{border:'none', padding:'0'}}> <td><Barcode value={`JUMBO${pro.id}`} height={20} /></td></button></td>
+                  {/* <td><ProgressBar now={220} label={`${pro.quantity}`} style={{width:"300px",height:"25px"}}/></td> */}
+                  <td>       
+                    <div style={{ padding: '50px',width: "400px" }}>
+                        {/* <MyProgressBar segments={segments} /> */}
+                        <div style={{ background:'#31E1F7',width: "400px" }}>
+                          <MyProgressBar jumboId={pro.id} containerWidth={Number(pro.quantity)} progressBarId={`progress-${index}`}/>
+                        </div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                              <span>0m</span>
+                              <span>{pro.quantity}m</span>
+                          </div>
+                    </div>
+                 </td>
                   <td>
-                    <td ><Button ><i className="bi bi-printer-fill my-bell-color" /></Button></td>
+                    <td ><Button ><i className="bi bi-printer-fill my-bell-color" onClick={()=>JumboPrint(pro.id)} /></Button></td>
                     <td ><Button onClick={()=>updateRollTogglefunction(pro)}><i className="bi bi-pencil-fill my-pen-color" /></Button></td>
                     <td ><Button  onClick={()=>handleDeleteClick(pro,index)}><i className="bi bi-trash-fill my-trash-color" /></Button></td>
                   </td>
                 </tr>
-              
               </tbody>
               </React.Fragment>
 
@@ -118,5 +147,4 @@ JumbotronComponent.propTypes = {
   product: PropTypes.object.isRequired,
   Refreshkey: PropTypes.string.isRequired,
   updateRollTogglefunction: PropTypes.func.isRequired,
-
 };

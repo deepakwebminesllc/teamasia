@@ -15,35 +15,19 @@ import {
 import PropTypes from 'prop-types';
 import {useNavigate} from 'react-router-dom';
 
-const ProductBackSideEdit = ({productIdOfParent,data1, data3, data4,data5,data6, data7, data8 }) => {
+const ProductBackSideEdit = ({productIdOfParent,frontSidedata,data1, data3, data4,data5,data6, data7, data8 }) => {
   const navigate= useNavigate();
   const [items, setItems] = React.useState([]);
-  const [items1, setItems1] = React.useState([{ design_id: 'x', shade_id: 'x' }]);
-  const [items2, setItems2] = React.useState([]);
+
   const [errorMessageFromApi, setErrorMessageFromApi] = useState([]);
   const [errors, setErrors] = useState({});
+
   const [formDatas, setFormDataS] = React.useState({
-    grain: 'x',
-    fabricId: '0',
-    fabricColorId: '0',
-    qualityId: 'x',
-    colorId: 'x',
-    hsnId: 'x',
-    quantity: '0',
-    PricePerUnit: '0',
-    Thickness: '0',
-    TaxRate: '0',
-    deliveryDate: '00-00-0000',
-    CustomerItemRefernce: '',
-    Topcoat:'',
-    FoamI:'',
-    FillerInFoamI:'',
-    FoamII:'',
-    FillerInFoamII:'',
-    Adhesive:'',
-    FillerInAdhesive:'',
-    FinalGsm:'',
+    productprints:[{ design_id: 'x', shade_id: 'x' }],
+    productadditionaltreatments:[{description: ''}]
   });
+
+  console.log('productIdOfParent in order-product-edit-backside',productIdOfParent,frontSidedata);
 
   const addItem = () => {
     const newItems = items.slice();
@@ -58,27 +42,39 @@ const ProductBackSideEdit = ({productIdOfParent,data1, data3, data4,data5,data6,
   };
 
   const addItem1 = () => {
-    const newItems = items1.slice();
+    const newItems = formDatas.productprints.slice();
     newItems.push({ design_id: 'x', shade_id: 'x' });
-    setItems1(newItems);
+    setFormDataS(prevState => ({
+      ...prevState,
+      productprints: newItems
+    }));
   };
 
   const removeItem1 = index => {
-    const newItems = items1.slice();
+    const newItems = formDatas.productprints.slice();
     newItems.splice(index, 1);
-    setItems1(newItems);
+    setFormDataS(prevState => ({
+      ...prevState,
+      productprints: newItems
+    }));
   };
 
   const addItem2 = () => {
-    const newItems = items2.slice();
+    const newItems = formDatas.productadditionaltreatments.slice();
     newItems.push({ description: '' });
-    setItems2(newItems);
+    setFormDataS(prevState => ({
+      ...prevState,
+      productadditionaltreatments: newItems
+    }));
   };
 
   const removeItem2 = index => {
-    const newItems = items2.slice();
+    const newItems = formDatas.productadditionaltreatments.slice();
     newItems.splice(index, 1);
-    setItems2(newItems);
+    setFormDataS(prevState => ({
+      ...prevState,
+      productadditionaltreatments: newItems
+    }));
   };
 
   const handleInputChange = (index, event) => {
@@ -90,16 +86,22 @@ const ProductBackSideEdit = ({productIdOfParent,data1, data3, data4,data5,data6,
 
   const handleInputChange1 = (index, event) => {
     const { name, value } = event.target;
-    const newItems = items1.slice();
+    const newItems = formDatas.productprints.slice();
     newItems[index][name] = value;
-    setItems1(newItems);
+    setFormDataS(prevState => ({
+      ...prevState,
+      productprints: newItems
+    }));
   };
 
   const handleInputChange2 = (index, event) => {
     const { name, value } = event.target;
-    const newItems = items2.slice();
+    const newItems = formDatas.productadditionaltreatments.slice();
     newItems[index][name] = value;
-    setItems2(newItems);
+    setFormDataS(prevState => ({
+      ...prevState,
+      productadditionaltreatments: newItems
+    }));
   };
 
   const closer =()=>{
@@ -110,18 +112,17 @@ const ProductBackSideEdit = ({productIdOfParent,data1, data3, data4,data5,data6,
     try {
 
         console.log('item',items);
-        console.log('item1',items1);
-        console.log('item2',items2);
+   
 
       
         // console.log('dataX',formDatas);
         const filtered = items.filter((temp)=>{
           return temp.id !== 'z';
         });
-        const filtered1 = items1.filter((temp)=>{
+        const filtered1 = formDatas.productprints.filter((temp)=>{
           return  (temp.design_id !== 'x') &&  (temp.shade_id !== 'x');
         });
-        const filtered2 = items2.filter((temp)=>{
+        const filtered2 = formDatas.productadditionaltreatments.filter((temp)=>{
           return temp.description !== '';
         });
 
@@ -139,8 +140,8 @@ const ProductBackSideEdit = ({productIdOfParent,data1, data3, data4,data5,data6,
 
 
         const token = localStorage.getItem('userToken');
-        const response = await fetch(`https://factory.teamasia.in/api/public/products`, {
-            method: "POST",
+        const response = await fetch(`https://factory.teamasia.in/api/public/products/${formDatas.resultId}`, {
+            method: "PUT",
             headers: {
               'Content-Type': 'application/json',
               'Authorization': `Bearer ${token}`
@@ -150,17 +151,18 @@ const ProductBackSideEdit = ({productIdOfParent,data1, data3, data4,data5,data6,
               order_id:formDatas.orderId,
               template_id:formDatas.orderTemplateId,
               grain_id: formDatas.grain,
-              fabric_id: formDatas.fabricId,
-              fabric_color_id: formDatas.fabricColorId,
+              fabric_id: frontSidedata.fabricId,
+              fabric_color_id: frontSidedata.fabricColorId,
               quality_id: formDatas.qualityId,
               color_id: formDatas.colorId,
               hsn_id: formDatas.hsnId,
-              quantity: formDatas.quantity,
-              price: formDatas.PricePerUnit,
-              thickness: formDatas.Thickness,
-              tax_rate: formDatas.TaxRate,
-              delivery_date:formDatas.deliveryDate,
-              customer_item_reference:formDatas.CustomerItemRefernce,
+
+              quantity: frontSidedata.quantity,
+              price: frontSidedata.PricePerUnit,
+              thickness: frontSidedata.Thickness,
+              tax_rate: frontSidedata.TaxRate,
+              delivery_date: frontSidedata.deliveryDate,
+              customer_item_reference:frontSidedata.CustomerItemRefernce,
 
               topcoat: formDatas.Topcoat,
               foam_1: formDatas.FoamI,
@@ -185,7 +187,7 @@ const ProductBackSideEdit = ({productIdOfParent,data1, data3, data4,data5,data6,
 
         const datas = await response.json();
         console.log("dataapi",datas,response.status);
-        if (response.status === 201) {
+        if (response.status === 200) {
           navigate(-1);
         } else {
           console.error("Authentication failed:", Object.values(datas.messages.errors));
@@ -264,14 +266,11 @@ const handleSubmit = async (event) => {
     // console.log('e',e.target.options[e.target.selectedIndex].text);
     console.log('e',e.target.value);
   };
-
   useEffect(() => {
-    
-    // Fetch the data from the API
-    const fetchData = async () => {
+    const fetchData8 = async () => {
       const token = localStorage.getItem('userToken');
       // console.log('token',token);
-      const response = await fetch('https://factory.teamasia.in/api/public/Products/', {
+      const response = await fetch(`https://factory.teamasia.in/api/public/products/?ref_product_id=${productIdOfParent}`, {
         method: 'GET', 
         headers: {
           'Authorization': `Bearer ${token}`
@@ -281,34 +280,53 @@ const handleSubmit = async (event) => {
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      const result = await response.json();
-      console.log("data1 customers",result.customers);
-      setFormDataS({    
-      grain: 'x',
-      fabricId: '0',
-      fabricColorId: '0',
-      qualityId: 'x',
-      colorId: 'x',
-      hsnId: 'x',
-      quantity: '0',
-      PricePerUnit: '0',
-      Thickness: '0',
-      TaxRate: '0',
-      deliveryDate: '00-00-0000',
-      CustomerItemRefernce: '',
-      Topcoat:'',
-      FoamI:'',
-      FillerInFoamI:'',
-      FoamII:'',
-      FillerInFoamII:'',
-      Adhesive:'',
-      FillerInAdhesive:'',
-      FinalGsm:'',
-    }) 
+      const resultjson = await response.json();
+      const result = resultjson.products[0];
+      console.log('result in product back side',result);
+      if(result){
+        const embossArray = result.emboss_ids.split(',');
+        if(embossArray.length !== 0 && embossArray[0] !== ''){
+          setItems(embossArray.map((em)=>({'id':em})));
+        }
+        setFormDataS(prevState => ({
+          ...prevState,
+            orderId:result.order_id,
+            orderTemplateId:result.template_id,
+            resultId:result.id,
+            grain: result.grain_id,
+            fabricId: result.fabric_id,
+            fabricColorId: result.fabric_color_id,
+            qualityId: result.quality_id,
+            colorId: result.color_id,
+            hsnId: result.hsn_id,
+            quantity: result.quantity,
+            PricePerUnit: result.price,
+            Thickness: result.price,
+            TaxRate: result.tax_rate,
+            deliveryDate: result.delivery_date,
+            CustomerItemRefernce: result.customer_item_reference,
+            Topcoat:result.topcoat,
+            FoamI:result.foam_1,
+            FillerInFoamI:result.filler_in_foam_1,
+            FoamII:result.foam_2,
+            FillerInFoamII:result.filler_in_foam_2,
+            Adhesive:result.adhesive,
+            FillerInAdhesive:result.filler_in_adhesive,
+            FinalGsm:result.final_gsm,
+  
+            isFactorySurplusProduct:result.is_factory_surplus_product,
+            isOnlineProduct:result.is_online_product,
+            isTrashed:result.is_trashed,
+            productIdOfParent:result.ref_product_id,
+            productprints:result.productprints,
+            productadditionaltreatments:result.productadditionaltreatments
+        })
+      )
+      }
+      console.log("response in Productedit",result,resultjson.products[0]);
+      
     };
-
- 
-    fetchData();
+    fetchData8();
   },[]);
 
   return (
@@ -487,7 +505,7 @@ const handleSubmit = async (event) => {
                       </thead>
           
                     <tbody>
-                    {items1.map((item, index) => (
+                    {formDatas.productprints.map((item, index) => (
                         <tr key={item.index}>
                           <Row>
                             <Col md="4">
@@ -538,7 +556,7 @@ const handleSubmit = async (event) => {
                       </thead>
           
                     <tbody>
-                    {items2.map((item, index) => (
+                    {formDatas.productadditionaltreatments.map((item, index) => (
                         <tr key={item.id}>
                           <Row>
                             <Col md="8"><Input name="description" value={item.description} type="text" onChange={e => handleInputChange2(index, e)} placeholder="" /></Col>
@@ -575,6 +593,7 @@ export default ProductBackSideEdit;
 ProductBackSideEdit.propTypes = {
   
   productIdOfParent:PropTypes.string.isRequired,
+  frontSidedata: PropTypes.object.isRequired,
   data1: PropTypes.array.isRequired,
   data3: PropTypes.array.isRequired,
   data4: PropTypes.array.isRequired,

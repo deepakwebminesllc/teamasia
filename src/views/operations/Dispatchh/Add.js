@@ -13,7 +13,6 @@ import {
   FormText,
   Button,
   Table,
-
 } from 'reactstrap';
 // import { useParams } from 'react-router-dom';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -69,7 +68,41 @@ const Add = () => {
 
   };
 
-  const addSmallRoll =()=>{
+
+  async function scanRoll(smallrollid) {
+    try {
+   
+
+      
+        const token = localStorage.getItem('userToken');
+        const response = await fetch(`https://factory.teamasia.in/api/public/smallrolls/scan/${smallrollid}`, {
+            method: "GET",
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+        });
+        const data = await response.json();
+        console.log("dataapi",data,response.status);
+        if (response.status === 200) {
+          console.log('hi')
+          return {state:'200',data: data?.smallrolls[0]}
+        }
+        if (response.status !== 200) {
+          console.log('bi');
+          return {state:'404',data: 'Small Roll belongs to the other order'}
+        }
+        // if (data.error) {
+        //   setErrorMessageFromApi(Object.values(data.error));
+        // }
+        return null;
+    } catch (error) {
+      setErrorMessageFromApi(["Network error"]);
+        return null;
+    }
+}
+
+  async function addSmallRoll(){
     console.log('dataSmallRollItems',dataSmallRollItems);
     const extractedRoll = formDatas.RollCode.split('SMALL')[1]
     console.log('extractedRoll',String(extractedRoll) ,dataSmallRoll);
@@ -80,7 +113,17 @@ const Add = () => {
     }
     else if(!dataSmallRoll.find((roll)=>roll.id === String(extractedRoll))){
       console.log('bye');
-      setErrorMessageFromApi((prev)=>([...prev,"Roll Code doesn't exist"]));
+      const scannedRollData = await scanRoll(extractedRoll);
+      console.log('scannedRollData',scannedRollData.state);
+
+      if(scannedRollData.state === '200'){
+        const newDataSmallRollItems = dataSmallRollItems.slice(0)
+       newDataSmallRollItems.push(scannedRollData.data);
+       setDataSmallRollItems(newDataSmallRollItems);
+      }
+      else{
+        setErrorMessageFromApi((prev)=>([...prev,scannedRollData.data]));
+      }
     }
     else{
       console.log('bi');
@@ -190,7 +233,7 @@ useEffect(() => {
   const fetchData = async () => {
     const token = localStorage.getItem('userToken');
     // console.log('token',token);
-    const response = await fetch(`https://factory.teamasia.in/api/public/smallrolls?order_id=${orderId}`, {
+    const response = await fetch(`https://factory.teamasia.in/api/public/smallrolls/?order_id=${orderId}`, {
       method: 'GET', 
       headers: {
         'Authorization': `Bearer ${token}`
@@ -413,7 +456,7 @@ useEffect(() => {
                                           <td>{roll.grade_id}</td>
                                           <td>{roll.weight}</td>
                                           <td>{roll.bin}</td>
-                                          <td>{roll.quantity}</td>
+                                          <td>{((roll.weight * 1000) / (roll.quantity * roll.width)).toFixed(2)}</td>
                                           {/* <td><img src={Barcode} alt='barcode'/></td> */}
                                           <td><Barcode value={`SMALL${roll.id}`} height={20} /></td>
                                           

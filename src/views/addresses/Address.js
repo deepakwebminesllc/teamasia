@@ -30,12 +30,12 @@ const Edit= () => {
   const [data3, setData3] = useState([]);
 
 // console.log('data',companyAddress[0].AddressLine1);
-// console.log('location',location.state);
+console.log('location in factory address',location.state);
 
 const handleEditAdd = () => {
   // Navigate to the edit page with the item's id
   // Navigate(`/resources/address-types/edit/${itemId}`);
-  navigate('/order/customers/address/add',{state: id});
+  navigate('/addresses/add',{state: id});
 };
 
 const handleEditAddress = (customer)=>{
@@ -43,7 +43,7 @@ const handleEditAddress = (customer)=>{
   customer.newCustomerId = newCustomerId ;
   console.log('address',id, location.state);
   console.log('address',customer);
-   navigate('/order/customers/address/edit', {state: customer });
+   navigate('/addresses/edit', {state: customer.id });
  } 
 
  const handleDeleteClick = async (itemId) => {
@@ -98,7 +98,7 @@ useEffect(() => {
   const fetchData = async () => {
     const token = localStorage.getItem('userToken');
     // console.log('token',token);
-    const response = await fetch('https://factory.teamasia.in/api/public/addresses', {
+    const response = await fetch(`https://factory.teamasia.in/api/public/addresses/?factory_id=${id}`, {
       method: 'GET', 
       headers: {
         'Authorization': `Bearer ${token}`
@@ -167,17 +167,18 @@ useEffect(() => {
   >
      <Row>
       <Col md="8">
-        <Button className='my-btn-color' style={{ marginBottom: '1rem',marginRight:'10px' }} onClick={() => handleEditAdd()}>
+        <Button 
+           className='my-btn-color' 
+           style={{ marginBottom: '1rem',marginRight:'10px',display:data.length > 0? 'none':'block' }}
+           
+           onClick={() => handleEditAdd()}>
           Add Address
         </Button>
       </Col>
     </Row>
-
-   
-     
 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
   
-<table className="table">        
+<table className="table">      
                   <thead>
                         <tr>
                         <Row className='mt-4'>

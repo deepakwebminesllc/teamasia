@@ -221,6 +221,7 @@
             margin-right: 3px;
             margin-bottom: 5px;
           }
+
          .order-view-page-flex{
             display: flex;
             flex-wrap: wrap;
@@ -233,11 +234,33 @@
            font-size:15px;
            margin-right:5px
          } 
-         @media only screen and (max-width:768px) {
+         @media only screen and (max-width:991px) {
           .order-view-page-flex{
             flex-direction: column;
           }
          }
+        .order-view-page-grid{
+          display: grid;
+          gap: 10px;
+          grid-template-columns: 1fr;
+        }
+        .order-view-page-grid div i{
+           font-size:15px;
+           margin-right:5px
+         }
+
+        @media (min-width:575px) and (max-width:991px){
+          .order-view-page-grid{
+            grid-template-columns:repeat(2,1fr)
+          }
+        }
+
+        @media (min-width:992px){
+          .order-view-page-grid{
+            grid-template-columns:repeat(3,1fr)
+          }
+        }
+
          .order-background{
           background:#ebeff3 !important;
          }
@@ -344,6 +367,11 @@
       .qa-packaging-roll-modal-items-padding td{
         padding: 5px !important;
       }
+    
+      .form-text.text-danger {
+          color: red !important;
+        }
+        
     </style>
   </head>
   <body>

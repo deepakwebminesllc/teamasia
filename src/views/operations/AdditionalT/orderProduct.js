@@ -4,66 +4,83 @@ import PropTypes from 'prop-types';
 
 const JumbotronComponent = (props) => {
   const { productID } = props;
-  const [data, setData] = useState({ front_side: {}, back_side: [] });
-  const [data1, setData1] = useState([]);
-  const [data2, setData2] = useState([]);
-  const [data3, setData3] = useState([]);
-  const [data4, setData4] = useState([]);
-  const [data5, setData5] = useState([]);
+  const [Frontdata, setFrontData] = useState(null);
+  const [Backdata, setBackData] = useState(null);
+  const [data7, setData7] = useState([]);
+  const [data8, setData8] = useState([]);
 
-  function getGrainNameById(grainId) {
-    const Name = data1.find(item => item.id === grainId);
-    return Name ? Name.name : 'Unknown grain';
+  const printing  = (productprints = [])=>{
+    console.log('productprints',productprints);
+    
+   const printArray =  productprints.map((item)=> {
+      let str = ''
+      const design = data7.find((d)=> d.id === item.design_id);
+      const shade = data8.find((s)=> s.id === item.shade_id);
+      
+      console.log('design,shade',design,shade)
+      if(design){
+        str += `${design.code}/${design.code}/`
+      }
+      if(shade){
+        str += shade.name
+      }
+
+      return str
+    }  
+)
+
+console.log('printArray',printArray);
+
+    return printArray.length > 0? printArray:[];
   }
 
-  function getFabricNameById(fabricId) {
-    const Name = data2.find(item => item.id === fabricId);
-    return Name ? Name.name : 'Unknown fabric';
-  }
 
-  function getFabricColorNameById(fabricId, fabricColorId) {
-    const Name = data2.find(item => item.id === fabricId);
-    let FabricColor = null;
-    if (Name) {
-      FabricColor = Name.fabriccolors.find(item => item.id === fabricColorId);
-    }
-    return FabricColor ? FabricColor.name : 'Unknown fabricColor';
-  }
+// console.log(data7, data8);
 
-  function getQualityNameById(qualityId) {
-    const Name = data3.find(item => item.id === qualityId);
-    return Name ? Name.name : 'Unknown quality';
-  }
-
-  function getColorNameById(colorId) {
-    const Name = data4.find(item => item.id === colorId);
-    return Name ? Name.name : 'Unknown color';
-  }
-
-  function getHsnNameById(hsnId) {
-    const Name = data5.find(item => item.id === hsnId);
-    return Name ? Name.name : 'Unknown HSN';
-  }
 
   useEffect(() => {
-    const fetchData1 = async () => {
+  
+    const fetchData7 = async () => {
       const token = localStorage.getItem('userToken');
-      const response = await fetch('https://factory.teamasia.in/api/public/grains', {
-        method: 'GET',
+      // console.log('token',token);
+      const response = await fetch('https://factory.teamasia.in/api/public/designs', {
+        method: 'GET', 
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
+      // console.log('result',response);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const result = await response.json();
-      setData1(result.grains);
+      const resultX = result.designs.slice();
+      // resultX.push({id:'x',design_id:'x',code:'Choose'});
+      setData7(resultX);
     };
 
-    const fetchData2 = async () => {
+    const fetchData8 = async () => {
       const token = localStorage.getItem('userToken');
-      const response = await fetch('https://factory.teamasia.in/api/public/fabrics', {
+      // console.log('token',token);
+      const response = await fetch('https://factory.teamasia.in/api/public/shades', {
+        method: 'GET', 
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      // console.log('result',response);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const result = await response.json();
+      const resultX = result.shades.slice();
+      // resultX.push({id:'x',shade_id:'x',name:'Choose'});
+      setData8(resultX);
+    }
+
+       const fetchDataFront = async (frontProductId) => {
+      const token = localStorage.getItem('userToken');
+      const response = await fetch(`https://factory.teamasia.in/api/public/products/${frontProductId}`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -73,12 +90,15 @@ const JumbotronComponent = (props) => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const result = await response.json();
-      setData2(result.fabrics);
+      console.log('result product',result)
+        setFrontData(result);
     };
 
-    const fetchData3 = async () => {
+       const fetchDataBack = async (backProductId) => {
+        console.log('back',backProductId);
+
       const token = localStorage.getItem('userToken');
-      const response = await fetch('https://factory.teamasia.in/api/public/qualities', {
+      const response = await fetch(`https://factory.teamasia.in/api/public/products/${backProductId}`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -88,38 +108,11 @@ const JumbotronComponent = (props) => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const result = await response.json();
-      setData3(result.qualities);
+      console.log('result product',result)
+        setBackData(result);
+
     };
 
-    const fetchData4 = async () => {
-      const token = localStorage.getItem('userToken');
-      const response = await fetch('https://factory.teamasia.in/api/public/colors', {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const result = await response.json();
-      setData4(result.colors);
-    };
-
-    const fetchData5 = async () => {
-      const token = localStorage.getItem('userToken');
-      const response = await fetch('https://factory.teamasia.in/api/public/hsns', {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const result = await response.json();
-      setData5(result.hsns);
-    };
 
     const fetchData = async () => {
       const token = localStorage.getItem('userToken');
@@ -133,21 +126,21 @@ const JumbotronComponent = (props) => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const result = await response.json();
-      console.log('result product',result)
-      setData(result);
+      console.log('result product',result);
+      if(!Array.isArray(result.front_side)){
+        fetchDataFront(result.front_side?.id);
+      }
+      if(!Array.isArray(result.back_side)){
+        fetchDataBack(result.back_side?.id);
+      }
     };
 
-    fetchData1();
-    fetchData2();
-    fetchData3();
-    fetchData4();
-    fetchData5();
+    fetchData8();
+    fetchData7();
     fetchData();
-  }, [productID]);
+  }, []);
 
-  if (!data.front_side || !data.back_side) {
-    return <div>Loading...</div>;
-  }
+  
 
   return (
     <>
@@ -159,17 +152,17 @@ const JumbotronComponent = (props) => {
                 <div style={{ margin: '5px 0px' }}>
                   <div className='fix-wid-1'>
                     <i className="bi-menu-button-wide-fill my-eye-color" style={{ fontSize: '20px', marginRight: '1px' }} />
-                    <span style={{ fontWeight: '900' }}> Product {data.front_side.id}</span>
+                    <span style={{ fontWeight: '900' }}> Product {Frontdata?.id}</span>
                   </div>
                 </div>
              
               
           
           </Table>
-          <Table className='table-margin-zero' responsive size="sm">
+          {Frontdata && (   <Table className='table-margin-zero' responsive size="sm">
             <thead>
               <tr>
-                <th colSpan={13} style={{ background: '#777', textAlign: 'center', color: 'white' }}>Front Side</th>
+                <th colSpan={13} style={{ background: '#777', textAlign: 'center', color: 'white' }}>{Backdata && 'Front Side'}</th>
               </tr>
               <tr>
                 <th scope="col">Grain</th>
@@ -189,24 +182,26 @@ const JumbotronComponent = (props) => {
             </thead>
             <tbody>
               <tr>
-                <td title={getGrainNameById(data.front_side.grain_id)}>{getGrainNameById(data.front_side.grain_id)}</td>
-                <td title={getColorNameById(data.front_side.color_id)}>{getColorNameById(data.front_side.color_id)}</td>
-                <td title={getQualityNameById(data.front_side.quality_id)}>{getQualityNameById(data.front_side.quality_id)}</td>
-                <td title={data.front_side.thickness}>{data.front_side.thickness}</td>
-                <td title={getFabricNameById(data.front_side.fabric_id)}>{getFabricNameById(data.front_side.fabric_id)}</td>
-                <td title={getFabricColorNameById(data.front_side.fabric_id, data.front_side.fabric_color_id)}>{getFabricColorNameById(data.front_side.fabric_id, data.front_side.fabric_color_id)}</td>
-                <td title={getHsnNameById(data.front_side.hsn_id)}>{getHsnNameById(data.front_side.hsn_id)}</td>
-                <td title={data.front_side.price}>{data.front_side.price}</td>
-                <td title={data.front_side.tax_rate}>{data.front_side.tax_rate}%</td>
-                <td>N/A</td>
-                <td>N/A</td>
+                <td title={Frontdata.grain_name}>{Frontdata.grain_name}</td>
+                <td title={Frontdata.color_name}>{Frontdata.color_name}</td>
+                <td title={Frontdata.quality_name}>{Frontdata.quality_name}</td>
+                <td title={Frontdata.thickness}>{Frontdata.thickness}</td>
+                <td title={Frontdata.fabric_name}>{Frontdata.fabric_name}</td>
+                <td title={Frontdata.fabric_color_name}>{Frontdata.fabric_color_name}</td>
+                <td title={Frontdata.hsn_name}>{Frontdata.hsn_name}</td>
+                <td title={Frontdata.price}>{Frontdata.price}</td>
+                <td title={Frontdata.tax_rate}>{Frontdata.tax_rate}%</td>
+                <td title={Frontdata.emboss_name}>{Frontdata.emboss_name}</td>
+                <td>{printing(Frontdata.productprints)?.map(item=> <div>{item}</div>)}</td>
                 <td>N/A</td>
                 <td>N/A</td>
               </tr>
             </tbody>
           </Table>
+        ) }
+       
         </div>
-        {data.back_side.length > 0 && (
+        {Backdata && (
           <div>
             <Table className='table-margin-zero' responsive size="sm">
               <thead>
@@ -230,23 +225,22 @@ const JumbotronComponent = (props) => {
                 </tr>
               </thead>
               <tbody>
-                {data.back_side.map((back) => (
-                  <tr key={back.id}>
-                    <td title={getGrainNameById(back.grain_id)}>{getGrainNameById(back.grain_id)}</td>
-                    <td title={getColorNameById(back.color_id)}>{getColorNameById(back.color_id)}</td>
-                    <td title={getQualityNameById(back.quality_id)}>{getQualityNameById(back.quality_id)}</td>
-                    <td title={back.thickness}>{back.thickness}</td>
-                    <td title={getFabricNameById(back.fabric_id)}>{getFabricNameById(back.fabric_id)}</td>
-                    <td title={getFabricColorNameById(back.fabric_id, back.fabric_color_id)}>{getFabricColorNameById(back.fabric_id, back.fabric_color_id)}</td>
-                    <td title={getHsnNameById(back.hsn_id)}>{getHsnNameById(back.hsn_id)}</td>
-                    <td title={back.price}>{back.price}</td>
-                    <td title={back.tax_rate}>{back.tax_rate}%</td>
-                    <td>N/A</td>
-                    <td>N/A</td>
-                    <td>N/A</td>
-                    <td>N/A</td>
-                  </tr>
-                ))}
+                {Backdata ?<tr key={Backdata.id}>
+                      <td title={Backdata.grain_name}>{Backdata.grain_name}</td>
+                      <td title={Backdata.color_name}>{Backdata.color_name}</td>
+                      <td title={Backdata.quality_name}>{Backdata.quality_name}</td>
+                      <td title={Backdata.thickness}>{Backdata.thickness}</td>
+                      <td title={Backdata.fabric_name}>{Backdata.fabric_name}</td>
+                      <td title={Backdata.fabric_color_name}>{Backdata.fabric_color_name}</td>
+                      <td title={Backdata.hsn_name}>{Backdata.hsn_name}</td>
+                      <td title={Backdata.price}>{Backdata.price}</td>
+                      <td title={Backdata.tax_rate}>{Backdata.tax_rate}%</td>
+                      <td title={Backdata.emboss_name}>{Backdata.emboss_name}</td>
+                      <td>{printing(Backdata.productprints).map(item=> <div>{item}</div>)}</td>
+                      <td>N/A</td>
+                      <td>N/A</td>
+                  </tr> :""}
+                  
               </tbody>
             </Table>
           </div>
@@ -260,3 +254,6 @@ export default JumbotronComponent;
 JumbotronComponent.propTypes = {
   productID: PropTypes.string.isRequired,
 };
+
+
+

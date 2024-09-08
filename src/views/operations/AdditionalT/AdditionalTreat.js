@@ -35,6 +35,11 @@ const AdditionalTreat = () => {
     return date ? date.plan_date : 'unknown date';
   };
 
+  const JumboQaView = (dispatchItem)=>{
+    console.log('hi',dispatchItem);
+    navigate('/operations/find-additional-jumbo-roll',{state: {jumboId:dispatchItem}});
+  }
+
   const customerNames = (planId) => {
     const PlanData = plans.find((p) => p.id === planId);
     if (PlanData) {
@@ -46,13 +51,13 @@ const AdditionalTreat = () => {
 
   const AdditionalTreatView = (rollItem) => {
     const customerName = customerNames(rollItem.production_plan_id);
-    navigate('/operations/additional-treatment/view', { state: { rollItem, customerName, plans, QaData } });
+    navigate('/operations/additional-treatment/view', { state: { id:rollItem.id, customerName,plans,QaData}});
   };
 
   useEffect(() => {
     const fetchDispatch = async () => {
       const token = localStorage.getItem('userToken');
-      const response = await fetch(`https://factory.teamasia.in/api/public/jumboroll/?send_for_additional_treatment=1`, {
+      const response = await fetch(`https://factory.teamasia.in/api/public/jumboroll/?send_for_additional_treatment=1&is_treated=0`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -135,7 +140,7 @@ const AdditionalTreat = () => {
   };
 
   const filteredData = data.filter((roll) => {
-    const plan = plans.find((p) => p.id === roll.production_plan_id);
+    const plan = plans?.find((p) => p.id === roll.production_plan_id);
     if (!plan) {
       return false; // If no plan is found, skip this entry
     }
@@ -163,7 +168,7 @@ const AdditionalTreat = () => {
         </p>
       }
     >
-      <Button className='my-btn-color' style={{ marginBottom: '1rem', marginRight: '10px' }} disabled>
+      <Button className='my-btn-color'onClick={()=>JumboQaView()} style={{ marginBottom: '1rem', marginRight: '10px' }}>
         Load By Code
       </Button>
 

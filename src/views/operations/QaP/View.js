@@ -5,18 +5,10 @@ import {
   Table,
   Col,
   Collapse,
-  Card,
-  CardBody,
-  CardTitle,
-  Form,
-  FormGroup,
-  Label,
-  Input,
-  FormText,
 } from 'reactstrap';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Barcode from 'react-barcode';
-import ProgressBar from 'react-bootstrap/ProgressBar';
+// import ProgressBar from 'react-bootstrap/ProgressBar';
 // import { stateFromHTML } from 'draft-js-import-html';
 import ComponentCard5 from '../../../components/ComponentCard5';
 import 'react-table-v6/react-table.css';
@@ -26,6 +18,8 @@ import CreateSmallRoll from './createSmallRoll'
 import UpdateSmallRoll from './updateSmallRoll'
 import QaViewSmall from './QaViewSmall'
 import OrderProduct from  './orderProduct';
+import MyProgressBarJumboR from './MyProgressBarJumboR';
+import MyProgressBarJumboCorrected from './MyProgressBarJumboCorrected';
 
 const JumbotronComponent = () => {
  
@@ -34,9 +28,12 @@ const JumbotronComponent = () => {
   const navigate = useNavigate();
   const location = useLocation();
   console.log('location in ad',location.state);
-  const {rollItem,customerName,plans,QaData } = location.state;
+  const {id,customerName ='missing'} = location.state;
+
   const [collapseProduct, setCollapseProduct] = useState(false);
   const [collapseNote, setCollapseNote] = useState(false);
+  const [rollItem, setRollItem] = useState(undefined);
+  const [plans, setPlans] = useState([]);
   const [modal, setModal] = useState(false);
   const [modal1, setModal1] = useState(false);
   const [modal2, setModal2] = useState(false);
@@ -47,7 +44,7 @@ const JumbotronComponent = () => {
   const [Qa,setQa] = useState({});
   const [order,setOrder] = useState({created_at:'0000-01-1',expected_delivery_date:'0000-01-1'});
   const [gradeData,setGradeData] = useState([]);
-  const [qaData,setQaData] = useState([]);
+  const [QaData,setQaData] = useState([]);
   const [JumboUpdateDataFromPlan, setJumboUpdateDataFromPlan] = useState({});
   const [refreshKey, setRefreshKey] = useState(0);
 
@@ -56,7 +53,11 @@ const JumbotronComponent = () => {
     setCollapseProduct(!collapseProduct)
   }
 
-  
+  const JumboPrint = (dispatchItem)=>{
+    console.log('hi',dispatchItem);
+    navigate('/operations/jumbo/print',{state: dispatchItem});
+  }
+
   function formatDate(inputDate) {
     const date = new Date(inputDate);
   
@@ -66,18 +67,17 @@ const JumbotronComponent = () => {
   }
 
   useEffect(()=>{
-      const plan = plans.find((p)=> p.id === rollItem.production_plan_id);
+      const plan = plans.find((p)=> p.id === rollItem?.production_plan_id);
       console.log('date',plan);
       if(plan){
         setPlanData(plan);
       }
-
-      const QaNew = QaData.find((p)=> p.id === rollItem.qa_pe_id);
+      const QaNew = QaData.find((p)=> p.id === rollItem?.qa_pe_id);
       console.log('date',QaNew);
       if(QaNew){
         setQa(QaNew);
       }
-  },[])
+  },[rollItem,QaData,plans]);
  
   const toggleNote = () =>{   
     setCollapseNote(!collapseNote)
@@ -115,7 +115,25 @@ const setterJumboUpdateDataFromPlan = (product)=>{
 }
 
 useEffect(()=>{
-  const fetchData = async()=>{
+  const fetchPlans = async () => {
+    const token = localStorage.getItem('userToken');
+    // console.log('token',token);
+    const response = await fetch(`https://factory.teamasia.in/api/public/productionplan`, {
+      method: 'GET', 
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    // console.log('result',response);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const result = await response.json();
+    // console.log("responsejson1",result.dispatch);
+    setPlans(result.production_plan); 
+  };
+
+  const fetchFaultData = async()=>{
    const token = localStorage.getItem('userToken');
    // console.log('token',token);
    const response = await fetch(`https://factory.teamasia.in/api/public/faults/?is_trashed=0`, {
@@ -152,45 +170,6 @@ useEffect(()=>{
    const resultX = result.severities.slice();
    resultX.push({id:'x',name:'Choose'});
    setSeverityData(resultX); 
-  }
-
-  const fetchData1 = async(saverityId)=>{
-   const token = localStorage.getItem('userToken');
-   // console.log('token',token);
-   const response = await fetch(`https://factory.teamasia.in/api/public/severities/${saverityId}`, {
-     method: 'GET', 
-     headers: {
-       'Authorization': `Bearer ${token}`
-     }
-   });
-   // console.log('result',response);
-   if (!response.ok) {
-     throw new Error(`HTTP error! status: ${response.status}`);
-   }
-   const result = await response.json();
-   console.log("responsejson saverity",result);
-   setSeverity(result[0]); 
-  }
-
-  const fetchOrderData = async()=>{
-   const token = localStorage.getItem('userToken');
-   // console.log('token',token);
-   const response = await fetch(`https://factory.teamasia.in/api/public/orders/${rollItem.order_id}`, {
-     method: 'GET', 
-     headers: {
-       'Authorization': `Bearer ${token}`
-     }
-   });
-   // console.log('result',response);
-   if (!response.ok) {
-     throw new Error(`HTTP error! status: ${response.status}`);
-   }
-   const result = await response.json();
-   console.log("responsejson order",result);
-   setOrder(result); 
-   fetchData1(result.severity_id);
-
-   console.log(order)
   }
 
   const fetchGradeData = async () => {
@@ -232,52 +211,81 @@ useEffect(()=>{
     resultX.push({id:'x',name:'Choose'});
     setQaData(resultX); 
   };
-  
+
+  const fetchData1 = async(saverityId = 0)=>{
+   const token = localStorage.getItem('userToken');
+   // console.log('token',token);
+   const response = await fetch(`https://factory.teamasia.in/api/public/severities/${saverityId}`, {
+     method: 'GET', 
+     headers: {
+       'Authorization': `Bearer ${token}`
+     }
+   });
+   // console.log('result',response);
+   if (!response.ok) {
+     throw new Error(`HTTP error! status: ${response.status}`);
+   }
+   const result = await response.json();
+   console.log("responsejson saverity",result);
+   setSeverity(result[0]); 
+  }
+
+  const fetchOrderData = async(jumboRoll)=>{
+   const token = localStorage.getItem('userToken');
+   // console.log('token',token);
+   const response = await fetch(`https://factory.teamasia.in/api/public/orders/${jumboRoll.order_id}`, {
+     method: 'GET', 
+     headers: {
+       'Authorization': `Bearer ${token}`
+     }
+   });
+   // console.log('result',response);
+   if (!response.ok) {
+     throw new Error(`HTTP error! status: ${response.status}`);
+   }
+   const result = await response.json();
+   console.log("responsejson order",result);
+   setOrder(result); 
+   fetchData1(result?.severity_id);
+   console.log(order)
+  }
+
+   const fetchJumboData = async()=>{
+   const token = localStorage.getItem('userToken');
+   // console.log('token',token);
+   const response = await fetch(`https://factory.teamasia.in/api/public/jumboroll/${id}`, {
+     method: 'GET', 
+     headers: {
+       'Authorization': `Bearer ${token}`
+     }
+   });
+   // console.log('result',response);
+   if (!response.ok) {
+     throw new Error(`HTTP error! status: ${response.status}`);
+   }
+   const result = await response.json();
+   console.log("responsejson jumboRoll",result);
+   fetchOrderData(result?.[0])
+   setRollItem(result?.[0])
+  //  fetchData1();
+  }
+
+  fetchJumboData();
+  fetchPlans();
   fetchGradeData();
   fetchQaData();
   fetchData2();
-  fetchOrderData();
-  fetchData();
-
+  // fetchOrderData();
+  fetchFaultData();
 },[]);
 
   return (
     <>
        {modal ?<AddFault modal={modal} faultData={faultData} rollItem ={rollItem} severityData={severityData} toggle={addFaultTogglefunction}/>:null}
-       {modal1?<CreateSmallRoll modal={modal1} rollItem ={rollItem} handleCreateSmallRoll={handleCreateSmallRoll} faultData={faultData} data1={gradeData} data2={qaData} severityData={severityData} toggle={addRollTogglefunction}/>:null}
-       {modal2?<UpdateSmallRoll modal={modal2} rollItem ={rollItem} handleCreateSmallRoll={handleCreateSmallRoll} JumboUpdateDataFromPlan ={JumboUpdateDataFromPlan} faultData={faultData} data1={gradeData} data2={qaData} severityData={severityData} toggle={updateRollTogglefunction}/>:null}
+       {modal1?<CreateSmallRoll modal={modal1} rollItem ={rollItem} handleCreateSmallRoll={handleCreateSmallRoll} faultData={faultData} data1={gradeData} data2={QaData} severityData={severityData} toggle={addRollTogglefunction}/>:null}
+       {modal2?<UpdateSmallRoll modal={modal2} rollItem ={rollItem} handleCreateSmallRoll={handleCreateSmallRoll} JumboUpdateDataFromPlan ={JumboUpdateDataFromPlan} faultData={faultData} data1={gradeData} data2={QaData} severityData={severityData} toggle={updateRollTogglefunction}/>:null}
         
-        <ComponentCard5>
-
-          <Card>
-            <CardTitle tag="h4" className="border-bottom bg-primary p-3 mb-0 text-white">
-            </CardTitle>
-            <CardBody className="bg-light">
-              <CardTitle tag="h4" className="mb-0">
-              </CardTitle>
-            </CardBody>
-            <CardBody>
-              <Form>
-                <Row style={{display:'none'}}>
-                  <Col md="8">
-                    <FormGroup>
-                      <Label>Jumbo Roll</Label>
-                      <Input type="text" placeholder="Enter Roll Code" />
-                      <FormText className="muted"></FormText>
-                    </FormGroup>
-                  </Col>
-                  <Col md="4">
-                    <FormGroup>
-                    <Button type="submit" className="btn my-btn-color-yellow" style={{marginTop:"28px"}}>
-                        Load Jumbo Roll
-                    </Button>
-                    </FormGroup>
-                  </Col>
-                </Row>
-              </Form>
-            </CardBody>
-          </Card>
-        </ComponentCard5>
+        
 
       <ComponentCard5 title="">
             <ComponentCard5>
@@ -286,16 +294,16 @@ useEffect(()=>{
                   <thead>
                     <tr>
                       <th scope="col" >
-                        <div><Barcode value={`JUMBO${rollItem.id}`} height={20} /></div>
+                        <div><Barcode value={`JUMBO${rollItem?.id}`} height={20} /></div>
                       </th>
-                      <th scope="col">Total: {rollItem.quantity} meters</th>
+                      <th scope="col">Total: {rollItem?.quantity} meters</th>
                       <th scope="col">Remaining: ? meters</th>
 
                       
                       <th scope="col"><Button className='my-btn-color' style={{whiteSpace:'nowrap'}} onClick={()=>addRollTogglefunction()}>Create Small Roll</Button></th>
                       <th scope="col"><Button className='my-btn-color-red' style={{whiteSpace:'nowrap'}} onClick={()=>addFaultTogglefunction()}>Add Fault</Button></th>
                       <th scope="col"><Button className='my-btn-color-red' style={{whiteSpace:'nowrap'}} onClick={()=>LabReportFunction()}>Lab Report</Button></th>
-                      <th scope="col"><Button className='my-btn-color-red'>Print</Button></th>
+                      <th scope="col"><Button className='my-btn-color-red' onClick={()=>JumboPrint(rollItem?.id)}>Print</Button></th>
                       {/* <th scope="col"><Button className='my-btn-mo-color'>More</Button></th> */}
                       
                     </tr>
@@ -313,7 +321,7 @@ useEffect(()=>{
                   <Row>
                     <Col className='col-10'>
                     <div style={{marginLeft:'10px'}}>
-                      {customerName}(#{rollItem.product_id}), Product({rollItem.product_id})   
+                      {customerName}(#{rollItem?.product_id}), Product({rollItem?.product_id})   
                     </div>
                     </Col>
                     <Col className='col-2'>
@@ -347,7 +355,7 @@ useEffect(()=>{
                   </tbody>
                 </Table>
 
-              <OrderProduct productID = {rollItem.product_id } />
+              <OrderProduct productID = {rollItem?.product_id}/>
 
                 
 
@@ -410,50 +418,33 @@ useEffect(()=>{
                   </div>
                  <div>Note From Production</div>
                   <div>
-                    {rollItem.note}
+                    {rollItem?.note}
                   </div>
                </ComponentCard5>                
             </Collapse>
 
-            <div style={{padding: "25px 0px 10px 0px",border: "1px solid #dee2e6"}}>
+            <div style={{border: "1px solid #dee2e6"}}>
                   <Row>
                     <Col className='col-10'>
                     {/* {" Small Rolls (Total : 8, Qty : 161 m, Avg Gsm : 1334.69 g/m2) "} */}
                     </Col>
-                    
-                   
+                    {rollItem ?<MyProgressBarJumboR jumboId = {rollItem?.id} containerWidth={Number(rollItem?.quantity)} progressBarId="progress-x"/>:''
+                    }
+                  </Row>
+                  <Row>
+                    <Col className='col-10'>
+                    {/* {" Small Rolls (Total : 8, Qty : 161 m, Avg Gsm : 1334.69 g/m2) "} */}
+                    </Col>
+                    {rollItem ?<MyProgressBarJumboCorrected jumboId = {rollItem?.id} containerWidth={Number(rollItem?.quantity)} progressBarId="progress-x"/>:''
+                    }
                   </Row>
                 </div>
                 
 
-                <div style={{padding: "25px 0px 10px 0px",border: "1px solid #dee2e6"}}>
-                  <Row style={{marginBottom:'10px'}}> 
-                    <Col className='col-10'>
-                      <div>
-                        {" Jumbo Roll Reverse Life Cycle Assessment (RLCA)" }
-                      </div>
-                     <ProgressBar  now={220} label={`${170}m`} className='progress_bar_color1' variant="info"/>
-                    </Col>
-                  </Row>
-                   <Row>
-                      <Col className='col-12' >
-                        <div style={{padding:"20px 10px", background:'#8EF3C5'}}>
-                          No faults have been reported, but remain alert for any unexpected faults.
-                        </div>
-                       </Col>
-                   </Row>
-                  <Row style={{marginBottom:'10px'}}>
-                    <Col className='col-10'>
-                    <div>
-                        {" Reverse Life Cycle Assessment Corrected " }
-                      </div>
-                     <ProgressBar  now={220} label={`${170}m`} className='progress_bar_color1' variant="warning"/>
-                    </Col>
-                  </Row>
-                </div>
+                
              </ComponentCard5>
 
-             <QaViewSmall Refreshkey={refreshKey} product={rollItem.product_id} data1={gradeData} updateRollTogglefunction={setterJumboUpdateDataFromPlan}/>
+             {rollItem ?<QaViewSmall Refreshkey={refreshKey} jumboId={rollItem?.id} data1={gradeData} updateRollTogglefunction={setterJumboUpdateDataFromPlan}/>:''}
       </ComponentCard5>
     </>
   );

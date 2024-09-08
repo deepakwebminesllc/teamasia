@@ -8,13 +8,15 @@ import {
 
 import PropTypes from 'prop-types';
 // import ComponentCard4 from '../../../components/ComponentCard5';
-import ProgressBar from 'react-bootstrap/ProgressBar';
+// import ProgressBar from 'react-bootstrap/ProgressBar';
 import Barcode from 'react-barcode';
+import { useNavigate } from 'react-router-dom';
+import MyProgressBarR from './MyProgressBarR';
 
 
 const JumbotronComponent = (props) => {
-
-  const {Refreshkey,product,data1,updateRollTogglefunction} = props;
+  const navigate = useNavigate();
+  const {Refreshkey,jumboId,data1,updateRollTogglefunction} = props;
   const [data, setData] = useState([]);
 
   // console.log('productID',product,data)
@@ -44,6 +46,10 @@ const JumbotronComponent = (props) => {
     }
   };
 
+  const SmallPrint = (dispatchItem)=>{
+    console.log('hi');
+    navigate('/operations/small/print',{state: dispatchItem});
+  }
 
   const GradeName = (cut)=>{
       const grade = data1.find((i)=> i.id === cut);
@@ -62,7 +68,7 @@ const JumbotronComponent = (props) => {
     const fetchData = async () => {
       const token = localStorage.getItem('userToken');
       // console.log('token',token);
-      const response = await fetch(`https://factory.teamasia.in/api/public/smallrolls?product_id=${product}`, {
+      const response = await fetch(`https://factory.teamasia.in/api/public/smallrolls/?jumbo_roll_id=${jumboId}`, {
         method: 'GET', 
         headers: {
           'Authorization': `Bearer ${token}`
@@ -93,7 +99,7 @@ const JumbotronComponent = (props) => {
             <th scope="col">BIN</th>
             <th scope="col">GSM(g/m2)</th>
             <th scope="col">Code</th>
-            <th scope="col">LCA</th>
+            <th scope="col">RLCA</th>
             <th scope="col">Action</th>
            
           </tr>
@@ -109,12 +115,24 @@ const JumbotronComponent = (props) => {
                   <td>{GradeName(pro.grade_id)}</td>
                   <td>{pro.weight}</td>
                   <td>{pro.bin}</td>
-                  <td>{pro.bin}</td>
+                  <td>{((pro.weight * 1000) / (pro.quantity * pro.width)).toFixed(2)}</td>
                   
                   <td><td> <td><Barcode value={`SMALL${pro.id}`} height={20} /></td></td></td>
-                  <td><ProgressBar now={220} label={`${220}`} style={{width:"300px",height:"25px"}}/></td>
+                  {/* <td><ProgressBar now={220} label={`${pro.quantity}`} style={{width:"300px",height:"25px"}}/></td> */}
+                  <td>       
+                    <div style={{ padding: '50px',width: "400px" }}>
+                        {/* <MyProgressBar segments={segments} /> */}
+                        <div style={{ background:'#31E1F7',width: "400px" }}>
+                          <MyProgressBarR jumboId={pro.id} containerWidth={Number(pro.quantity)} progressBarId={`progress-${index}`}/>
+                        </div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                              <span>0m</span>
+                              <span>{pro.quantity}m</span>
+                          </div>
+                    </div>
+                  </td>
                   <td>
-                    <td ><Button ><i className="bi bi-printer-fill my-bell-color" /></Button></td>
+                    <td ><Button ><i className="bi bi-printer-fill my-bell-color" onClick={()=>SmallPrint(pro.id)}/></Button></td>
                     <td ><Button onClick={()=>updateRollTogglefunction(pro)}><i className="bi bi-pencil-fill my-pen-color" /></Button></td>
                     <td ><Button  onClick={()=>handleDeleteClick(pro,index)}><i className="bi bi-trash-fill my-trash-color" /></Button></td>
                   </td>
@@ -122,10 +140,7 @@ const JumbotronComponent = (props) => {
               
               </tbody>
               </React.Fragment>
-
                       })}
-                      
-            
         </Table> </>:''
   }
     
@@ -136,7 +151,7 @@ const JumbotronComponent = (props) => {
 export default memo(JumbotronComponent);
 
 JumbotronComponent.propTypes = {
-  product: PropTypes.object.isRequired,
+  jumboId: PropTypes.object.isRequired,
   Refreshkey: PropTypes.string.isRequired,
   updateRollTogglefunction: PropTypes.func.isRequired,
   data1: PropTypes.array.isRequired,

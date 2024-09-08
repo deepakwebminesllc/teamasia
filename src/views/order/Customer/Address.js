@@ -1,21 +1,15 @@
 // import React,{useEffect, useState} from 'react';
 import {useNavigate,useLocation } from 'react-router-dom';
+
 // import Select, { components } from 'react-select';
 
 import React,{useState,useEffect} from 'react';
-// import { useLocation } from 'react-router-dom';
-// import Select from 'react-select';
 
-
-// import { useParams } from 'react-router-dom';
 
 
 import {
-  
-  Row,
-  Col,
   Button,
-
+  Table
 } from 'reactstrap';
 
 import ComponentCard from '../../../components/ComponentCard';
@@ -26,15 +20,8 @@ const Edit= () => {
   const  id = location.state || {};
   const navigate= useNavigate();
   const [data, setData] = useState([]); 
-  const [data2, setData2] = useState([]);
-  const [data3, setData3] = useState([]);
-
-// console.log('data',companyAddress[0].AddressLine1);
-// console.log('location',location.state);
 
 const handleEditAdd = () => {
-  // Navigate to the edit page with the item's id
-  // Navigate(`/resources/address-types/edit/${itemId}`);
   navigate('/order/customers/address/add',{state: id});
 };
 
@@ -73,24 +60,7 @@ const handleEditAddress = (customer)=>{
   }
 };
 
-function getStateNameById(stateId) {
-  const stateName = data3.find(state => state.id === stateId);
-  console.log('state',stateName);
-  return stateName ? stateName.name : 'Unknown State';
-}
 
-// This function finds the name of the country by its ID
-function getCityNameById(cityId) {
-  const cityName = data2.find(country => country.id === cityId);
-  console.log('city',cityName);
-  return cityName ? cityName.name : 'Unknown City';
-}
-
-const citiesWithNames = data.map(city => ({
-  ...city,
-  stateName: getStateNameById(city.state_id),
-  cityName: getCityNameById(city.city_id)
-}));
 
 useEffect(() => {
   
@@ -113,43 +83,6 @@ useEffect(() => {
     setData(result.addresses); 
   };
 
-  const fetchData2 = async () => {
-    const token = localStorage.getItem('userToken');
-    // console.log('token',token);
-    const response = await fetch('https://factory.teamasia.in/api/public/cities', {
-      method: 'GET', 
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    });
-    // console.log('result',response);
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const result = await response.json();
-    console.log("responsejson2",result);
-    setData2(result.cities); 
-  };
-  const fetchData3 = async () => {
-    const token = localStorage.getItem('userToken');
-    // console.log('token',token);
-    const response = await fetch('https://factory.teamasia.in/api/public/states', {
-      method: 'GET', 
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    });
-    // console.log('result',response);
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const result = await response.json();
-    console.log("responsejson3",result);
-    setData3(result.states); 
-  };
-
-  fetchData3();
-  fetchData2();
   fetchData();
 
 
@@ -165,60 +98,49 @@ useEffect(() => {
       </p>
     }
   >
-     <Row>
-      <Col md="8">
-        <Button className='my-btn-color' style={{ marginBottom: '1rem',marginRight:'10px' }} onClick={() => handleEditAdd()}>
-          Add Address
-        </Button>
-      </Col>
-    </Row>
-
-   
-     
-<div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-  
-<table className="table">        
+       <Table responsive>        
                   <thead>
+                      <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td>
+                                   <Button className='my-btn-color' onClick={() => handleEditAdd()}>
+                                     Add Address
+                                   </Button>
+                                </td>
+                              
+                        </tr>
                         <tr>
-                        <Row className='mt-4'>
-                          <Col md="6">
-                              <td >Address</td>
-                          </Col>
-                          <Col md="2">
-                              <td>City</td>
-                          </Col>
-                          <Col md="2">
-                              <td >State</td>
-                          </Col>
-                          <Col md="2">
-                              <td >Actions</td>
-                          </Col>
-                          
-                        </Row>
+                        
+                                  <td >Address</td>
+                                  <td>City</td>
+                                  <td >State</td>
+                                  <td >Actions</td>
                         </tr>
                       </thead>
           
               <tbody>
-              {citiesWithNames.map((customer) => (
+              {data.map((customer) => (
                   <tr key={customer.id}>
-                    <Row>
-                      <Col md="6">{customer.address_line_1}</Col>
-                      <Col md="2">{customer.cityName}</Col>
-                      <Col md="2">{customer.stateName}</Col>
-                      <Col md="2"><button type="button" className="btn mybtncustomer btn-secondary btn-sm mr-2" onClick={() => handleEditAddress(customer)}><i className="bi bi-pencil-fill my-pen-color" /></button><button type="button" className="btn mybtncustomer btn-secondary btn-sm mr-2" onClick={() => handleDeleteClick(customer.id)}><i className="bi bi-trash-fill my-trash-color" /></button></Col>
-                     
-                    </Row>
-                    
+                        <td>
+                          {customer.address_line_1}
+                        </td>
+                        <td>
+                          {customer.city_name}
+                        </td>
+                        <td>
+                          {customer.state_name}
+                        </td>
+                        <td>
+                          <button type="button" className="btn mybtncustomer btn-secondary btn-sm mr-2" onClick={() => handleEditAddress(customer)}><i className="bi bi-pencil-fill my-pen-color" /></button><button type="button" className="btn mybtncustomer btn-secondary btn-sm mr-2" onClick={() => handleDeleteClick(customer.id)}><i className="bi bi-trash-fill my-trash-color" /></button>
+                        </td>
+                                         
                   </tr>
                 ))}
                 
               </tbody>
-            </table>
- 
-</div>
-     
-   
-   
+            </Table>
   </ComponentCard>
 
 

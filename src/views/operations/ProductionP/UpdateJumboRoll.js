@@ -13,8 +13,8 @@ import {
   Button,
   FormText,
 } from 'reactstrap';
-
 import PropTypes from 'prop-types';
+import MyProgressBarModal from './MyProgressBarModal';
 import ComponentCard5 from '../../../components/ComponentCard5';
 import 'react-table-v6/react-table.css';
 
@@ -22,7 +22,7 @@ const JumbotronComponent = ({modal,JumboUpdateDataFromPlan,toggle,data2,data6}) 
   
   const [modalRoll,setModalRoll] = useState(false);
   const [modalPhysical,setModalPhysical] = useState(false);
-  const [sendOption,setSendOption] = useState(JumboUpdateDataFromPlan.send_for_additional_treatment === 1);
+  const [sendOption,setSendOption] = useState(JumboUpdateDataFromPlan.send_for_additional_treatment === "1");
   const [data7,setData7] = useState([]);
   const [formDatasRoll, setFormDatasRoll] = useState({});
   
@@ -205,6 +205,7 @@ const handleTypeChange = (e) => {
       ...prevState,
       items1: newItems
     }));
+    setFaultChanged(faultChanged + 1);
   };
 
   const handleInputChange1 = (index, e) => {
@@ -682,7 +683,7 @@ const handleSubmitforPhysical = async (e) => {
     const fetchData = async () => {
       const token = localStorage.getItem('userToken');
       console.log('token',token);
-      const response = await fetch(`https://factory.teamasia.in/api/public/faultlogs/?jumbo_roll_id=${JumboUpdateDataFromPlan.id}`, {
+      const response = await fetch(`https://factory.teamasia.in/api/public/faultlogs/?jumbo_roll_id=${JumboUpdateDataFromPlan.id}&small_roll_id=0`, {
         method: 'GET', 
         headers: {
           'Authorization': `Bearer ${token}`
@@ -760,6 +761,17 @@ const handleSubmitforPhysical = async (e) => {
                            <Button onClick={()=>{updateRollToggle()}}><i className="bi bi-pencil-fill my-pen-color" />Update Jumbo Roll</Button>
               </ModalHeader>
               <ModalBody>
+                    <div style={{ padding: '50px' }}>
+                        {/* <MyProgressBar segments={segments} /> */}
+                        <div style={{ background:'#31E1F7' }}>
+                        <MyProgressBarModal BarRefreshkey={faultChanged } jumboId={JumboUpdateDataFromPlan.id} containerWidth={300} progressBarId="progress-0"/>
+                        </div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                              <span>0m</span>
+                              <span>{300}m</span>
+                          </div>
+                    </div>
+
                  <Form>
                     <Row>
                         <Col md="9">{errorMessageFromFaultApi.length !== 0 && (

@@ -69,7 +69,7 @@ const States = () => {
   // This function finds the name of the country by its ID
   function getCountryNameById(countryId) {
     const countryName = data2.find(country => country.id === countryId);
-    console.log('country',countryName);
+    // console.log('country',countryName);
     return countryName ? countryName.name : 'Unknown Country';
   }
 
@@ -96,6 +96,11 @@ const States = () => {
       }
       const result = await response.json();
       console.log("responsejson in country",result.states);
+      if(result.states){
+        result.states.sort((a, b) => {
+           return a.name.localeCompare(b.name, undefined, { sensitivity: 'base' });
+      });
+    }
       setData(result.states);
     };
     const fetchData2 = async () => {

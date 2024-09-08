@@ -1,4 +1,6 @@
-import React,{useEffect,useState} from 'react';
+import React,{useEffect,useState,useCallback} from 'react';
+import AsyncSelect from 'react-select/async';
+import debounce from 'lodash.debounce';
 import {
   Card,
   CardBody,
@@ -25,6 +27,34 @@ import Product from './Products';
 import DashCard from '../../../components/dashboard/dashboardCards/DashCard';
 // import ComponentCard from '../../components/ComponentCard';
 
+
+// Custom hook for fetching options
+const useDebouncedFetchOptions = (endpoint) => {
+  const fetchOptions = async (inputValue) => {
+    const token = localStorage.getItem('userToken');
+    const response = await fetch(`https://factory.teamasia.in/api/public/${endpoint}?search=${inputValue}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const result = await response.json();
+    return result[endpoint].map(item => ({ value: item.id, label: item.name || item.code || item.company_name }));
+  };
+
+  const debouncedFetch = useCallback(debounce((inputValue, callback) => {
+    fetchOptions(inputValue).then(callback).catch(error => {
+      console.error(error);
+      callback([]);
+    });
+  }, 300), [endpoint]);
+
+  return debouncedFetch;
+};
+
 const Edit = () => {
   const navigate= useNavigate();
   const location = useLocation();
@@ -45,9 +75,7 @@ const Edit = () => {
     status_id:statusId
  } = location.state.order;
   
-  const {data1,data2,data3,data4,data5} = location.state;
   const [SaverityData, setSaverityData] = useState([]);
-  const [CustomerData, setCustomerData] = useState([]);
   const [AddressData, setAddressData] = useState([]);
   const [AddressData1, setAddressData1] = useState([]);
   const [firstcheck, setFirstCheck] = useState(false);
@@ -55,8 +83,9 @@ const Edit = () => {
   const [errorMessageFromApi, setErrorMessageFromApi] = useState([]);
 
 
+console.log('location.state',location.state.order);
 
-
+ const customerOptions = useDebouncedFetchOptions('customers');
 
 const contentFromHTML = stateFromHTML(orderNotes);
 
@@ -104,6 +133,14 @@ console.log('convertFromRaw(content)',contentFromHTML ,EditorState.createWithCon
     const options = { day: 'numeric', month: 'short', year: 'numeric' };
     return new Intl.DateTimeFormat('en-GB', options).format(date);
   }
+
+
+  const handleSelectChange = (selectedOption, actionMeta) => {
+    setFormDataS(prevState => ({
+      ...prevState,
+      [actionMeta.name]: selectedOption
+    }));
+  };
 
 const handleChange = (e) => {
   const { name, value } = e.target;
@@ -159,19 +196,8 @@ const closer =()=>{
       
        
 
-        console.log('formdataX',formDatas);
-        console.log('final', JSON.stringify({
-          customer_id:formDatas.customerId,
-          billing_address_id:formDatas.billingAddressId,
-          delivery_address_id:formDatas.deliveryAddressId,
-          order_notes:htmlContent,
-          severity_id:formDatas.severityId,
-          expected_delivery_date:formDatas.expectedDeliveryDate,
-          purchase_order:formDatas.purchaseOrder,
-          representative_id:formDatas.representativeId,
-          is_trashed:0,
-              // product_additional_treatment: filtered2,
-        }));
+        console.log('formdataX',formDatas.purchaseOrder);
+
 
         const token = localStorage.getItem('userToken');
         const response = await fetch(`https://factory.teamasia.in/api/public/orders/${id}`, {
@@ -182,7 +208,7 @@ const closer =()=>{
             },
            
             body: JSON.stringify({
-              customer_id:formDatas.customerId,
+              customer_id:formDatas.customerId.value,
               billing_address_id:formDatas.billingAddressId,
               delivery_address_id:formDatas.deliveryAddressId,
               order_notes:htmlContent,
@@ -201,7 +227,7 @@ const closer =()=>{
         console.log("dataapi",dataZ,response);
         if (response.status === 200) {
           
-            navigate('order/orders');
+            navigate('/order/orders');
         
         } else {
           console.error("Authentication failed:", Object.values(dataZ.messages.errors));
@@ -233,9 +259,9 @@ useEffect(()=>{
   const fetchData2 = async () => {
     const token = localStorage.getItem('userToken');
     // console.log('token',token);
-    let temp = formDatas.customerId;
+    let temp = formDatas.customerId.value;
     if(secondcheck){
-      temp = formDatas.customerId2;
+      temp = formDatas.customerId2.value;
     }
     const response = await fetch(`https://factory.teamasia.in/api/public/addresses/?customer_id=${temp}`, {
       method: 'GET', 
@@ -268,7 +294,7 @@ useEffect(()=>{
     const fetchData1 = async () => {
       const token = localStorage.getItem('userToken');
       // console.log('token',token);
-      const response = await fetch('https://factory.teamasia.in/api/public/customers', {
+      const response = await fetch(`https://factory.teamasia.in/api/public/customers/${customerId}`, {
         method: 'GET', 
         headers: {
           'Authorization': `Bearer ${token}`
@@ -279,21 +305,24 @@ useEffect(()=>{
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const result = await response.json();
-      console.log("data1 customers",result.customers);
-      const resultX = result.customers.slice();
-      const sever = resultX.find(item => item.id === formDatas.customerId);
-      if(!sever){
+      console.log("data1 customers",result);
+      // const resultX = result.customers.slice();
+      // const sever = result.find(item => item.id === formDatas.customerId);
+      if(!result.id){
         setFormDataS(prevState => ({
           ...prevState,
-           customerId:'x',
+           customerId:{value:'x',label:'choose'},
            billingAddressId:'x',
            deliveryAddressId:'x'
         }));
       }
 
-      resultX.push({id:'x',company_name:'Choose'});
-      setCustomerData(resultX); 
+      setFormDataS(prevState => ({
+        ...prevState,
+         customerId:{value: result.id,label:result.company_name}
+      }));
     };
+
 
     const fetchData = async () => {
       const token = localStorage.getItem('userToken');
@@ -380,17 +409,14 @@ useEffect(()=>{
                           <Col md="10" className=''>
                             <FormGroup>
                               <Label>Customer Details</Label>
-                              <Input type="select" 
-                                name="customerId" 
+                              <AsyncSelect
+                                name="customerId"
+                                onChange={handleSelectChange}
+                                loadOptions={customerOptions}
                                 value={formDatas.customerId}
-                                onChange={handleChange}
-                                >
-                                  {CustomerData.map((item)=>{
-          
-                                    return <option key={item.id} value={item.id}>{item.company_name}</option>
-                                  })}
-                              </Input>
-                            
+                                isClearable
+                                isSearchable
+                              />
                                 <FormText className="text-danger"></FormText>
                               
                               
@@ -436,25 +462,23 @@ useEffect(()=>{
                           </FormGroup>
                         </Col>
                         {secondcheck?<>
-                                <Col md="10" className=''>
-                                    <FormGroup>
-                                      <Label>Customer </Label>
-                                      <Input type="select" 
-                                        name="customerId2" 
-                                        value={formDatas.customerId2}
-                                        onChange={handleChange}
-                                        >
-                                          {CustomerData.map((item)=>{
-                  
-                                            return <option key={item.id} value={item.id}>{item.company_name}</option>
-                                          })}
-                                      </Input>
-                                    
-                                        <FormText className="text-danger"></FormText>
-                                      
-                                      
-                                    </FormGroup>
-                                  </Col>
+                          <Col md="10" className=''>
+                            <FormGroup>
+                              <Label>Customer Details</Label>
+                              <AsyncSelect
+                                name="customerId2"
+                                onChange={handleSelectChange}
+                                loadOptions={customerOptions}
+                                value={formDatas.customerId2}
+                                isClearable
+                                isSearchable
+                              />
+                            
+                                <FormText className="text-danger"></FormText>
+                              
+                              
+                            </FormGroup>
+                          </Col>
                         </>:null}
                         
                             
@@ -611,7 +635,7 @@ useEffect(()=>{
 
                  <Row style={{marginTop:'10px'}}>
                   <Col md="12">
-                        <Product orderID={id} data1={data1} data2={data2} data3={data3} data4={data4} data5={data5}/>
+                        <Product orderID={id}/>
                   </Col>
                 </Row>
               

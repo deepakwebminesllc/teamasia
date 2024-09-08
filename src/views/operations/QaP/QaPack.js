@@ -27,8 +27,13 @@ const AdditionalTreat = () => {
   const [plans, setPlans] = useState([]);
   const [Customerdata,setCustomerData] = useState([]);
   const [QaData, setQaData] = useState([]);
-
   const navigate = useNavigate();
+
+  const JumboQaView = (dispatchItem)=>{
+    console.log('hi',dispatchItem);
+    navigate('/operations/find-a-jumbo-roll',{state: {jumboId:dispatchItem}});
+  }
+  
   const tableStyle = {
     // margin: 'auto', 
     // width: '60%',  
@@ -57,9 +62,9 @@ const AdditionalTreat = () => {
     return 'customer not found';
   };
 
-  const AdditionalTreatView = (rollItem)=>{
+  const QaPackView = (rollItem)=>{
     const customerName =customerNames(rollItem.production_plan_id)
-    navigate('/operations/qa-packaging/view',{state: { rollItem, customerName,plans,QaData}})
+    navigate('/operations/qa-packaging/view',{state: { id:rollItem.id, customerName,plans,QaData}})
   }
 
   // const handleJumboSearch = ()=>{
@@ -70,7 +75,7 @@ const AdditionalTreat = () => {
     const fetchDispatch = async () => {
       const token = localStorage.getItem('userToken');
       // console.log('token',token);
-      const response = await fetch(`https://factory.teamasia.in/api/public/jumboroll/?send_for_additional_treatment=1`, {
+      const response = await fetch(`https://factory.teamasia.in/api/public/jumboroll/fetchjumborollforqanp`, {
         method: 'GET', 
         headers: {
           'Authorization': `Bearer ${token}`
@@ -160,7 +165,7 @@ const AdditionalTreat = () => {
      {/* <Button className='my-btn-color' style={{ marginBottom: '1rem',marginRight:'10px' }} onClick={() => handleJumboSearch()}>
            Load By Code
      </Button> */}
-     <Button className='my-btn-color' style={{ marginBottom: '1rem',marginRight:'10px' }} disabled>
+     <Button onClick={()=>JumboQaView()} className='my-btn-color' style={{ marginBottom: '1rem',marginRight:'10px' }}>
            Load By Code
      </Button>
            
@@ -231,7 +236,7 @@ const AdditionalTreat = () => {
                     <td>{roll.order_id}</td>
                     <td>{roll.product_id}</td>
                   <td>
-                      <button type="button" className="btn mybtncustomer btn-secondary btn-sm mr-2"><i className="bi bi-eye-fill my-eye-color" onClick={()=>{AdditionalTreatView(roll)}}/></button>
+                      <button type="button" className="btn mybtncustomer btn-secondary btn-sm mr-2"><i className="bi bi-eye-fill my-eye-color" onClick={()=>{QaPackView(roll)}}/></button>
                   </td>
                 </tr>
                 ))}

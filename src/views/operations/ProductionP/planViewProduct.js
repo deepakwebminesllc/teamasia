@@ -6,54 +6,34 @@ import PropTypes from 'prop-types';
 
 const JumbotronComponent = (props) => {
 
-  const {productID,data1,data2,data3,data4,} = props;
+  const {productID} = props;
   const [data, setData] = useState([]);
-
+  const [data7, setData7] = useState([]);
+  const [data8, setData8] = useState([]);
+  
   console.log('productID',productID)
 
-  function getGrainNameById(grainId) {
-    const Name = data1.find(item => item.id === grainId);
-    // console.log('a1',Name);
-    return Name ? Name.name : 'Unknown grain';
-  }
+  const printing  = (productprints)=>{
+    console.log('productprints',productprints);
+    
+   const printArray =  productprints.map((item)=> {
+      let str = ''
+      const design = data7.find((d)=> d.id === item.design_id);
+      const shade = data8.find((s)=> s.id === item.shade_id);
+      
+      console.log('design,shade',design,shade)
+      if(design){
+        str += `${design.code}/${design.code}/`
+      }
+      if(shade){
+        str += shade.name
+      }
+      return str
+    }  
+)
 
-  function getFabricNameById(fabricId) {
-    const Name = data2.find(item => item.id === fabricId);
-    // console.log('a1',Name);
-    return Name ? Name.name : 'Unknown fabric';
+    return printArray.length > 0? printArray:[];
   }
-  function getFabricColorNameById(fabricId,fabricColorId) {
-    const Name = data2.find(item => item.id === fabricId);
-    let FabricColor = null;
-    if(Name){
-       FabricColor = Name.fabriccolors.find(item => item.id === fabricColorId);
-    }
-    // console.log('a1',Name);
-    return FabricColor ? FabricColor.name : 'Unknown fabricColor';
-  }
-
-  function getQualityNameById(qualityId) {
-    const Name = data3.find(item => item.id === qualityId);
-    // console.log('a1',Name);
-    return Name ? Name.name : 'Unknown quality';
-  }
-
-  function getColorNameById(colorId) {
-    const Name = data4.find(item => item.id === colorId);
-    // console.log('a1',Name);
-    return Name ?  Name.name : 'Unknown color';
-  }
-
-  
-  const productwithNames = data.map(product => ({
-    ...product,
-    grainName: getGrainNameById(product.grain_id),
-    fabricName: getFabricNameById(product.fabric_id),
-    fabricColorName: getFabricColorNameById(product.fabric_id,product.fabric_color_id),
-    qualityName: getQualityNameById(product.quality_id),
-    colorName: getColorNameById(product.color_id),
-  
-  }));
 
   useEffect(() => {
     
@@ -72,18 +52,58 @@ const JumbotronComponent = (props) => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const result = await response.json();
-      console.log("responsejson in s..",result);
+      console.log("responsejson in s..11111",result);
       setData([result]);
     };
+    const fetchData7 = async () => {
+      const token = localStorage.getItem('userToken');
+      // console.log('token',token);
+      const response = await fetch('https://factory.teamasia.in/api/public/designs', {
+        method: 'GET', 
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      // console.log('result',response);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const result = await response.json();
+      const resultX = result.designs.slice();
+      // resultX.push({id:'x',design_id:'x',code:'Choose'});
+      setData7(resultX);
+    };
+
+    const fetchData8 = async () => {
+      const token = localStorage.getItem('userToken');
+      // console.log('token',token);
+      const response = await fetch('https://factory.teamasia.in/api/public/shades', {
+        method: 'GET', 
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      // console.log('result',response);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const result = await response.json();
+      const resultX = result.shades.slice();
+      // resultX.push({id:'x',shade_id:'x',name:'Choose'});
+      setData8(resultX);
+    };
+
+    fetchData8();
+    fetchData7();
     fetchData();  
   },[]);
 
   return (
   <>
     
-    {productwithNames.map((pro) => {
+    {data.map((pro) => {
       return  <Table key={pro.id} size='sm' className="table-margin-zero" responsive>
-              <thead>
+                  <thead>
                     <tr>
                       <th scope="col">Grain</th>
                       <th scope="col">Color</th>
@@ -102,19 +122,19 @@ const JumbotronComponent = (props) => {
                   </thead> 
             <tbody> 
               <tr>
-                    <td title={pro.grainName}>{pro.grainName}</td>
-                    <td title={pro.colorName}>{pro.colorName}</td>
-                    <td title={pro.qualityName}>{pro.qualityName}</td>   
-                    <td title={pro.thickness}>{pro.thickness}mm</td>
-                    <td title={pro.fabricName}>{pro.fabricName}</td>
-                    <td title={pro.fabricColorName}>{pro.fabricColorName}</td>
-                              <td>59031090</td>
-                    <td title={pro.price}>${pro.price}</td>
-                              <td>313.6</td>
-                              <td>12%</td>
-                              <td>N/A</td>
-                              <td>N/A</td>
-                              <td>N/A</td>
+                    <td title={pro.grain_name}>{pro.grain_name}</td>
+                    <td title={pro.color_name}>{pro.color_name}</td>
+                    <td title={pro.quality_name}>{pro.quality_name}</td>
+                    <td title={pro.thickness}>{pro.thickness}</td>
+                    <td title={pro.fabric_name}>{pro.fabric_name}</td>
+                    <td title={pro.fabric_color_name}>{pro.fabric_color_name}</td>
+                    <td title={pro.hsn_name}>{pro.hsn_name}</td>
+                    <td title={pro.price}>{pro.price}</td>
+                    <td title={pro.tax_rate}>{pro.tax_rate}%</td>
+                    <td title={pro.emboss_name}>{pro.emboss_name}</td>
+                    <td>{printing(pro.productprints).map(item=> <div>{item}</div>)}</td>
+                    <td>N/A</td>
+                    <td>N/A</td>
                     </tr>
                 </tbody>
                 </Table> 
@@ -128,8 +148,4 @@ export default JumbotronComponent;
 
 JumbotronComponent.propTypes = {
   productID: PropTypes.string.isRequired,
-  data1: PropTypes.array.isRequired,
-  data2: PropTypes.array.isRequired,
-  data3: PropTypes.array.isRequired,
-  data4: PropTypes.array.isRequired,
 };

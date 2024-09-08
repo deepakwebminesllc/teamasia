@@ -161,7 +161,7 @@ const validateForm=()=>{
                    <FormGroup>
                      <Label>Color Code</Label>
                      <Input        
-                     type="text" 
+                      type="text" 
                       name="code" 
                       id="name" 
                       placeholder="Enter" 

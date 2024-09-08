@@ -51,8 +51,8 @@ const handleChange = (e) => {
 const handleTypeChange = (e) => {
   const { name, value } = e.target;
 
-  console.log('name',name,value);
-  console.log('data3',data3);
+  // console.log('name',name,value);
+  // console.log('data3',data3);
   
   if(name === 'countryId'){
     
@@ -115,7 +115,7 @@ const handleTypeChange = (e) => {
   const removeItem = (index) => {
     const newItems = formDatas.items.slice();
     newItems.splice(index, 1);
-    console.log('newItems',newItems);
+    // console.log('newItems',newItems);
     setFormDataS(prevState=>({
       ...prevState,
       items:newItems
@@ -125,7 +125,7 @@ const handleTypeChange = (e) => {
   const handleInputChange = (index, event) => {
     const {name ,value,type} = event.target;
     const newItems = formDatas.items.slice();
-    console.log("data",index,newItems[index]);
+    // console.log("data",index,newItems[index]);
     if(type === 'checkbox'){
       console.log('check value',value,event.target.checked);
       if(newItems[index][name] === '0')
@@ -188,21 +188,20 @@ const handleTypeChange = (e) => {
         });
 
         const datas = await response.json();
-        console.log("dataapi",datas,response.status);
         if (response.status === 200) {
-          navigate('/factories/factory');
+          navigate(-1);
         } else {
-          console.error("Authentication failed:", datas.messages);
-          if (datas.messages.errors.address_line_1) {
-            setErrorMessageFromApi(datas.messages.errors.address_line_1);
+          console.error("Authentication failed:", Object.values(datas.messages.errors));
+          if (datas.error) {
+            setErrorMessageFromApi(Object.values(datas.messages.errors));
           }
         }  
         return null;
       } catch (error) {
         console.log('error',error);
-         setErrorMessageFromApi("Network error");
+         setErrorMessageFromApi(["Network error"]);
         return null;
-      }   
+      }
 }
 
 const validateForm = () => {
@@ -224,34 +223,34 @@ const validateForm = () => {
     // eslint-disable-next-line dot-notation
     errors1["cityId"] = "Please select a city.";
   }
-  formDatas.items.forEach((element) => {
-    console.log('element',element);
-          if(element.name === ''){
-             formIsValid = false;
-      // eslint-disable-next-line dot-notation
-            errors1["representName"] ="Required"
-          }
-          if(element.designation === ''){
-             formIsValid = false;
-      // eslint-disable-next-line dot-notation
-            errors1["representDesignation"] ="Required"
-          }
-          if(element.email === ''){
-             formIsValid = false;
-      // eslint-disable-next-line dot-notation
-            errors1["representEmail"] ="Required"
-          }
-          if(element.country_code === ''){
-             formIsValid = false;
-      // eslint-disable-next-line dot-notation
-            errors1["representCountryCode"] ="Required"
-          }
-          if(element.mobile === ''){
-             formIsValid = false;
-      // eslint-disable-next-line dot-notation
-            errors1["representMobile"] ="Required"
-          }
-      });
+  // formDatas.items.forEach((element) => {
+  //   console.log('element',element);
+  //         if(element.name === ''){
+  //            formIsValid = false;
+  //     // eslint-disable-next-line dot-notation
+  //           errors1["representName"] ="Required"
+  //         }
+  //         if(element.designation === ''){
+  //            formIsValid = false;
+  //     // eslint-disable-next-line dot-notation
+  //           errors1["representDesignation"] ="Required"
+  //         }
+  //         if(element.email === ''){
+  //            formIsValid = false;
+  //     // eslint-disable-next-line dot-notation
+  //           errors1["representEmail"] ="Required"
+  //         }
+  //         if(element.country_code === ''){
+  //            formIsValid = false;
+  //     // eslint-disable-next-line dot-notation
+  //           errors1["representCountryCode"] ="Required"
+  //         }
+  //         if(element.mobile === ''){
+  //            formIsValid = false;
+  //     // eslint-disable-next-line dot-notation
+  //           errors1["representMobile"] ="Required"
+  //         }
+  //     });
 
   setErrors(errors1);
   return formIsValid;
@@ -359,8 +358,9 @@ useEffect(() => {
   };
 
   const fetchData0 = async () => {
+    console.log('id',id)
     const token = localStorage.getItem('userToken');
-    const response = await fetch(`https://factory.teamasia.in/api/public/addresses/?factory_id=${id}`, {
+    const response = await fetch(`https://factory.teamasia.in/api/public/addresses/${id}`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`
@@ -370,8 +370,8 @@ useEffect(() => {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     const result = await response.json();
-    const resultX = result.addresses[0];
-    console.log("data0", result.addresses, result.addresses.addressrepresentatives);
+    const resultX = result;
+    console.log("data0", result.addresses,id, result.addressrepresentatives);
     setFormDataS(prevState => ({
       ...prevState,
       addressesId:resultX.id,
@@ -419,16 +419,18 @@ useEffect(() => {
            <CardBody>
              <Form onSubmit={handleSubmit}>
                <Row>
-               <Col md="9">{errorMessageFromApi && (
+               <Col md="9">{errorMessageFromApi.length !== 0 && (
                       <div style={{ background:'#ff9c7a',color: 'black', marginBottom: '10px', padding:"5px 10px"}}>
                         <div style={{display:'flex',justifyContent:'space-between'}}>
                           Following errors were found:
                           <span onClick={closer} style={{cursor:'pointer'}}>X</span>
                         </div>
                         <ul>
+                          {errorMessageFromApi.map((item)=>
                           <li>
-                            {errorMessageFromApi}
+                              {item}
                           </li>
+                          )}
                         </ul>
                       </div>
                     )}

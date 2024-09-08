@@ -151,8 +151,6 @@ useEffect(() => {
   fetchData3();
   fetchData2();
   fetchData();
-
-
 },[]);
 
   return (

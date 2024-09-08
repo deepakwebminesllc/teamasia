@@ -3,7 +3,7 @@ import {
   Row,
   Button,
   Col,
-  // Table
+  Table
 } from 'reactstrap';
 import { useLocation, useNavigate } from 'react-router-dom';
 import OrderProductView from './orderProductView';
@@ -25,11 +25,10 @@ const JumbotronComponent = () => {
     purchase_order:purchaseOrder,
     customer_id:customerId,
   status_id:statusId}  = location.state.item;
-    const {data1,data2,data3,data4,data5} = location.state;
 
   const  editOrder = () => {
     const order = location.state.item;
-    navigate('/order/orders/edit',{state: {order,data1,data2,data3,data4,data5}});
+    navigate('/order/orders/edit',{state: {order}});
   };
  const [data,setData] =useState();
  const [data11,setData11] =useState();
@@ -117,7 +116,7 @@ useEffect(()=>{
                 
               </Row>
             <ComponentCard>
-               <div className="order-view-page-flex">
+               <div className="order-view-page-flex-(remove grid for this rule) order-view-page-grid">
                 <div><i className="bi-hash my-trash-color" style={{fontSize:'19px'}}/>Order No : #{id}</div>
                 <div> <i className="bi-calendar2-event-fill my-eye-color"/>Expected Date : {formatDate(expectedDeliveryDate)}</div>
                 <div><i className="bi-hourglass-split my-calander-color"/>Status : {StatusName(statusId)}</div>
@@ -125,19 +124,19 @@ useEffect(()=>{
                 <div><i className="bi-calendar2-event-fill my-eye-color"/>Order Date : {formatDate(createdAt)}</div>
                 <div><i className="bi-hash my-eye-color" style={{fontSize:'19px'}}/>Purchase Order : {purchaseOrder}</div>
                 <div><i className="bi bi-tags-fill my-eye-color"/>Priority : {data}</div>
-                {/* <div><i className="bi bi-plus-circle-fill my-calander-color"/>Created By : Team Operations</div> */}
+                <div><i className="bi bi-plus-circle-fill my-calander-color"/>Created By : Team Operations - missing </div>
                </div>
             </ComponentCard>
              
             <ComponentCard4>
              
-              {/* <div className='table-margin'>
+              <div className='table-margin'>
                <Table className='table-margin-zero order-table-button-x' size="sm">
               
                   <Row  style={{background:'#e3e3e3',padding:'2px'}}>
                     <Col md="8">
                       <div style={{margin:'5px 0px'}}>
-                        <div><i className="bi bi-stopwatch-fill  my-calander-color" style={{fontSize:'20px',marginRight:'1px'}}/>Proforma Invoice</div> 
+                        <div><i className="bi bi-stopwatch-fill  my-calander-color" style={{fontSize:'20px',marginRight:'1px'}}/>Proforma Invoice - missing</div> 
                       </div>
                     </Col>
                     <Col md="4" style={{padding:'5px 0px'}}>
@@ -152,16 +151,16 @@ useEffect(()=>{
                 
                  <div>
                   <div className="order-history">
-                      <div>Email History</div>
+                      <div>Email History - missing</div>
                          <div><i className="bi bi-arrow-right my-eye-color" style={{fontSize:'19px',marginRight:'2px'}}/>No history found</div>
                   </div>
                  
                   <div className="order-history">
-                      <div>Whatsapp History</div>
+                      <div>Whatsapp History - missing</div>
                          <div><i className="bi bi-arrow-right my-eye-color" style={{fontSize:'19px',marginRight:'2px'}}/>No history found</div>
                   </div>
                  </div>
-               </div> */}
+               </div>
              
             
             
@@ -169,7 +168,7 @@ useEffect(()=>{
              </ComponentCard4>
 
             <ComponentCard>
-                 <OrderProductView orderID={id} data1={data1} data2={data2} data3={data3} data4={data4} data5={data5}/>
+                 <OrderProductView orderID={id}/>
              </ComponentCard>
          
          <Row>
@@ -183,8 +182,8 @@ useEffect(()=>{
           </Col>
          </Row>
          <Row>
-          {/* <Col md="12">
-                <div style={{background:'#e3e3e3',padding:'10px'}}><i className="bi bi-stopwatch-fill  my-calander-color" style={{fontSize:'19px'}}/>Order History</div>
+          <Col md="12">
+                <div style={{background:'#e3e3e3',padding:'10px'}}><i className="bi bi-stopwatch-fill  my-calander-color" style={{fontSize:'19px'}}/>Order History - missing</div>
                 <ComponentCard4>
                   <div className="order-history">
                      <div><i className="bi bi-arrow-right my-eye-color" style={{fontSize:'19px',marginRight:'2px'}}/>Order Created by Team Operations with Confirmed Status on 17 Dec, 2021</div>
@@ -193,7 +192,7 @@ useEffect(()=>{
                   </div>
                     
                 </ComponentCard4>
-          </Col> */}
+          </Col>
           
          </Row>
       </ComponentCard1>

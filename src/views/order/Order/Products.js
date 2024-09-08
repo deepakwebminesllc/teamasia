@@ -12,53 +12,25 @@ import PropTypes from 'prop-types';
 
 const Products = (props) => {
   const navigate = useNavigate();
-  const {orderID,data1,data2,data3,data4,data5} = props;
+  const {orderID} = props;
 
   const [data, setData] = useState([]);
+  const [ProductsAll, setAllProducts] = useState([]);
 
   console.log('in product',orderID);
 
   const addProductItem = () => {
-     navigate('/order/orders/product-add',{state: {orderID,data1,data2,data3,data4,data5}});
+     navigate('/order/orders/product-add',{state: {orderID}});
   };
 
   const editProductItem = (product) => {
-     navigate('/order/orders/product-edit',{state: {product,data1,data2,data3,data4,data5}});
+    const backSideProduct = ProductsAll.find((prod)=> prod.ref_product_id === product.id);
+    console.log('backSideProduct',backSideProduct);
+     navigate('/order/orders/product-edit',{state: {product,backSideProduct}});
   };
 
 
-  function getGrainNameById(grainId) {
-    const Name = data1.find(item => item.id === grainId);
-    // console.log('a1',Name);
-    return Name ? Name.name : 'Unknown grain';
-  }
 
-  function getFabricNameById(fabricId) {
-    const Name = data2.find(item => item.id === fabricId);
-    // console.log('a1',Name);
-    return Name ? Name.name : 'Unknown fabric';
-  }
-
-  function getQualityNameById(qualityId) {
-    const Name = data3.find(item => item.id === qualityId);
-    // console.log('a1',Name);
-    return Name ? Name.name : 'Unknown quality';
-  }
-
-  function getColorNameById(colorId) {
-    const Name = data4.find(item => item.id === colorId);
-    // console.log('a1',Name);
-    return Name ?  Name.name : 'Unknown color';
-  }
-
-  
-  const productwithNames = data.map(product => ({
-    ...product,
-    grainName: getGrainNameById(product.grain_id),
-    fabricName: getFabricNameById(product.fabric_id),
-    qualityName: getQualityNameById(product.quality_id),
-    colorName: getColorNameById(product.color_id)
-  }));
 
 
   const handleDeleteClick = async (itemId) => {
@@ -105,8 +77,9 @@ const Products = (props) => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const result = await response.json();
-      // console.log("responsejson in products",result);
       const resultFiltered = result.products.filter(product => product.ref_product_id === '0');
+      console.log("responsejson in products",resultFiltered);
+      setAllProducts(result.products);
       setData(resultFiltered);
     };
     fetchData();  
@@ -140,15 +113,17 @@ const Products = (props) => {
               </thead>
 
               <tbody>
-                {productwithNames.map((product) => (
+                {data.map((product) => (
                   <tr key={product.id}>
-                  <td title={product.grainName}>{product.grainName}</td>
-                  <td title={product.qualityName}>{product.qualityName}</td>
-                  <td title={product.colorName}>{product.colorName}</td>
+                  <td title={product.grain_name}>{product.grain_name}</td>
+                  <td title={product.quality_name}>{product.quality_name}</td>
+                  <td title={product.color_name}>{product.color_name}</td>
                   <td title={product.thickness}>{product.thickness}</td>
-                  <td title={product.fabricName}>{product.fabricName}</td>
+                  <td title={product.fabric_name}>{product.fabric_name}</td>
                   <td title={product.quantity}>{product.quantity}</td>
                   <td>{product.delivery_date}</td>
+
+            
                   <td>
                             {/* Action buttons or icons */}
                               <button type="button" className="btn btn-secondary btn-sm mr-2" onClick={() => editProductItem(product)} ><i className="bi bi-pencil-fill my-pen-color" /></button>
@@ -169,10 +144,5 @@ const Products = (props) => {
 
 export default Products;
 Products.propTypes = {
-  orderID: PropTypes.string.isRequired,
-  data1: PropTypes.array.isRequired,
-  data2: PropTypes.array.isRequired,
-  data3: PropTypes.array.isRequired,
-  data4: PropTypes.array.isRequired,
-  data5: PropTypes.array.isRequired
+  orderID: PropTypes.string.isRequired
 };

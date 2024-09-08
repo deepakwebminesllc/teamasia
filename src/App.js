@@ -19,14 +19,11 @@ const App = () => {
         className={`${direction ? 'rtl' : 'ltr'} ${isMode ? 'dark' : ''}`}
         dir={direction ? 'rtl' : 'ltr'}
       >
-        <ThemeSelector />
-
+        <ThemeSelector/>
            {routing}
-
       </div>
     </Suspense>
     </AuthProvider>
   );
 };
-
 export default App;

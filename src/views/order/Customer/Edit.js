@@ -28,10 +28,7 @@ import OpenImageButton from './OpenImageButton';
 const Edit= () => {
   const location = useLocation();
   const navigate= useNavigate();
-  const {id,company_name:companyName,factory_ids:Factory,labels:AddLabels,company_description:CompanyDescription,
-    day_limit:LimitforDaysAllowed,credit_limit:LimitforCreditAllowed,
-    customercompanyrepresentatives:items,
-    customercompanydocuments:compdoc} = location.state || {}; // Default to an empty object if state is undefined
+  const {id} = location.state || {}; // Default to an empty object if state is undefined
     
     const [FactoryArray, setFactoryArray] = useState([]);
     const [regularTags, setRegularTags] = useState([]);
@@ -39,26 +36,21 @@ const Edit= () => {
     const [errorMessageFromApi, setErrorMessageFromApi] = useState([]);
     const [errors, setErrors] = useState({});
     const [imageFile, setImageFile] = useState(null);
-    let compdocFromApi;
-console.log('AddLabels',location.state);
-if(compdoc.length === 0){
-  compdocFromApi=[{name:'',file_path:'',image_id:''}]
-}else{
-  compdocFromApi = compdoc;
-}
+
+// console.log('AddLabels',location.state);
   
 const [formDatas, setFormDataS] = useState({
-  companyName,
-  Factory,
-  AddLabels,
-  CompanyDescription,
-  LimitforDaysAllowed,
-  LimitforCreditAllowed,
-  items,
-  compdoc:compdocFromApi
+  companyName:'',
+  Factory:'',
+  AddLabels:'',
+  CompanyDescription:'',
+  LimitforDaysAllowed:'',
+  LimitforCreditAllowed:'',
+  items:[],
+  compdoc:[{name:'',file_path:'',image_id:''}]
 });
 
-const [selectedOptions, setSelectedOptions] = useState(Factory);
+const [selectedOptions, setSelectedOptions] = useState('');
 
 const handleChange = (e) => {
   const { name, value } = e.target;
@@ -352,59 +344,32 @@ const handleSubmit = async (event) => {
   }
 };
 
-useEffect(()=>{
-    if(AddLabels)
-      {
-        setFormDataS(item =>(
-          {
-            ...item,
-            AddLabels:AddLabels.split(',')
-          }
-          ));
-        setRegularTags(AddLabels.split(','));
-      }
 
-      const fetchData = async () => {
-        const token = localStorage.getItem('userToken');
-        console.log('token',token);
-        const response = await fetch('https://factory.teamasia.in/api/public/factories', {
-          method: 'GET', 
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        console.log('result',response);
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const result = await response.json();
-        console.log("responsejson",result);
-        setFactoryData(result.factories); 
-      };
-    
-      fetchData();
-  },[]);
 
-  useEffect(()=>{
-    const companyOptions = ()=>{
+ 
+  
+  const companyOptions = (factoryIds='',fact=[])=>{
       
       // const newFactoryArray = Factory.split(',');
-      const obj = factorydata.map((factoryitem)=>{
+      console.log('in companyop ', factoryIds, factorydata);
+
+      const obj = fact.map((factoryitem)=>{
         return {
           value:factoryitem.id,
           label:factoryitem.name,
           color: '#00B8D9'
         }
-      })
+      });
+
       setFactoryArray(obj);
 
-      const newFactoryArray = Factory.split(',');
+      const newFactoryArray = factoryIds.split(',');
       const ids = newFactoryArray.map(Number);
       console.log('newFactoryArray', newFactoryArray); // Log to check the ids you want to filter by
       console.log('newFactoryArray', ids); // Log to check the ids you want to filter by
-      console.log('factorydata', factorydata);
+      console.log('factorydata', fact);
 
-      const filteredArray = factorydata.filter(item => ids.includes(Number(item.id)));
+      const filteredArray = fact.filter(item => ids.includes(Number(item.id)));
       console.log('filteredArray',filteredArray);
 
       const obj1 =filteredArray.map((factoryitem)=>{
@@ -418,14 +383,83 @@ useEffect(()=>{
       console.log('obj1',obj1);
       setSelectedOptions(obj1);
   }
-  companyOptions();
-  console.log('factoryarray',FactoryArray);
-  },[factorydata]);
+ 
+
+  const companyOptions2 = (factoryIds='', AddLab='')=>{
+    console.log('Addlab in coop2',AddLab);
+    if(AddLab)
+      {
+        setRegularTags(AddLab.split(','));
+        setFormDataS(item =>(
+          {
+            ...item,
+            AddLabels:AddLab.split(',')
+          }
+          ));
+      }
+
+      const fetchData = async () => {
+        const token = localStorage.getItem('userToken');
+        const response = await fetch('https://factory.teamasia.in/api/public/factories', {
+          method: 'GET', 
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        // console.log('result',response);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const result = await response.json();
+        // console.log("responsejson",result);
+        setFactoryData(result.factories);
+        companyOptions(factoryIds,result?.factories);
+      };
+    
+      fetchData();
+}
+
 
   const handleRegularTags = (tags) => {
     console.log('tags',tags);
     setRegularTags(tags);
   };
+
+  useEffect(()=>{
+    const fetchCustomerData = async ()=>{
+
+      const token = localStorage.getItem('userToken');
+      const response =await  fetch(`https://factory.teamasia.in/api/public/customers/${id}`,{
+        method: "GET",
+        headers:{
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if(!response.ok){
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const datas = await response.json();
+      console.log('result customer',datas);
+      if(datas){
+        setFormDataS(prevState => ({
+          ...prevState,
+          id,
+          companyName:datas.company_name,
+          Factory:datas.factory_ids,
+          AddLabels:datas.labels,
+          CompanyDescription:datas.company_description,
+          LimitforDaysAllowed:datas.day_limit,
+          LimitforCreditAllowed:datas.credit_limit,
+          items:datas.customercompanyrepresentatives,
+          compdoc: datas.customercompanydocuments.length === 0 ? datas.customercompanydocuments:[{name:'',file_path:'',image_id:''}]
+        }));
+        companyOptions2(datas?.factory_ids, datas?.labels);
+      }
+    }
+    fetchCustomerData();
+  },[])
 
   return (
 <div>
@@ -463,7 +497,7 @@ useEffect(()=>{
                         </div>
                         <ul>
                         {errorMessageFromApi.map((item)=>
-                        <li>
+                        <li key={item.id}>
                             {item}
                         </li>
                         )}
@@ -504,7 +538,11 @@ useEffect(()=>{
                    <FormGroup>
                      <Label>Add Labels</Label>
                      <TagsInput
-                          value={regularTags}
+                          value={/* The above code is a comment in JavaScript using the multi-line
+                          comment syntax. It is not performing any specific action in the
+                          code, but is used to provide information or explanations for other
+                          developers reading the code. */
+                          regularTags}
                           onChange={(tags) => handleRegularTags(tags)}
                           tagProps={{
                             className: 'react-tagsinput-tag bg-info text-white rounded',

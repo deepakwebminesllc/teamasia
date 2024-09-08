@@ -24,6 +24,7 @@ const JumbotronComponent = ({modal,rollItem,handleCreateSmallRoll,JumboUpdateDat
     id:JumboUpdateDataFromPlan.id,
     product_id: JumboUpdateDataFromPlan.product_id,
     jumbo_roll_id: JumboUpdateDataFromPlan.jumbo_roll_id,
+    // jumbo_roll_id: '0',
     quantity: JumboUpdateDataFromPlan.quantity,
     grade_id: JumboUpdateDataFromPlan.grade_id,
     bin : JumboUpdateDataFromPlan.bin,
@@ -113,7 +114,8 @@ const JumbotronComponent = ({modal,rollItem,handleCreateSmallRoll,JumboUpdateDat
     console.log("data",newItems);
     newItems.push({ 
       id:'x',
-      jumbo_roll_id : rollItem.id,
+      // jumbo_roll_id : rollItem.id,
+      jumbo_roll_id : '0',
       small_roll_id : JumboUpdateDataFromPlan.id,
       fault_id : "x",
       fault_start_point : "",
@@ -661,7 +663,7 @@ useEffect(() => {
                       <Col md="3" >
                         <FormGroup>
                           <Label>T1</Label>
-                          <Input type="text" 
+                          <Input type="number" 
                           name="t1" 
                           id="name"
                           placeholder="Enter name" 
@@ -676,7 +678,7 @@ useEffect(() => {
                       <Col md="3" >
                         <FormGroup>
                           <Label>T2</Label>
-                          <Input type="text" 
+                          <Input type="number" 
                           name="t2" 
                           id="name"
                           placeholder="Enter name" 
@@ -690,7 +692,7 @@ useEffect(() => {
                       <Col md="3" >
                         <FormGroup>
                           <Label>T3</Label>
-                          <Input type="text" 
+                          <Input type="number" 
                           name="t3" 
                           id="name"
                           placeholder="Enter name" 

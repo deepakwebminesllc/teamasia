@@ -30,7 +30,7 @@ const Factory = () => {
   const handleEditAddress = (factoryId)=>{
     
     console.log('address');
-     navigate('/addresses/edit', {state:factoryId});
+     navigate('/addresses', {state:factoryId});
    } 
 
   const handleTrash = ()=>{

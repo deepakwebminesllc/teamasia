@@ -411,10 +411,10 @@ const handleSubmitforSmall = async (e) => {
                       <Col md="3" >
                         <FormGroup>
                           <Label>T1</Label>
-                          <Input type="text" 
+                          <Input type="number" 
                           name="t1" 
                           id="name"
-                          placeholder="Enter name" 
+                          placeholder="Enter number" 
                           value={formDataS.t1}
                           onChange={handleChange} 
                           className={formDataS.t1 === '' && errorsP.t1 ? "is-invalid":""}
@@ -426,10 +426,10 @@ const handleSubmitforSmall = async (e) => {
                       <Col md="3" >
                         <FormGroup>
                           <Label>T2</Label>
-                          <Input type="text" 
+                          <Input type="number" 
                           name="t2" 
                           id="name"
-                          placeholder="Enter name" 
+                          placeholder="Enter number" 
                           value={formDataS.t2}
                           onChange={handleChange} 
                           className={formDataS.t2 === '' && errorsP.t2 ? "is-invalid":""}
@@ -440,10 +440,10 @@ const handleSubmitforSmall = async (e) => {
                       <Col md="3" >
                         <FormGroup>
                           <Label>T3</Label>
-                          <Input type="text" 
+                          <Input type="number" 
                           name="t3" 
                           id="name"
-                          placeholder="Enter name" 
+                          placeholder="Enter number" 
                           value={formDataS.t3}
                           onChange={handleChange} 
                           className={formDataS.t3 === '' && errorsP.t3 ? "is-invalid":""}

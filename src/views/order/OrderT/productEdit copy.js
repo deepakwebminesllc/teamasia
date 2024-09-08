@@ -19,7 +19,7 @@ import ProductBackSideEdit from './productBackSideEdit';
 
 // import ComponentCard from '../../components/ComponentCard';
 
-const Edit = () => {
+const Add = () => {
     const location = useLocation();
     const   {
       id,
@@ -50,13 +50,12 @@ const Edit = () => {
       is_online_product:isOnlineProduct,
       is_trashed:isTrashed,
       productadditionaltreatments,
-      productprints,  
-  }  = location.state.item;
-  console.log('local XXXX',productadditionaltreatments,productprints)
-  const {data1,data2,data3,data4,data5} = location.state;
+      productprints,
+      emboss_ids:embossIds  
+  }  = location.state.product
+  const {data1,data2,data3,data4}  = location.state;
   const navigate = useNavigate();
   const [items, setItems] = useState([]);
-
   const [data6, setData6] = useState([]);
   const [data7, setData7] = useState([]);
   const [data8, setData8] = useState([]);
@@ -102,8 +101,9 @@ console.log('local',id,location.state);
 //   console.log('isonline',formDatas.isOnlineProduct);
 //     setFormDataS(prevState => ({
 //       ...prevState,
-//       isOnlineProduct: formDatas.isOnlineProduct === '0' ? '1':'0'
+//       isOnlineProduct: formDatas.isOnlineProduct === '0' ? '1': '0'
 //     }));
+ 
 // };
 
 const handleChange = (e) => {
@@ -174,7 +174,7 @@ const removeItem2 = index => {
  const handleInputChange = (index, event) => {
    const {name,value} = event.target;
     const newItems = items.slice();
-    console.log("data",index,name,value,newItems);
+    console.log("data1",index,name,value,newItems);
     newItems[index][name] = value;
     setItems(newItems);
   };
@@ -182,7 +182,7 @@ const removeItem2 = index => {
   const handleInputChange1 = (index, event) => {
     const {name,value} = event.target;
     const newItems = formDatas.productprints.slice();
-    console.log("data1xxxxxxxx",index,name,value,newItems);
+    console.log("data1",index,name,value,newItems);
     newItems[index][name] = value;
     setFormDataS(prevState => ({
       ...prevState,
@@ -227,7 +227,7 @@ const removeItem2 = index => {
           return temp.description !== '';
         });
 
-        console.log('formdataXxxxx',formDatas);
+        console.log('formdataX',formDatas);
         console.log('filtered',filtered);
       
 
@@ -281,7 +281,7 @@ const removeItem2 = index => {
             navigate(-1)
           }
           setsubmitBlock(true);
-          console.log('this is product edit ,so "product is added successfully ,please use this product id as ref_id in back side product" is not valid')
+          console.log('product is added successfully ,please use this product id as ref_id in back side product')
         } else {
           console.error("Authentication failed:", Object.values(datas.messages.errors));
           if (datas.error) {
@@ -321,11 +321,7 @@ const validateForm = () => {
     // eslint-disable-next-line dot-notation
     errors1["colorId"] = "Please select a color.";
   }
-  if(formDatas.hsnId === 'x') {
-    formIsValid = false;
-    // eslint-disable-next-line dot-notation
-    errors1["hsnId"] = "Please select a hsn.";
-  }
+
 
   setErrors(errors1);
   return formIsValid;
@@ -372,6 +368,24 @@ const handleSubmit = async (event) => {
 
   useEffect(() => {
     
+    // Fetch the data from the API
+    const fetchData1 = async () => {
+      const resultGrain = data1.filter((item)=>(
+        item.id === formDatas.grain
+      ));
+      
+      if(resultGrain.length === 0){
+        setFormDataS(prevState => ({
+          ...prevState,
+          grain: 'x',
+        }));
+      }
+      const embossArray = embossIds.split(',');
+      if(embossArray.length !== 0 && embossArray[0] !== ''){
+        setItems(embossArray.map((em)=>({'id':em})));
+      }
+    };
+
     const fetchData2 = async () => {    
       const resultFabric = data2.filter((item)=>(
         item.id === formDatas.fabricId
@@ -389,6 +403,31 @@ const handleSubmit = async (event) => {
         console.log('robo',resultFabric[0].fabriccolors)
         setDataX(resultFabric[0].fabriccolors);
       }
+    };
+    const fetchData3 = async () => {
+      const resultQuality = data3.filter((item)=>(
+        item.id === formDatas.qualityId
+      ));
+      
+      if(resultQuality.length === 0){
+        setFormDataS(prevState => ({
+          ...prevState,
+          qualityId: 'x',
+        }));
+      }
+    };
+    const fetchData4 = async () => {
+      const resultColor = data4.filter((item)=>(
+        item.id === formDatas.colorId
+      ));
+      
+      if(resultColor.length === 0){
+        setFormDataS(prevState => ({
+          ...prevState,
+          colorId: 'x',
+        }));
+      }
+
     };
 
     const fetchData6 = async () => {
@@ -450,7 +489,11 @@ const handleSubmit = async (event) => {
     fetchData8();
     fetchData7();
     fetchData6();
+    fetchData4();
+    fetchData3();
     fetchData2();
+    fetchData1();
+
   },[]);
   
 
@@ -539,6 +582,7 @@ const handleSubmit = async (event) => {
                          value={formDatas.fabricColorId}
                         onChange={handleTypeChange}
                         disabled={submitBlock}
+                       
                         >
                            {dataX.map((item)=>{
                              return <option key={item.id} value={item.id}>{item.name}</option>
@@ -578,7 +622,7 @@ const handleSubmit = async (event) => {
                         onChange={handleTypeChange}
                         className={errors.colorId ? "is-invalid" : ""}
                         disabled={submitBlock}
-                       >
+                        >
                            {data4.map((item)=>{
    
                              return <option key={item.id} value={item.id}>{item.name}</option>
@@ -590,37 +634,18 @@ const handleSubmit = async (event) => {
                     </FormGroup>
                   </Col>
 
-                  <Col md="10">
-                    <FormGroup>
-                      <Label>HSN Code</Label>
-                      <Input type="select" 
-                         name="hsnId" 
-                         value={formDatas.hsnId}
-                        onChange={handleTypeChange}
-                        className={errors.hsnId ? "is-invalid" : ""}
-                        disabled={submitBlock}
-                        >
-                           {data5.map((item)=>{
-   
-                             return <option key={item.id} value={item.id}>{item.name}</option>
-                           })}
-                      </Input>
-                      {errors.hsnId && (
-                        <FormText className="text-danger">{errors.hsnId}</FormText>
-                      )}
-                    </FormGroup>
-                  </Col>
+                  
 
                   <Col md="10" >
                    <FormGroup>
                      <Label>Quantity (in meters)</Label>
-                     <Input type="text" 
+                     <Input type="number" 
                      name="quantity" 
                      id="name"
-                     placeholder="Enter name" 
+                     placeholder="Enter number" 
                      value={formDatas.quantity}
-                     onChange={handleChange}
-                     disabled={submitBlock} 
+                     onChange={handleChange} 
+                     disabled={submitBlock}
                       />
                      
                      <FormText className="muted"></FormText>
@@ -630,10 +655,10 @@ const handleSubmit = async (event) => {
                  <Col md="10" >
                    <FormGroup>
                      <Label>Price Per Unit (Inclusive of Tax)</Label>
-                     <Input type="text" 
+                     <Input type="number" 
                      name="PricePerUnit" 
                      id="name"
-                     placeholder="Enter name" 
+                     placeholder="Enter number" 
                      value={formDatas.PricePerUnit}
                      onChange={handleChange} 
                      disabled={submitBlock}
@@ -644,13 +669,13 @@ const handleSubmit = async (event) => {
                  <Col md="10" >
                    <FormGroup>
                      <Label>Thickness (in mm)</Label>
-                     <Input type="text" 
+                     <Input type="number" 
                      name="Thickness" 
                      id="name"
-                     placeholder="Enter name" 
+                     placeholder="Enter number" 
                      value={formDatas.Thickness}
-                     onChange={handleChange} 
-                     disabled={submitBlock}
+                     onChange={handleChange}
+                     disabled={submitBlock} 
                       />
                      <FormText className="muted"></FormText>
                    </FormGroup>
@@ -658,41 +683,126 @@ const handleSubmit = async (event) => {
                  <Col md="10" >
                    <FormGroup>
                      <Label>Tax Rate (in %)</Label>
-                     <Input type="text" 
+                     <Input type="number" 
                      name="TaxRate" 
                      id="name"
-                     placeholder="Enter name" 
+                     placeholder="Enter number" 
                      value={formDatas.TaxRate}
-                     onChange={handleChange} 
-                     disabled={submitBlock}
-                      />
-                     <FormText className="muted"></FormText>
-                   </FormGroup>
-                 </Col>
-                 <Col md="10" >
-                   <FormGroup>
-                     <Label>Delivery Date</Label>
-                     <Input type="date" 
-                     name="deliveryDate" 
-                     id="name"
-                     placeholder="Enter name" 
-                     value={formDatas.deliveryDate}
-                     onChange={handleChange} 
-                     disabled={submitBlock}
-                      />
-                     <FormText className="muted"></FormText>
-                   </FormGroup>
-                 </Col>
-                 <Col md="10" >
-                   <FormGroup>
-                     <Label>Customer Item Reference</Label>
-                     <Input type="text" 
-                     name="CustomerItemRefernce" 
-                     id="name"
-                     placeholder="Enter name" 
-                     value={formDatas.CustomerItemRefernce}
                      onChange={handleChange}
                      disabled={submitBlock} 
+                      />
+                     <FormText className="muted"></FormText>
+                   </FormGroup>
+                 </Col>
+                 <Col md="10" >
+                   <FormGroup>
+                     <Label>Topcoat</Label>
+                     <Input type="text" 
+                     name="Topcoat" 
+                     id="name"
+                     placeholder="Enter" 
+                     value={formDatas.Topcoat}
+                     onChange={handleChange} 
+                     disabled={submitBlock}
+                      />
+                     <FormText className="muted"></FormText>
+                   </FormGroup>
+                 </Col>
+                 <Col md="10" >
+                   <FormGroup>
+                     <Label>Foam I</Label>
+                     <Input type="text" 
+                     name="FoamI" 
+                     id="name"
+                     placeholder="Enter" 
+                     value={formDatas.FoamI}
+                     onChange={handleChange} 
+                     disabled={submitBlock}
+                      />
+                     <FormText className="muted"></FormText>
+                   </FormGroup>
+                 </Col>
+                 <Col md="10" >
+                   <FormGroup>
+                     <Label>Filler In Foam I</Label>
+                     <Input type="text" 
+                     name="FillerInFoamI" 
+                     id="name"
+                     placeholder="Enter" 
+                     value={formDatas.FillerInFoamI}
+                     onChange={handleChange} 
+                     disabled={submitBlock}
+                      />
+                     <FormText className="muted"></FormText>
+                   </FormGroup>
+                 </Col>
+                 <Col md="10" >
+                   <FormGroup>
+                     <Label>Foam II</Label>
+                     <Input type="text" 
+                     name="FoamII" 
+                     id="name"
+                     placeholder="Enter" 
+                     value={formDatas.FoamII}
+                     onChange={handleChange} 
+                     disabled={submitBlock}
+                      />
+                     <FormText className="muted"></FormText>
+                   </FormGroup>
+                 </Col>
+                 <Col md="10" >
+                   <FormGroup>
+                     <Label>Filler In Foam II</Label>
+                     <Input type="text" 
+                     name="FillerInFoamII" 
+                     id="name"
+                     placeholder="Enter" 
+                     value={formDatas.FillerInFoamII}
+                     onChange={handleChange} 
+                     disabled={submitBlock}
+                      />
+                     <FormText className="muted"></FormText>
+                   </FormGroup>
+                 </Col>
+                 <Col md="10" >
+                   <FormGroup>
+                     <Label>Adhesive</Label>
+                     <Input type="text" 
+                     name="Adhesive" 
+                     id="name"
+                     placeholder="Enter" 
+                     value={formDatas.Adhesive}
+                     onChange={handleChange} 
+                     disabled={submitBlock}
+                      />
+                     <FormText className="muted"></FormText>
+                   </FormGroup>
+                 </Col>
+                 <Col md="10" >
+                   <FormGroup>
+                     <Label>Filler In Adhesive</Label>
+                     <Input type="text" 
+                     name="FillerInAdhesive" 
+                     id="name"
+                     placeholder="Enter" 
+                     value={formDatas.FillerInAdhesive}
+                     onChange={handleChange} 
+                     disabled={submitBlock}
+                      />
+                     <FormText className="muted"></FormText>
+                   </FormGroup>
+                 </Col>
+
+                 <Col md="10" >
+                   <FormGroup>
+                     <Label>Final Gsm</Label>
+                     <Input type="text" 
+                     name="FinalGsm" 
+                     id="name"
+                     placeholder="Enter" 
+                     value={formDatas.FinalGsm}
+                     onChange={handleChange} 
+                     disabled={submitBlock}
                       />
                      <FormText className="muted"></FormText>
                    </FormGroup>
@@ -824,10 +934,11 @@ const handleSubmit = async (event) => {
                     </tbody>
                   </table>
                 </Row>
-
+                
                 <Col md="10">
                           <FormGroup>
                             {/* <Input type="checkbox" checked={ DefaultToFactoryStock === '1'} onChange={checkboxclick()}  /> */}
+                            {/* <Input type="checkbox" checked={formDatas.isOnlineProduct === '1'} onChange={checkboxclick1} disabled={submitBlock} /> */}
                             <Input type="checkbox" checked={formDatas.isOnlineProduct === '1'}  disabled={submitBlock} />
                             <Label className='mx-1'> This is a online product</Label>
                             <FormText className="muted"></FormText>
@@ -837,7 +948,8 @@ const handleSubmit = async (event) => {
                  <Col md="4">
                    <FormGroup>
                     <Button type="submit" className="btn my-btn-color" style={{marginTop:"28px"}}
-                     disabled={submitBlock}>
+                    disabled={submitBlock}
+                    >
                         Submit
                     </Button>
                    </FormGroup>
@@ -846,11 +958,11 @@ const handleSubmit = async (event) => {
                
               
              </Form>
-             
              {
-              formDatas.isOnlineProduct === '1'? <ProductBackSideEdit productIdOfParent={id} data1={data1} data2={data2} data3={data3} data4={data4} data5={data5} data6={data6} data7={data7} data8={data8} />:''
+              formDatas.isOnlineProduct === '1'? <ProductBackSideEdit productIdOfParent={id} frontSidedata={formDatas} orderTemplateID = {id} data1={data1} data2={data2} data3={data3} data4={data4}  data6={data6} data7={data7} data8={data8} />:''
              }
            </CardBody>
+           
          </Card>
        </Col> 
      </Row>
@@ -862,4 +974,4 @@ const handleSubmit = async (event) => {
   );
 };
 
-export default Edit;
+export default Add;

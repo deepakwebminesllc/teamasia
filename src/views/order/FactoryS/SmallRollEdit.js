@@ -84,8 +84,10 @@ const Add = () => {
 
   async function apiCall() {
     try {
+      console.log('formdatas',formDatas.gradeId);
+
       const token = localStorage.getItem('userToken');
-      const response = await fetch(`https://factory.teamasia.in/api/public/rolls/${id}`, {
+      const response = await fetch(`https://factory.teamasia.in/api/public/smallrolls/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -281,7 +283,7 @@ const Add = () => {
                     <FormGroup>
                       <Label>T1</Label>
                       <Input
-                        type="text"
+                        type="number"
                         name="t1"
                         placeholder="Enter T1"
                         value={formDatas.t1}
@@ -294,7 +296,7 @@ const Add = () => {
                     <FormGroup>
                       <Label>T2</Label>
                       <Input
-                        type="text"
+                        type="number"
                         name="t2"
                         placeholder="Enter T2"
                         value={formDatas.t2}
@@ -307,7 +309,7 @@ const Add = () => {
                     <FormGroup>
                       <Label>T3</Label>
                       <Input
-                        type="text"
+                        type="number"
                         name="t3"
                         placeholder="Enter T3"
                         value={formDatas.t3}

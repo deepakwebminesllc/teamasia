@@ -6,52 +6,15 @@ import ComponentCard4 from '../../../components/ComponentCard5';
 
 const JumbotronComponent = (props) => {
 
-  const {orderID,formatDate,customerID,customerNameFromManagePlan,data1,data2,data3,data4,addItemToLine} = props;
+  const {orderID,formatDate,customerID,customerNameFromManagePlan,addItemToLine} = props;
   const [data, setData] = useState([]);
 
   //  console.log('removeItemFromLine',removeItemFromLine,addItemToLine);
 
-  function getGrainNameById(grainId) {
-    const Name = data1.find(item => item.id === grainId);
-    // console.log('a1',Name);
-    return Name ? Name.name : 'Unknown grain';
-  }
-
-  function getFabricNameById(fabricId) {
-    const Name = data2.find(item => item.id === fabricId);
-    // console.log('a1',Name);
-    return Name ? Name.name : 'Unknown fabric';
-  }
-  function getFabricColorNameById(fabricId,fabricColorId) {
-    const Name = data2.find(item => item.id === fabricId);
-    let FabricColor = null;
-    if(Name){
-       FabricColor = Name.fabriccolors.find(item => item.id === fabricColorId);
-    }
-    // console.log('a1',Name);
-    return FabricColor ? FabricColor.name : 'Unknown fabricColor';
-  }
-
-  function getQualityNameById(qualityId) {
-    const Name = data3.find(item => item.id === qualityId);
-    // console.log('a1',Name);
-    return Name ? Name.name : 'Unknown quality';
-  }
-
-  function getColorNameById(colorId) {
-    const Name = data4.find(item => item.id === colorId);
-    // console.log('a1',Name);
-    return Name ?  Name.name : 'Unknown color';
-  }
 
   
   const productwithNames = data.map(product => ({
     ...product,
-    grainName: getGrainNameById(product.grain_id),
-    fabricName: getFabricNameById(product.fabric_id),
-    fabricColorName: getFabricColorNameById(product.fabric_id,product.fabric_color_id),
-    qualityName: getQualityNameById(product.quality_id),
-    colorName: getColorNameById(product.color_id),
     customerNameFromManagePlan,
     customer_id:customerID,
     status_id:'0'
@@ -85,26 +48,26 @@ const JumbotronComponent = (props) => {
 
   return (
   <>
-    
-    {productwithNames.map((product) => {
+    {productwithNames.length > 0 ? productwithNames.map((product) => {
       return  <ComponentCard4 key={product.id}>
                 <div>
                   <span className='production-plan-page-collape-heading'>PRODUCT</span> { product.id}
                    {/* <button type='button' style={{padding:'1px',background:'#777',borderRadius:'5px',marginLeft:'5px',marginRight:'5px',color:'white'}}>{product.is_factory_surplus_product !== '0'?'':'factory product'}</button> */}
-                   <button type='button' style={{padding:'1px',background: '#B33C12',borderRadius:'5px',marginLeft:'5px',marginRight:'20px',color:'white'}}>{product.is_online_product !== 0?'online product':''}</button>
-                   <button type='button' style={{padding:'1px',background: '#B33C12',borderRadius:'5px',marginRight:'20px',color:'white'}}>{product.ref_product_id !== '0'?'back side':'front side'}</button>
-                    <span style={{paddingTop:'2px'}}><i className="bi bi-arrow-right-square-fill" style={{fontSize:"20px",marginTop:'2px'}} onClick={()=>addItemToLine(product)}></i></span>
+                   {(product.is_online_product !== '0' || product.ref_product_id !== '0') && <button type='button' style={{padding:'1px',background: '#B33C12',borderRadius:'5px',marginLeft:'5px',marginRight:'20px',color:'white'}}>online product</button>}
+                   {product.is_online_product !== '0' && product.ref_product_id === '0' && <button type='button' style={{padding:'1px',background: '#B33C12',borderRadius:'5px',marginLeft:'5px',marginRight:'20px',color:'white'}}>front side</button>}
+                   {product.is_online_product === '0' && product.ref_product_id !== '0' && <button type='button' style={{padding:'1px',background: '#B33C12',borderRadius:'5px',marginLeft:'5px',marginRight:'20px',color:'white'}}>back side</button>}
+                    <span style={{marginLeft:'5px',paddingTop:'2px'}}><i className="bi bi-arrow-right-square-fill" style={{fontSize:"20px",marginTop:'2px'}} onClick={()=>addItemToLine(product)}></i></span>
                  </div>
        <Table size='sm' className="order-page-table" responsive>
                  
             <tbody>
                  
                   <tr >
-                    <td title={product.grainName}>{product.grainName}</td>
-                    <td title={product.colorName}>{product.colorName}</td>
-                    <td title={product.qualityName}>{product.qualityName}</td>
-                    <td title={product.fabricName}>{product.fabricName}</td>
-                    <td title={product.fabricColorName}>{product.fabricColorName}</td>
+                    <td title={product.grain_name}>{product.grain_name}</td>
+                    <td title={product.color_name}>{product.color_name}</td>
+                    <td title={product.quality_name}>{product.quality_name}</td>
+                    <td title={product.fabric_name}>{product.fabric_name}</td>
+                    <td title={product.fabric_color_name}>{product.fabric_color_name}</td>
                   </tr>
                   <tr >
                     <td title="">{}</td>
@@ -118,20 +81,22 @@ const JumbotronComponent = (props) => {
                   </tr>
                   <tr >
                     <td title="" colSpan={3}><span className='production-plan-page-collape-heading'>Delivery Date:</span> {formatDate(product.delivery_date)}</td>
-                    <td title="" colSpan={2}><span className='production-plan-page-collape-heading'>Price Per Unit:</span> ₹{product.price}</td>
+                    <td title="" colSpan={2}><span className='production-plan-page-collape-heading'>Price Per Unit: ₹</span> {product.price}</td>
                   </tr>
                   <tr >
                     <td title="" colSpan={3}><span className='production-plan-page-collape-heading'>Cust. Item Ref:</span>  {product.customer_item_reference}</td>
-                    <td title="" colSpan={2}> <span className='production-plan-page-collape-heading'>Total Qty:</span> {product.quantity}m</td>
+                    <td title="" colSpan={2}> <span className='production-plan-page-collape-heading'>Total Qty:</span> {product.total}m</td>
                   </tr>
                   <tr >
-                    <td title="" colSpan={3}> <span className='production-plan-page-collape-heading'>Remaining Qty:</span> 0.00m</td>
-                    <td title="" colSpan={2}> <span className='production-plan-page-collape-heading'>Planned Qty:</span> {product.quantity}m</td>
+                    <td title="" colSpan={3}> <span className='production-plan-page-collape-heading'>Remaining Qty:</span> {Number(product.total)-Number(product.planned)}m</td>
+                    <td title="" colSpan={2}> <span className='production-plan-page-collape-heading'>Planned Qty:</span>{product.planned}m</td>
                   </tr>
                 </tbody>
                 </Table> 
                 </ComponentCard4>
-                })}
+                }):<div className="my-btn-color-temp"  style={{background: '#e0f1f2',textAlign:'center',border: '2px solid black',color:'black',marginBottom:'2px',padding:'20px'}}> 
+                        NO PRODUCTS IN THIS ORDER
+                  </div>}
   </>
 
   );
@@ -143,10 +108,6 @@ JumbotronComponent.propTypes = {
   orderID: PropTypes.string.isRequired,
   customerID: PropTypes.string.isRequired,
   customerNameFromManagePlan: PropTypes.string.isRequired,
-  data1: PropTypes.array.isRequired,
-  data2: PropTypes.array.isRequired,
-  data3: PropTypes.array.isRequired,
-  data4: PropTypes.array.isRequired,
   addItemToLine: PropTypes.func.isRequired,
   // removeItemFromLine: PropTypes.func.isRequired,
   formatDate: PropTypes.func.isRequired,

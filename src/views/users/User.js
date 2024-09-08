@@ -12,20 +12,7 @@ import ComponentCard from '../../components/ComponentCard';
 const User = () => {
   const [data, setData] = useState([]);
 
-  const navigate = useNavigate();
-  // const data = [
-  //   { id: 1, Name: '1037 A', Email: 'sonu.modal@teamcolence.com', Mobile: '9315496801', Role: 'superadmin', Mfastatus: 'Disable'},
-  //   { id: 2, Name: '1037 A', Email: 'sonu.modal@teamcolence.com', Mobile: '9315496801', Role: 'Admin', Mfastatus: 'Disable'},
-  //   { id: 3, Name: '1037 A', Email: 'sonu.modal@teamcolence.com', Mobile: '9315496801', Role: 'Admin', Mfastatus: 'Disable'},
-  //   { id: 4, Name: '1037 A', Email: 'sonu.modal@teamcolence.com', Mobile: '9315496801', Role: 'Admin', Mfastatus: 'Disable'},
-  //   { id: 5, Name: '1037 A', Email: 'sonu.modal@teamcolence.com', Mobile: '9315496801', Role: 'Admin', Mfastatus: 'Disable'},
-  //   { id: 6, Name: '1037 A', Email: 'sonu.modal@teamcolence.com', Mobile: '9315496801', Role: 'Admin', Mfastatus: 'Disable'},
-  //   { id: 7, Name: '1037 A', Email: 'sonu.modal@teamcolence.com', Mobile: '9315496801', Role: 'Admin', Mfastatus: 'Disable'},
-  //   { id: 8, Name: '1037 A', Email: 'sonu.modal@teamcolence.com', Mobile: '9315496801', Role: 'Admin', Mfastatus: 'Disable'},
-  //   { id: 9, Name: '1037 A', Email: 'sonu.modal@teamcolence.com', Mobile: '9315496801', Role: 'Admin', Mfastatus: 'Disable'},
-  //   { id: 10, Name: '1037 A', Email: 'sonu.modal@teamcolence.com', Mobile: '9315496801', Role: 'Admin', Mfastatus: 'Disable'},
-  // ];
- 
+  const navigate = useNavigate(); 
   const handleEditClick = (item) => {
     // Navigate to the edit page with the item's id
     // Navigate(`/resources/address-types/edit/${itemId}`);
@@ -40,10 +27,12 @@ const User = () => {
   const handleDeleteClick = async (itemId) => {
     try {
       // Call your API endpoint to delete the item
+      const token = localStorage.getItem('userToken');
       const response = await fetch(`https://factory.teamasia.in/api/public/users/${itemId}`, {
         method: 'DELETE',
         headers: {
           // Your headers here (if needed)
+          'Authorization': `Bearer ${token}`
         }
       });
   
