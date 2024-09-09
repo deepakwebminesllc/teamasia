@@ -32,19 +32,13 @@ const Products = (props) => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const result = await response.json();
-      // console.log("responsejson in products",result);
-      // const resultFiltered = result.products.filter(product => product.ref_product_id === '0');
-
-      const products = result.products.slice();
-
- 
+      console.log("responsejson in products",result);
 
 
-
-      console.log('pairedProducts',products);
-
+      const resultFiltered = result.products.filter(product => product.ref_product_id === '0');
+      console.log('pairedProducts',resultFiltered);
       // setData(resultFiltered);
-      setData(products);
+      setData(resultFiltered);
 
     };
 
@@ -63,8 +57,8 @@ const Products = (props) => {
            </CardTitle>
           
            <CardBody>
-           {data.length > 0 ? data.map(({item }) => (
-             <ProductPairView productID={item.id}/>
+           {data.length > 0 ? data.map((item) => (
+             <ProductPairView productID={item?.id}/>
         )):<div className="my-btn-color-temp"  style={{background: 'rgb(227, 227, 227)',fontWeight: '700',textAlign:'center',color:'black',marginBottom:'2px',padding:'20px'}}> 
                 NO PRODUCTS IN THIS ORDER
           </div>}

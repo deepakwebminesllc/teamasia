@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Table} from 'reactstrap';
 import PropTypes from 'prop-types';
-import { useNavigate } from 'react-router-dom';
 
 const JumbotronComponent = (props) => {
   const { productID } = props;
-  const navigate = useNavigate();
   const [data, setData] = useState({ front_side: {}, back_side: [] });
   const [data7, setData7] = useState([]);
   const [data8, setData8] = useState([]);
@@ -79,10 +77,9 @@ console.log('printArray',printArray);
       setData8(resultX);
     }
 
-    const fetchData = async (backProductData) => {
-      console.log('backProductData',backProductData);
+    const fetchData = async () => {
       const token = localStorage.getItem('userToken');
-      const response = await fetch(`https://factory.teamasia.in/api/public/products/pair/${backProductData.ref_product_id}`, {
+      const response = await fetch(`https://factory.teamasia.in/api/public/products/pair/${productID}`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -97,39 +94,10 @@ console.log('printArray',printArray);
     };
 
 
-     const checkProductFrontBack = async()=> {
-      try {
-          const token = localStorage.getItem('userToken');
-          const response = await fetch(`https://factory.teamasia.in/api/public/products/${productID}`, {
-            method: 'GET', 
-            headers: {
-              'Authorization': `Bearer ${token}`
-            }
-          });
-  
-           if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-          const result = await response.json();
-          console.log("responsejson1",result);
-          if(result.is_online_product === '1' && result.ref_product_id === '0'){
-            navigate(-1)
-          }else if(result.is_online_product === '0' && result.ref_product_id === '0'){
-            setData({front_side:result,back_side:{}});
-          }else{
-            fetchData(result);
-          }
-          return null;
-  
-      } catch (error) {
-        console.log('error',error);
-          return null;
-      }
-  }
+     
     fetchData8();
     fetchData7();
     fetchData();
-    checkProductFrontBack();
   }, [productID]);
 
   // if (!data.front_side && !data.back_side) {
@@ -146,7 +114,7 @@ console.log('printArray',printArray);
                 <div style={{ margin: '5px 0px' }}>
                   <div className='fix-wid-1-temp'>
                     <i className="bi-menu-button-wide-fill my-eye-color" style={{ fontSize: '20px', marginRight: '1px' }} />
-                    <span style={{ fontWeight: '900' }}> Product {data?.back_side?.id} {data.front_side.is_online_product === '1' && data.front_side.ref_product_id === '0' && `(front_side:${data?.front_side?.id})`}</span>
+                    <span style={{ fontWeight: '900' }}> Product {data.front_side.is_online_product === '0' && data.front_side.ref_product_id === '0' && `${data?.front_side?.id}`}{data?.back_side?.id} {data.front_side.is_online_product === '1' && data.front_side.ref_product_id === '0' && `(front_side:${data?.front_side?.id})`}</span>
                   </div>
                 </div>
              
