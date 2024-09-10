@@ -143,15 +143,15 @@ const Products = (props) => {
            <CardBody>
            {data.length > 0 ? data.map(({ front, back }) => (
           <div key={front.id} className='table-margin'>
-            <Table className='table-margin-zero order-table-button' size="sm">
-              <Row style={{ background: '#e3e3e3', padding: '2px' }}>
+            <Table className='table-margin-zero order-table-button' size="sm" style={{ background: '#e3e3e3', padding: '2px'}}>
+              <Row style={{ background: '#e3e3e3', padding: '2px' }} >
                 <Col md="2">
                   <div style={{ margin: '5px 0px' }}>
                     <div className='fix-wid-1'><i className="bi-menu-button-wide-fill my-eye-color" style={{ fontSize: '20px', marginRight: '1px' }} /><span style={{ fontWeight: '900' }}> Product {front.id}</span></div>
                   </div>
                 </Col>
                 <Col md="10" style={{ padding: '5px 0px',display:'flex',justifyContent:'space-around'}}>
-                       <Button  className="btn mybtncustomer btn-secondary" outline color="info"> Planned: 2000.00m</Button>
+                          <Button  className="btn mybtncustomer btn-secondary" outline color="info"> Planned: 2000.00m</Button>
                           <Button  className="btn mybtncustomer btn-secondary" outline color="danger"> Mfd Length: 996.70m</Button>
                           <Button  className="btn mybtncustomer btn-secondary" outline color="info"> Dispatched: 0.00m</Button>
                           <Button  className="btn mybtncustomer btn-secondary" outline color="danger"> Actual Pending: 3.30m</Button>

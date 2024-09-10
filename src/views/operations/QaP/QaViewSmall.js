@@ -16,7 +16,7 @@ import MyProgressBarR from './MyProgressBarR';
 
 const JumbotronComponent = (props) => {
   const navigate = useNavigate();
-  const {Refreshkey,jumboId,data1,updateRollTogglefunction} = props;
+  const {Refreshkey,jumboId,jumboRollDATA,data1,updateRollTogglefunction} = props;
   const [data, setData] = useState([]);
 
   // console.log('productID',product,data)
@@ -62,8 +62,27 @@ const JumbotronComponent = (props) => {
     }
     return null;
   }
+
+  const averageGsm = (smallRollDetailsFromView = [])=>{
+    // let ag = 0;
+    // const noOfSmall = smallRollDetailsFromView.length;
+  let res = 0;
+  let totalWeight = 0;
+  let totalQuantity = 0;
+    smallRollDetailsFromView.forEach(element => {
+    // const elementGsm =  ((element.weight * 1000) / (element.quantity * element.width));
+    totalWeight += (element.weight*1000);
+    totalQuantity += (element.quantity * element.width);
+   })
+   res = (totalWeight/totalQuantity).toFixed(2);
+   console.log('res..............................................................................',res)
+  
+   return res;
+  }
+
   useEffect(() => {
-    
+ 
+
     // Fetch the data from the API
     const fetchData = async () => {
       const token = localStorage.getItem('userToken');
@@ -89,6 +108,9 @@ const JumbotronComponent = (props) => {
   {
     data.length !== 0 ? <>
     {/* {"Jumbo Rolls (Total : 1, Qty : 170 m, Small Rolls => Count : 8 , Qty : 161 m, Avg GSM : 1334.69 g/m2"} */}
+    <div style={{marginBottom:10}}>
+      {`Small Rolls (Total : ${jumboRollDATA?.total_small_roll_count}, Qty : ${jumboRollDATA?.total_small_roll_qauntity} m, Avg Gsm : ${averageGsm(jumboRollDATA?.small_roll_details)} g/m2) `}
+    </div>
     <Table responsive size="sm">
         <thead>
           <tr>
@@ -155,4 +177,5 @@ JumbotronComponent.propTypes = {
   Refreshkey: PropTypes.string.isRequired,
   updateRollTogglefunction: PropTypes.func.isRequired,
   data1: PropTypes.array.isRequired,
+  jumboRollDATA: PropTypes.object.isRequired,
 };

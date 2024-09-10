@@ -1,10 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Table} from 'reactstrap';
+import { 
+  Table,
+  Button,
+  Row,
+  Col
+} from 'reactstrap';
 import PropTypes from 'prop-types';
 
 const JumbotronComponent = (props) => {
   const { productID } = props;
-  const [data, setData] = useState({ front_side: {}, back_side: [] });
+  const [data, setData] = useState({ front_side: {}, back_side: {} });
   const [data7, setData7] = useState([]);
   const [data8, setData8] = useState([]);
 
@@ -108,17 +113,31 @@ console.log('printArray',printArray);
     <>
     
         <div className='table-margin' >
-          <Table className='table-margin-zero order-table-button' size="sm" style={{ background: '#e3e3e3', padding: '2px' }}>
+          <Table className='table-margin-zero order-table-button' size="sm" style={{ background: '#e3e3e3', padding: '2px',margin:'10px' }}>
             
-             
-                <div style={{ margin: '5px 0px' }}>
+          <Row style={{ background: '#012e43', padding: '2px' }}>
+              <Col md="2">
+                <div style={{ margin: '5px 0px'}}>
                   <div className='fix-wid-1-temp'>
                     <i className="bi-menu-button-wide-fill my-eye-color" style={{ fontSize: '20px', marginRight: '1px' }} />
-                    <span style={{ fontWeight: '900' }}> Product {data.front_side.is_online_product === '0' && data.front_side.ref_product_id === '0' && `${data?.front_side?.id}`}{data?.back_side?.id} {data.front_side.is_online_product === '1' && data.front_side.ref_product_id === '0' && `(front_side:${data?.front_side?.id})`}</span>
+                    {/* <span style={{ fontWeight: '900' }}> Product {data.front_side.is_online_product === '0' && data.front_side.ref_product_id === '0' && `${data?.front_side?.id}`}{data?.back_side?.id} {data.front_side.is_online_product === '1' && data.front_side.ref_product_id === '0' && `(front_side:${data?.front_side?.id})`}</span> */}
+                    <span style={{ fontWeight: '900' }}> Product {data?.front_side?.id}</span>
                   </div>
-                </div>
-             
-              
+                  </div>
+               </Col>
+               <Col md="10" style={{ padding: '5px 0px',display:'flex',justifyContent:'space-around'}}>
+                  
+                            <Button  className="btn mybtncustomer btn-secondary" outline color="info"> Planned: {data.planned}m</Button>
+                            <Button  className="btn mybtncustomer btn-secondary" outline color="danger"> Mfd Length: {data.manufactured}m</Button>
+                            <Button  className="btn mybtncustomer btn-secondary" outline color="info"> Dispatched: {data.dispatched}m</Button>
+                            <Button  className="btn mybtncustomer btn-secondary" outline color="danger"> Actual Pending: {data.pending}m</Button>
+                            <Button  className="btn mybtncustomer btn-secondary" outline color="info"> Delivery Date: {data.delivery_date}</Button>
+                            <button type='button' className="btn mybtncustomer my-btn-color mr-1"> Total: {data.total}m</button>
+                  
+               </Col>
+            </Row>
+                
+                
           
           </Table>
           <Table className='table-margin-zero' responsive size="sm">

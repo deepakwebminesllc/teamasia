@@ -297,7 +297,7 @@ useEffect(()=>{
                         <div><Barcode value={`JUMBO${rollItem?.id}`} height={20} /></div>
                       </th>
                       <th scope="col">Total: {rollItem?.quantity} meters</th>
-                      <th scope="col">Remaining: ? meters</th>
+                      <th scope="col">Remaining: {Number(rollItem?.quantity) - Number(rollItem?.total_small_roll_qauntity)} meters</th>
 
                       
                       <th scope="col"><Button className='my-btn-color' style={{whiteSpace:'nowrap'}} onClick={()=>addRollTogglefunction()}>Create Small Roll</Button></th>
@@ -444,7 +444,7 @@ useEffect(()=>{
                 
              </ComponentCard5>
 
-             {rollItem ?<QaViewSmall Refreshkey={refreshKey} jumboId={rollItem?.id} data1={gradeData} updateRollTogglefunction={setterJumboUpdateDataFromPlan}/>:''}
+             {rollItem ?<QaViewSmall Refreshkey={refreshKey} jumboId={rollItem?.id} jumboRollDATA={rollItem} data1={gradeData} updateRollTogglefunction={setterJumboUpdateDataFromPlan}/>:''}
       </ComponentCard5>
     </>
   );

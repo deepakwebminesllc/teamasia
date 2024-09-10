@@ -105,6 +105,33 @@ const setterPasteDataFromPlan = (product)=>{
 }
 
 useEffect(()=>{
+  const fetchDataPlanDe = async () => {
+    const token = localStorage.getItem('userToken');
+    // console.log('token',token);
+    const response = await fetch(`https://factory.teamasia.in/api/public/productionplan/?plan_date=${planDate}`, {
+      method: 'GET', 
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    // console.log('result',response);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const result = await response.json();
+    // console.log("responsejson1 producton",result);
+    const plans = result.production_plan;
+    
+    // Set state
+    setLine1(line1Data);
+    setLine2(line2Data);
+    setLine3(line3Data);
+    setLine4(line4Data);
+
+  };
+
+
+
   const fetchQaData = async () => {
     const token = localStorage.getItem('userToken');
     // console.log('token',token);
